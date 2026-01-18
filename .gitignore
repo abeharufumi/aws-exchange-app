@@ -1,0 +1,64 @@
+# Learn more https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files
+
+# node dependencies
+frontend/node_modules/
+
+# python venv (root or backend)
+.venv/
+backend/.venv/
+
+# python caches
+**/__pycache__/
+*.py[cod]
+
+# Expo
+frontend/.expo/
+frontend/dist/
+frontend/web-build/
+expo-env.d.ts
+
+# Native
+.kotlin/
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+
+# Metro
+.metro-health-check*
+
+# debug
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# macOS
+.DS_Store
+*.pem
+
+# local env files
+.env*.local
+
+# typescript
+*.tsbuildinfo
+
+app-example
+
+# generated native folders
+/ios
+/android
+
+/lib/generated/prisma
+
+# 環境変数（機密情報）
+.env
+frontend/.env
+frontend/.env.local
+
+# OS一時ファイル
+.DS_Store
+
+# Prisma 生成物 (スキーマ自体は管理するが、バイナリ等は除外する場合)
+# node_modules/ があれば基本は大丈夫ですが念のため
