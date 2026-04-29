@@ -1,155 +1,150 @@
 import React, { useState } from "react";
-import {
-  View,
-  TextInput,
-  TouchableOpacity,
-  Text,
-  StyleSheet,
-  Alert,
-  ScrollView,
-} from "react-native";
-import { useAuthStore } from "../../stores/authStore";
+import { Alert, View } from "react-native";
+import { useRouter } from "expo-router";
+import { Button, Text, TextInput } from "react-native-paper";
+import { useAuth } from "../../contexts/auth";
 
 export function SignupScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [gender, setGender] = useState("male");
-  const [phone, setPhone] = useState("");
   const [loading, setLoading] = useState(false);
-  const signup = useAuthStore((state) => state.signup);
+  const { signup } = useAuth();
+  const router = useRouter();
 
   const handleSignup = async () => {
-    if (!email || !password || !displayName || !phone) {
+    if (!email || !password || !displayName) {
       Alert.alert("エラー", "全ての項目を入力してください");
       return;
     }
-
     try {
       setLoading(true);
-      await signup({ email, password, displayName, gender, phone });
+      await signup(email, password, gender, displayName);
+      router.replace("/(tabs)");
     } catch (error: any) {
-      Alert.alert("サインアップ失敗", error.response?.data?.detail || "エラーが発生しました");
+      Alert.alert("サインアップ失敗", error?.message || "エラーが発生しました");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <ScrollView style={styles.container}>
-      <Text style={styles.title}>新規登録</Text>
-
-      <TextInput
-        style={styles.input}
-        placeholder="メール"
-        value={email}
-        onChangeText={setEmail}
-        editable={!loading}
-      />
-
-      <TextInput
-        style={styles.input}
-        placeholder="パスワード"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-        editable={!loading}
-      />
-
-      <TextInput
-        style={styles.input}
-        placeholder="表示名"
-        value={displayName}
-        onChangeText={setDisplayName}
-        editable={!loading}
-      />
-
-      <TextInput
-        style={styles.input}
-        placeholder="電話番号"
-        value={phone}
-        onChangeText={setPhone}
-        editable={!loading}
-      />
-
-      <View style={styles.genderContainer}>
-        <TouchableOpacity
-          style={[styles.genderButton, gender === "male" && styles.genderButtonActive]}
-          onPress={() => setGender("male")}
-          disabled={loading}
-        >
-          <Text style={styles.genderButtonText}>男性</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.genderButton, gender === "female" && styles.genderButtonActive]}
-          onPress={() => setGender("female")}
-          disabled={loading}
-        >
-          <Text style={styles.genderButtonText}>女性</Text>
-        </TouchableOpacity>
-      </View>
-
-      <TouchableOpacity
-        style={[styles.button, loading && styles.buttonDisabled]}
-        onPress={handleSignup}
-        disabled={loading}
+    <View style={{ flex: 1, backgroundColor: "#f3f4f6" }}>
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "space-between",
+          paddingHorizontal: 20,
+          paddingVertical: 40,
+        }}
       >
-        <Text style={styles.buttonText}>{loading ? "登録中..." : "登録"}</Text>
-      </TouchableOpacity>
-    </ScrollView>
+        <View style={{ marginBottom: 40, alignItems: "center" }}>
+          <Text
+            variant="headlineLarge"
+            style={{ marginBottom: 8, fontWeight: "bold", color: "#1f2937" }}
+          >
+            AWS Exchange
+          </Text>
+          <Text variant="bodyMedium" style={{ color: "#6b7280" }}>
+            新規登録
+          </Text>
+        </View>
+
+        <View style={{ marginBottom: 32 }}>
+          <View style={{ marginBottom: 20 }}>
+            <Text variant="labelLarge" style={{ marginBottom: 8, color: "#1f2937" }}>
+              メールアドレス
+            </Text>
+            <TextInput
+              mode="outlined"
+              placeholder="example@example.com"
+              value={email}
+              onChangeText={setEmail}
+              disabled={loading}
+              keyboardType="email-address"
+              autoCapitalize="none"
+              style={{ backgroundColor: "#fff" }}
+              outlineStyle={{ borderRadius: 8 }}
+            />
+          </View>
+          <View style={{ marginBottom: 20 }}>
+            <Text variant="labelLarge" style={{ marginBottom: 8, color: "#1f2937" }}>
+              パスワード
+            </Text>
+            <TextInput
+              mode="outlined"
+              placeholder="8文字以上"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry
+              disabled={loading}
+              style={{ backgroundColor: "#fff" }}
+              outlineStyle={{ borderRadius: 8 }}
+            />
+          </View>
+          <View style={{ marginBottom: 20 }}>
+            <Text variant="labelLarge" style={{ marginBottom: 8, color: "#1f2937" }}>
+              表示名
+            </Text>
+            <TextInput
+              mode="outlined"
+              placeholder="Taro Yamada"
+              value={displayName}
+              onChangeText={setDisplayName}
+              disabled={loading}
+              style={{ backgroundColor: "#fff" }}
+              outlineStyle={{ borderRadius: 8 }}
+            />
+          </View>
+          <View style={{ marginBottom: 20 }}>
+            <Text variant="labelLarge" style={{ marginBottom: 8, color: "#1f2937" }}>
+              性別
+            </Text>
+            <View style={{ flexDirection: "row", gap: 12 }}>
+              <Button
+                mode={gender === "male" ? "contained" : "outlined"}
+                onPress={() => setGender("male")}
+                disabled={loading}
+                style={{ flex: 1 }}
+              >
+                男性
+              </Button>
+              <Button
+                mode={gender === "female" ? "contained" : "outlined"}
+                onPress={() => setGender("female")}
+                disabled={loading}
+                style={{ flex: 1 }}
+              >
+                女性
+              </Button>
+            </View>
+          </View>
+        </View>
+
+        <View style={{ marginBottom: 20 }}>
+          <Button
+            mode="contained"
+            buttonColor="#3b82f6"
+            textColor="#fff"
+            style={{ borderRadius: 8 }}
+            contentStyle={{ paddingVertical: 4 }}
+            onPress={handleSignup}
+            disabled={loading}
+          >
+            {loading ? "登録中..." : "登録"}
+          </Button>
+        </View>
+
+        <View style={{ marginBottom: 32, alignItems: "center" }}>
+          <Text variant="bodySmall" style={{ marginBottom: 4, color: "#6b7280" }}>
+            すでにアカウントをお持ちですか？
+          </Text>
+          <Button mode="text" onPress={() => router.push("/auth/login")} disabled={loading}>
+            ログインへ
+          </Button>
+        </View>
+      </View>
+    </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 20,
-    textAlign: "center",
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    padding: 12,
-    marginBottom: 15,
-    borderRadius: 8,
-  },
-  genderContainer: {
-    flexDirection: "row",
-    marginBottom: 20,
-    gap: 10,
-  },
-  genderButton: {
-    flex: 1,
-    padding: 12,
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 8,
-    alignItems: "center",
-  },
-  genderButtonActive: {
-    backgroundColor: "#e74c3c",
-    borderColor: "#e74c3c",
-  },
-  genderButtonText: {
-    fontSize: 16,
-  },
-  button: {
-    backgroundColor: "#e74c3c",
-    padding: 15,
-    borderRadius: 8,
-    alignItems: "center",
-  },
-  buttonDisabled: {
-    opacity: 0.6,
-  },
-  buttonText: {
-    color: "white",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-});

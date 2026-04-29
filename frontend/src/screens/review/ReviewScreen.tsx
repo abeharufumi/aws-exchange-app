@@ -1,12 +1,37 @@
-import React, { useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, Alert } from "react-native";
+import React, { useEffect, useState } from "react";
+import { ActivityIndicator, View, Text, TouchableOpacity, TextInput, Alert } from "react-native";
+import { useRouter } from "expo-router";
 import apiClient from "../../services/api";
+import { MeetReviewStatusResponse, MeetReviewSubmitResponse } from "../../types/meet";
 
 export function ReviewScreen({ route }: any) {
-  const { meetId } = route.params;
+  const router = useRouter();
+  const { meetId, chatUserId } = route.params;
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [statusLoading, setStatusLoading] = useState(true);
+  const [alreadyReviewed, setAlreadyReviewed] = useState(false);
+  const [canReview, setCanReview] = useState(true);
+
+  useEffect(() => {
+    const checkStatus = async () => {
+      if (!meetId) {
+        setStatusLoading(false);
+        return;
+      }
+      try {
+        const res = await apiClient.get<MeetReviewStatusResponse>(`/meet/${meetId}/review/status`);
+        setAlreadyReviewed(res.data.reviewed);
+        setCanReview(res.data.can_review);
+      } catch {
+        // ステータス取得失敗時は投稿可として扱う
+      } finally {
+        setStatusLoading(false);
+      }
+    };
+    checkStatus();
+  }, [meetId]);
 
   const handleSubmitReview = async () => {
     if (rating === 0) {
@@ -16,38 +41,153 @@ export function ReviewScreen({ route }: any) {
 
     try {
       setSubmitting(true);
-      await apiClient.post(`/meets/${meetId}/review`, {
+      const response = await apiClient.post<MeetReviewSubmitResponse>(`/meet/${meetId}/review`, {
         rating,
         comment,
       });
-      Alert.alert("成功", "レビューが投稿されました");
-    } catch (error) {
-      Alert.alert("エラー", "レビュー投稿に失敗しました");
+      if (chatUserId) {
+        router.replace({
+          pathname: "/chat/[id]",
+          params: {
+            id: String(chatUserId),
+            snackbar: "review_posted",
+          },
+        });
+        return;
+      }
+      Alert.alert("完了", response.data?.message || "レビューを投稿しました");
+      router.back();
+    } catch (error: any) {
+      Alert.alert("エラー", error?.response?.data?.detail || "レビュー投稿に失敗しました");
     } finally {
       setSubmitting(false);
     }
   };
 
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>レビュー</Text>
+  if (statusLoading) {
+    return (
+      <View
+        style={{
+          flex: 1,
+          alignItems: "center",
+          justifyContent: "center",
+          backgroundColor: "#000000",
+          paddingHorizontal: 20,
+          paddingVertical: 20,
+        }}
+      >
+        <ActivityIndicator size="large" color="#e74c3c" />
+      </View>
+    );
+  }
 
-      <View style={styles.ratingContainer}>
-        <Text style={styles.label}>評価:</Text>
-        <View style={styles.stars}>
+  if (alreadyReviewed) {
+    return (
+      <View
+        style={{
+          flex: 1,
+          alignItems: "center",
+          justifyContent: "center",
+          backgroundColor: "#000000",
+          paddingVertical: 32,
+        }}
+      >
+        <Text style={{ textAlign: "center", fontSize: 16 }}>
+          このデートのレビューは投稿済みです
+        </Text>
+        <TouchableOpacity
+          style={{
+            marginTop: 24,
+            alignItems: "center",
+            borderRadius: 8,
+            backgroundColor: "#ef4444",
+            paddingHorizontal: 20,
+            paddingVertical: 12,
+          }}
+          onPress={() => router.back()}
+        >
+          <Text style={{ fontSize: 16, fontWeight: "700", color: "#ffffff" }}>戻る</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
+  if (!canReview) {
+    return (
+      <View
+        style={{
+          flex: 1,
+          alignItems: "center",
+          justifyContent: "center",
+          backgroundColor: "#000000",
+          paddingVertical: 32,
+        }}
+      >
+        <Text style={{ textAlign: "center", fontSize: 16 }}>現在レビューを投稿できません</Text>
+        <TouchableOpacity
+          style={{
+            marginTop: 24,
+            alignItems: "center",
+            borderRadius: 8,
+            backgroundColor: "#ef4444",
+            paddingHorizontal: 20,
+            paddingVertical: 12,
+          }}
+          onPress={() => router.back()}
+        >
+          <Text style={{ fontSize: 16, fontWeight: "700", color: "#ffffff" }}>戻る</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
+  return (
+    <View
+      style={{ flex: 1, backgroundColor: "#000000", paddingHorizontal: 20, paddingVertical: 20 }}
+    >
+      <Text
+        style={{
+          marginBottom: 20,
+          textAlign: "center",
+          fontSize: 24,
+          fontWeight: "700",
+          color: "#ffffff",
+        }}
+      >
+        レビュー
+      </Text>
+
+      <View style={{ marginBottom: 20 }}>
+        <Text style={{ marginBottom: 10, fontSize: 16, fontWeight: "700", color: "#ffffff" }}>
+          評価:
+        </Text>
+        <View style={{ flexDirection: "row", gap: 10 }}>
           {[1, 2, 3, 4, 5].map((i) => (
             <TouchableOpacity key={i} onPress={() => setRating(i)} disabled={submitting}>
-              <Text style={[styles.star, rating >= i && styles.starActive]}>★</Text>
+              <Text style={{ fontSize: 36, color: rating >= i ? "#ffc107" : "#6b7280" }}>★</Text>
             </TouchableOpacity>
           ))}
         </View>
       </View>
 
-      <View style={styles.commentContainer}>
-        <Text style={styles.label}>コメント:</Text>
+      <View style={{ marginBottom: 20 }}>
+        <Text style={{ marginBottom: 10, fontSize: 16, fontWeight: "700", color: "#ffffff" }}>
+          コメント:
+        </Text>
         <TextInput
-          style={styles.input}
+          style={[
+            {
+              borderRadius: 8,
+              borderWidth: 1,
+              backgroundColor: "#ffffff",
+              paddingHorizontal: 12,
+              paddingVertical: 12,
+              color: "#111827",
+            },
+            { textAlignVertical: "top" },
+          ]}
           placeholder="コメントを入力..."
+          placeholderTextColor="#6b7280"
           value={comment}
           onChangeText={setComment}
           editable={!submitting}
@@ -56,69 +196,22 @@ export function ReviewScreen({ route }: any) {
       </View>
 
       <TouchableOpacity
-        style={[styles.button, submitting && styles.buttonDisabled]}
+        style={[
+          {
+            alignItems: "center",
+            borderRadius: 8,
+            backgroundColor: "#ef4444",
+            paddingVertical: 14,
+          },
+          submitting ? { opacity: 0.6 } : undefined,
+        ]}
         onPress={handleSubmitReview}
         disabled={submitting}
       >
-        <Text style={styles.buttonText}>{submitting ? "投稿中..." : "投稿"}</Text>
+        <Text style={{ fontSize: 16, fontWeight: "700", color: "#ffffff" }}>
+          {submitting ? "投稿中..." : "投稿"}
+        </Text>
       </TouchableOpacity>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 20,
-    textAlign: "center",
-  },
-  ratingContainer: {
-    marginBottom: 20,
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: "bold",
-    marginBottom: 10,
-  },
-  stars: {
-    flexDirection: "row",
-    gap: 10,
-  },
-  star: {
-    fontSize: 32,
-    color: "#ddd",
-  },
-  starActive: {
-    color: "#ffc107",
-  },
-  commentContainer: {
-    marginBottom: 20,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    padding: 12,
-    borderRadius: 8,
-    height: 100,
-    textAlignVertical: "top",
-  },
-  button: {
-    backgroundColor: "#e74c3c",
-    padding: 15,
-    borderRadius: 8,
-    alignItems: "center",
-  },
-  buttonDisabled: {
-    opacity: 0.6,
-  },
-  buttonText: {
-    color: "white",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-});
