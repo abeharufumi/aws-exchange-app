@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { FlatList, Text, View } from "react-native";
+import { FlatList, Text, TouchableOpacity, View } from "react-native";
 import { Button, Surface, TextInput } from "react-native-paper";
+import { useRouter } from "expo-router";
 import apiClient from "../../services/api";
 
 export function SearchScreen() {
@@ -8,6 +9,7 @@ export function SearchScreen() {
   const [maxAge, setMaxAge] = useState("50");
   const [users, setUsers] = useState<any[]>([]);
   const [searching, setSearching] = useState(false);
+  const router = useRouter();
 
   const handleSearch = async () => {
     try {
@@ -74,7 +76,9 @@ export function SearchScreen() {
         data={users}
         keyExtractor={(item) => String(item.id)}
         renderItem={({ item }) => (
-          <View
+          <TouchableOpacity
+            activeOpacity={0.7}
+            onPress={() => router.push(`/user/${item.id}`)}
             style={{
               borderBottomWidth: 1,
               borderBottomColor: "#e5e7eb",
@@ -86,7 +90,7 @@ export function SearchScreen() {
               {item.displayName}, {item.age}
             </Text>
             <Text style={{ fontSize: 14, color: "#6b7280" }}>{item.bio}</Text>
-          </View>
+          </TouchableOpacity>
         )}
       />
     </View>
