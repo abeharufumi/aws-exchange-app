@@ -316,34 +316,50 @@ export function ProfileScreen() {
   };
 
   return (
-    <ScrollView ref={scrollRef} style={{ flex: 1, backgroundColor: '#ffffff', paddingHorizontal: 20 }}>
+    <ScrollView
+      ref={scrollRef}
+      style={{ flex: 1, backgroundColor: "#ffffff", paddingHorizontal: 20 }}
+    >
       {loading ? (
-        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+        <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
           <ActivityIndicator size="large" color="#e74c3c" />
         </View>
       ) : profile ? (
         <>
-          <View style={{ borderBottomWidth: 1, borderColor: '#e5e7eb', paddingBottom: 20, paddingTop: 20 }}>
-            <Text style={{ marginBottom: 10, fontSize: 24, fontWeight: '700', color: '#111827' }}>{profile.displayName}</Text>
-            <Text style={{ marginBottom: 4, fontSize: 16, color: '#6b7280' }}>
+          <View
+            style={{
+              borderBottomWidth: 1,
+              borderColor: "#e5e7eb",
+              paddingBottom: 20,
+              paddingTop: 20,
+            }}
+          >
+            <Text style={{ marginBottom: 10, fontSize: 24, fontWeight: "700", color: "#111827" }}>
+              {profile.displayName}
+            </Text>
+            <Text style={{ marginBottom: 4, fontSize: 16, color: "#6b7280" }}>
               {profile.age ? `${profile.age}歳` : "年齢未設定"} •
               {profile.gender === "male" ? "男性" : "女性"}
             </Text>
-            <Text style={{ marginBottom: 4, fontSize: 16, color: '#6b7280' }}>
+            <Text style={{ marginBottom: 4, fontSize: 16, color: "#6b7280" }}>
               ⭐ レビュー平均: {Number(profile.reviewAvg || 0).toFixed(2)}
             </Text>
-            <Text style={{ marginBottom: 4, fontSize: 16, color: '#6b7280' }}>
+            <Text style={{ marginBottom: 4, fontSize: 16, color: "#6b7280" }}>
               🤝 会った回数: {profile.meetsCount || 0}
             </Text>
-            <Text style={{ marginBottom: 4, fontSize: 16, color: '#6b7280' }}>
+            <Text style={{ marginBottom: 4, fontSize: 16, color: "#6b7280" }}>
               💬 返信率: {Number(profile.replyRate || 0).toFixed(1)}%
             </Text>
-            <Text style={{ marginBottom: 4, fontSize: 16, color: '#6b7280' }}>
+            <Text style={{ marginBottom: 4, fontSize: 16, color: "#6b7280" }}>
               🛡️ マナー点: {profile.mannerPoints || 0}
             </Text>
-            <Text style={{ marginBottom: 4, fontSize: 16, color: '#6b7280' }}>🏅 ランク: {profile.rank || 1}</Text>
-            <Text style={{ marginBottom: 4, fontSize: 16, color: '#6b7280' }}>📧 {profile.email}</Text>
-            <Text style={{ marginBottom: 4, fontSize: 16, color: '#6b7280' }}>
+            <Text style={{ marginBottom: 4, fontSize: 16, color: "#6b7280" }}>
+              🏅 ランク: {profile.rank || 1}
+            </Text>
+            <Text style={{ marginBottom: 4, fontSize: 16, color: "#6b7280" }}>
+              📧 {profile.email}
+            </Text>
+            <Text style={{ marginBottom: 4, fontSize: 16, color: "#6b7280" }}>
               📱 {profile.phoneNumber || "未設定"}
             </Text>
           </View>
@@ -411,9 +427,21 @@ export function ProfileScreen() {
             )}
           </View>
 
-          <View style={{ marginBottom: 12, marginTop: 20, borderRadius: 12, borderWidth: 1, borderColor: '#e5e7eb', backgroundColor: '#f9fafb', paddingVertical: 14 }}>
-            <Text style={{ marginBottom: 4, fontSize: 16, fontWeight: '700', color: '#1f2937' }}>受信フィルター</Text>
-            <Text style={{ marginBottom: 12, fontSize: 12, color: '#6b7280' }}>
+          <View
+            style={{
+              marginBottom: 12,
+              marginTop: 20,
+              borderRadius: 12,
+              borderWidth: 1,
+              borderColor: "#e5e7eb",
+              backgroundColor: "#f9fafb",
+              paddingVertical: 14,
+            }}
+          >
+            <Text style={{ marginBottom: 4, fontSize: 16, fontWeight: "700", color: "#1f2937" }}>
+              受信フィルター
+            </Text>
+            <Text style={{ marginBottom: 12, fontSize: 12, color: "#6b7280" }}>
               指定ランクからの「いいね受信」を制限できます
             </Text>
 
@@ -439,9 +467,28 @@ export function ProfileScreen() {
             />
           </View>
 
-          <View style={{ marginBottom: 12, marginTop: 8, borderRadius: 12, borderWidth: 1, paddingVertical: 14 }}>
-            <Text style={{ fontSize: 16, fontWeight: '700', color: '#1f2937' }}>会員・ブースト状態</Text>
-            <View style={{ borderRadius: 8, borderWidth: 1, borderColor: '#e5e7eb', backgroundColor: '#ffffff', paddingHorizontal: 12, paddingVertical: 10 }}>
+          <View
+            style={{
+              marginBottom: 12,
+              marginTop: 8,
+              borderRadius: 12,
+              borderWidth: 1,
+              paddingVertical: 14,
+            }}
+          >
+            <Text style={{ fontSize: 16, fontWeight: "700", color: "#1f2937" }}>
+              会員・ブースト状態
+            </Text>
+            <View
+              style={{
+                borderRadius: 8,
+                borderWidth: 1,
+                borderColor: "#e5e7eb",
+                backgroundColor: "#ffffff",
+                paddingHorizontal: 12,
+                paddingVertical: 10,
+              }}
+            >
               <View
                 style={{
                   flexDirection: "row",
@@ -450,7 +497,7 @@ export function ProfileScreen() {
                   marginBottom: 4,
                 }}
               >
-                <Text style={{ fontSize: 12, fontWeight: '600', color: '#6b7280' }}>Premium</Text>
+                <Text style={{ fontSize: 12, fontWeight: "600", color: "#6b7280" }}>Premium</Text>
                 {isPremiumActive ? (
                   <TouchableOpacity
                     style={{
@@ -474,19 +521,30 @@ export function ProfileScreen() {
                   </TouchableOpacity>
                 ) : null}
               </View>
-              <Text style={{ marginTop: 4, fontSize: 14, fontWeight: '700', color: '#1f2937' }}>{premiumStateLabel}</Text>
-              <Text style={{ marginTop: 4, fontSize: 12, color: '#6b7280' }}>
+              <Text style={{ marginTop: 4, fontSize: 14, fontWeight: "700", color: "#1f2937" }}>
+                {premiumStateLabel}
+              </Text>
+              <Text style={{ marginTop: 4, fontSize: 12, color: "#6b7280" }}>
                 {premiumEndsAt
                   ? `有効期限: ${premiumEndsAt}${premiumRemainingDays !== null ? `（残り${premiumRemainingDays}日）` : ""}`
                   : "加入するとメッセージ送信が無制限になります"}
               </Text>
             </View>
-            <View style={{ borderRadius: 8, borderWidth: 1, borderColor: '#e5e7eb', backgroundColor: '#ffffff', paddingHorizontal: 12, paddingVertical: 10 }}>
-              <Text style={{ fontSize: 12, fontWeight: '600', color: '#6b7280' }}>Boost</Text>
-              <Text style={{ marginTop: 4, fontSize: 14, fontWeight: '700', color: '#1f2937' }}>
+            <View
+              style={{
+                borderRadius: 8,
+                borderWidth: 1,
+                borderColor: "#e5e7eb",
+                backgroundColor: "#ffffff",
+                paddingHorizontal: 12,
+                paddingVertical: 10,
+              }}
+            >
+              <Text style={{ fontSize: 12, fontWeight: "600", color: "#6b7280" }}>Boost</Text>
+              <Text style={{ marginTop: 4, fontSize: 14, fontWeight: "700", color: "#1f2937" }}>
                 {activeBoost ? "有効" : "未有効"}
               </Text>
-              <Text style={{ marginTop: 4, fontSize: 12, color: '#6b7280' }}>
+              <Text style={{ marginTop: 4, fontSize: 12, color: "#6b7280" }}>
                 {boostEndsAt
                   ? `有効期限: ${boostEndsAt}${boostRemainingDays !== null ? `（残り${boostRemainingDays}日）` : ""}`
                   : "有効化するとチャット送信上限が増加します"}
@@ -567,13 +625,12 @@ export function ProfileScreen() {
           )}
 
           <ActionButtonRow style={{ flexDirection: "row", gap: 12, marginTop: 4 }}>
-            <ActionButton
-              label={activeBoost ? "Boost延長購入" : "Boost購入"}
-              variant="secondary"
-              onPress={() => router.push("/boost-purchase")}
+            <TouchableOpacity
               style={secondaryButtonStyle}
-              textStyle={buttonTextStyle}
-            />
+              onPress={() => router.push("/boost-purchase")}
+            >
+              <Text style={buttonTextStyle}>{activeBoost ? "Boost延長購入" : "Boost購入"}</Text>
+            </TouchableOpacity>
             <ActionButton
               label={premiumStatus ? "Premium利用中" : "Premium加入"}
               variant="secondary"
@@ -667,18 +724,42 @@ export function ProfileScreen() {
           </TouchableOpacity>
 
           {!profile.canViewFootprints && (
-            <View style={{ marginBottom: 20, borderRadius: 8, borderWidth: 1, borderColor: '#e5e7eb', backgroundColor: '#f9fafb', paddingVertical: 16 }}>
-              <Text style={{ marginBottom: 4, textAlign: 'center', fontSize: 14, fontWeight: '700', color: '#374151' }}>
+            <View
+              style={{
+                marginBottom: 20,
+                borderRadius: 8,
+                borderWidth: 1,
+                borderColor: "#e5e7eb",
+                backgroundColor: "#f9fafb",
+                paddingVertical: 16,
+              }}
+            >
+              <Text
+                style={{
+                  marginBottom: 4,
+                  textAlign: "center",
+                  fontSize: 14,
+                  fontWeight: "700",
+                  color: "#374151",
+                }}
+              >
                 足あと閲覧は Rank3 以上で解放されます
               </Text>
-              <Text style={{ textAlign: 'center', fontSize: 12, color: '#6b7280' }}>
+              <Text style={{ textAlign: "center", fontSize: 12, color: "#6b7280" }}>
                 解放後は直近{profile.footprintViewLimit || 3}人まで確認できます
               </Text>
             </View>
           )}
 
           {profile.canViewFootprints && showFootprints && (
-            <View style={{ marginBottom: 20, borderRadius: 8, backgroundColor: '#f9fafb', paddingVertical: 8 }}>
+            <View
+              style={{
+                marginBottom: 20,
+                borderRadius: 8,
+                backgroundColor: "#f9fafb",
+                paddingVertical: 8,
+              }}
+            >
               {footprints.length > 0 ? (
                 <FlatList
                   data={footprints}
@@ -692,17 +773,38 @@ export function ProfileScreen() {
                       minute: "2-digit",
                     });
                     return (
-                      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', borderBottomWidth: 1, borderColor: '#e5e7eb', paddingHorizontal: 12, paddingVertical: 10 }}>
-                        <Text style={{ flex: 1, fontSize: 14, fontWeight: '600', color: '#374151' }}>
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          borderBottomWidth: 1,
+                          borderColor: "#e5e7eb",
+                          paddingHorizontal: 12,
+                          paddingVertical: 10,
+                        }}
+                      >
+                        <Text
+                          style={{ flex: 1, fontSize: 14, fontWeight: "600", color: "#374151" }}
+                        >
                           {item.visitorName}
                         </Text>
-                        <Text style={{ fontSize: 12, color: '#9ca3af' }}>{viewedDate}</Text>
+                        <Text style={{ fontSize: 12, color: "#9ca3af" }}>{viewedDate}</Text>
                       </View>
                     );
                   }}
                 />
               ) : (
-                <Text style={{ paddingVertical: 20, textAlign: 'center', fontSize: 14, color: '#9ca3af' }}>足跡はありません</Text>
+                <Text
+                  style={{
+                    paddingVertical: 20,
+                    textAlign: "center",
+                    fontSize: 14,
+                    color: "#9ca3af",
+                  }}
+                >
+                  足跡はありません
+                </Text>
               )}
             </View>
           )}
@@ -724,7 +826,9 @@ export function ProfileScreen() {
           />
         </>
       ) : (
-        <Text style={{ paddingVertical: 20, fontSize: 16, color: '#6b7280' }}>プロフィールが見つかりません</Text>
+        <Text style={{ paddingVertical: 20, fontSize: 16, color: "#6b7280" }}>
+          プロフィールが見つかりません
+        </Text>
       )}
     </ScrollView>
   );

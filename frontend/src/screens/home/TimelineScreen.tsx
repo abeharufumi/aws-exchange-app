@@ -9,7 +9,6 @@ import {
   View,
 } from "react-native";
 import { useRouter } from "expo-router";
-import { ActionButton } from "../../components/common/ActionButton";
 import { EmptyState } from "../../components/common/EmptyState";
 import { LoadingState } from "../../components/common/LoadingState";
 import apiClient from "../../services/api";
@@ -197,18 +196,18 @@ export function TimelineScreen() {
           containerStyle={{ paddingVertical: 0 }}
           textStyle={{ fontSize: 18, color: "#fff" }}
         />
-        <ActionButton
-          label="リロード"
+        <TouchableOpacity
           style={{
             backgroundColor: "#e74c3c",
             paddingVertical: 12,
             paddingHorizontal: 24,
             borderRadius: 24,
-            flex: 0,
+            alignSelf: "center",
           }}
-          textStyle={{ color: "#fff", fontSize: 16, fontWeight: "600" }}
           onPress={fetchUsers}
-        />
+        >
+          <Text style={{ color: "#fff", fontSize: 16, fontWeight: "600" }}>リロード</Text>
+        </TouchableOpacity>
       </View>
     );
   }

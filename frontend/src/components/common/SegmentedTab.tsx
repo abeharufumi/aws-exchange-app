@@ -1,6 +1,5 @@
 import React from "react";
-import { StyleProp, TextStyle, View, ViewStyle } from "react-native";
-import { Button } from "react-native-paper";
+import { StyleProp, Text, TextStyle, TouchableOpacity, View, ViewStyle } from "react-native";
 
 type SegmentedTabItem<T extends string> = {
   key: T;
@@ -33,17 +32,35 @@ export function SegmentedTab<T extends string>({
       {items.map((item) => {
         const active = item.key === value;
         return (
-          <Button
+          <TouchableOpacity
             key={item.key}
-            mode={active ? "contained" : "outlined"}
-            buttonColor={active ? "#2563eb" : undefined}
-            textColor={active ? "#ffffff" : "#374151"}
-            style={[{ flex: 1 }, itemStyle, active && activeItemStyle]}
-            labelStyle={[{ fontSize: 13, fontWeight: "600" }, textStyle, active && activeTextStyle]}
+            activeOpacity={0.85}
+            style={[
+              {
+                flex: 1,
+                borderRadius: 10,
+                alignItems: "center",
+                justifyContent: "center",
+                paddingVertical: 10,
+                borderWidth: active ? 0 : 1,
+                borderColor: "#d1d5db",
+                backgroundColor: active ? "#2563eb" : "transparent",
+              },
+              itemStyle,
+              active && activeItemStyle,
+            ]}
             onPress={() => onChange(item.key)}
           >
-            {item.label}
-          </Button>
+            <Text
+              style={[
+                { fontSize: 13, fontWeight: "600", color: active ? "#ffffff" : "#374151" },
+                textStyle,
+                active && activeTextStyle,
+              ]}
+            >
+              {item.label}
+            </Text>
+          </TouchableOpacity>
         );
       })}
     </View>

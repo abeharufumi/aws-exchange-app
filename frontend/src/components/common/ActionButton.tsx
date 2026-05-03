@@ -1,6 +1,5 @@
 import React from "react";
-import { StyleProp, TextStyle, ViewStyle } from "react-native";
-import { Button } from "react-native-paper";
+import { StyleProp, Text, TextStyle, TouchableOpacity, ViewStyle } from "react-native";
 
 type ActionButtonProps = {
   label: string;
@@ -19,7 +18,7 @@ export function ActionButton({
   style,
   textStyle,
 }: ActionButtonProps) {
-  const buttonColor =
+  const backgroundColor =
     variant === "secondary"
       ? "#6b7280"
       : variant === "danger"
@@ -29,17 +28,26 @@ export function ActionButton({
           : "#2563eb";
 
   return (
-    <Button
-      mode="contained"
-      buttonColor={buttonColor}
-      textColor="#ffffff"
-      style={[{ flex: 1, borderRadius: 10 }, disabled && { opacity: 0.6 }, style]}
-      contentStyle={{ paddingVertical: 2 }}
-      labelStyle={[{ fontSize: 14, fontWeight: "700" }, textStyle]}
+    <TouchableOpacity
+      activeOpacity={0.85}
+      style={[
+        {
+          flex: 1,
+          borderRadius: 10,
+          paddingVertical: 12,
+          alignItems: "center",
+          justifyContent: "center",
+          backgroundColor,
+        },
+        disabled && { opacity: 0.6 },
+        style,
+      ]}
       onPress={onPress}
       disabled={disabled}
     >
-      {label}
-    </Button>
+      <Text style={[{ color: "#ffffff", fontSize: 14, fontWeight: "700" }, textStyle]}>
+        {label}
+      </Text>
+    </TouchableOpacity>
   );
 }

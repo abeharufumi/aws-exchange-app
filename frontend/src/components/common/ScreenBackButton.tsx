@@ -1,6 +1,5 @@
 import React from "react";
-import { StyleProp, TextStyle, ViewStyle } from "react-native";
-import { Button } from "react-native-paper";
+import { StyleProp, Text, TextStyle, TouchableOpacity, ViewStyle } from "react-native";
 
 type ScreenBackButtonProps = {
   onPress: () => void;
@@ -25,21 +24,25 @@ export function ScreenBackButton({
   const compactLabel = label === "← 戻る" ? "<" : label;
 
   return (
-    <Button
-      mode="text"
-      compact={compact}
-      textColor={textColor}
-      style={[{ alignSelf: "flex-start" }, style]}
-      contentStyle={compact ? { width: 32, height: 32 } : { paddingVertical: 4 }}
-      labelStyle={[
-        { fontSize: 16, fontWeight: "600" },
-        compact && { fontSize: 24, fontWeight: "700", lineHeight: 24 },
-        textStyle,
+    <TouchableOpacity
+      activeOpacity={0.85}
+      style={[
+        { alignSelf: "flex-start", paddingVertical: compact ? 0 : 4 },
+        compact && { width: 32, height: 32, alignItems: "center", justifyContent: "center" },
+        style,
       ]}
       onPress={onPress}
       disabled={disabled}
     >
-      {compact ? compactLabel : label}
-    </Button>
+      <Text
+        style={[
+          { fontSize: 16, fontWeight: "600", color: textColor },
+          compact && { fontSize: 24, fontWeight: "700", lineHeight: 24 },
+          textStyle,
+        ]}
+      >
+        {compact ? compactLabel : label}
+      </Text>
+    </TouchableOpacity>
   );
 }
