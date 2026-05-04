@@ -11,6 +11,7 @@ import {
   View,
 } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
+import { useFocusEffect } from "@react-navigation/native";
 import { ActionButton } from "../../components/common/ActionButton";
 import { ActionButtonRow } from "../../components/common/ActionButtonRow";
 import { AvatarWithFrame } from "../../components/common/AvatarWithFrame";
@@ -103,9 +104,11 @@ export function ProfileScreen() {
     }
   }, [fetchFootprints]);
 
-  useEffect(() => {
-    fetchProfile();
-  }, [fetchProfile]);
+  useFocusEffect(
+    useCallback(() => {
+      fetchProfile();
+    }, [fetchProfile]),
+  );
 
   useEffect(() => {
     if (loading || focus !== "rank") {
