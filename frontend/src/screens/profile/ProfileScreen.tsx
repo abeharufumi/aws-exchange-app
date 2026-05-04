@@ -390,6 +390,9 @@ export function ProfileScreen() {
               📧 {profile.email}
             </Text>
             <Text style={{ marginBottom: 4, fontSize: 16, color: "#6b7280" }}>
+              🎁 ギフト送信用ID: {profile.id}
+            </Text>
+            <Text style={{ marginBottom: 4, fontSize: 16, color: "#6b7280" }}>
               📱 {profile.phoneNumber || "未設定"}
             </Text>
           </View>

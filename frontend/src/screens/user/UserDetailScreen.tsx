@@ -222,6 +222,9 @@ export function UserDetailScreen({ route }: any) {
             <Text style={{ marginBottom: 8, fontSize: 14, fontWeight: "600", color: "#374151" }}>
               ⭐ {Number(profile.reviewAvg || 0).toFixed(2)} / 🤝 {profile.meetsCount || 0}回
             </Text>
+            <Text style={{ marginBottom: 8, fontSize: 13, color: "#6b7280" }}>
+              🎁 ギフト送信用ID: {profile.id}
+            </Text>
 
             <Text style={{ marginBottom: 6, fontSize: 14, fontWeight: "700", color: "#111827" }}>
               自己紹介
