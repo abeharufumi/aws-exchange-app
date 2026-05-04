@@ -42,6 +42,8 @@ export function SearchScreen() {
           dense
           value={minAge}
           onChangeText={setMinAge}
+          textColor="#111827"
+          placeholderTextColor="#6b7280"
           keyboardType="number-pad"
           style={{ marginBottom: 12, backgroundColor: "#ffffff" }}
           outlineStyle={{ borderRadius: 6 }}
@@ -55,6 +57,8 @@ export function SearchScreen() {
           dense
           value={maxAge}
           onChangeText={setMaxAge}
+          textColor="#111827"
+          placeholderTextColor="#6b7280"
           keyboardType="number-pad"
           style={{ marginBottom: 12, backgroundColor: "#ffffff" }}
           outlineStyle={{ borderRadius: 6 }}

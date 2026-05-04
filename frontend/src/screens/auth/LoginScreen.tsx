@@ -29,18 +29,36 @@ export function LoginScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: "#f3f4f6" }}>
-      <View style={{ flex: 1, justifyContent: "space-between", paddingHorizontal: 20, paddingVertical: 40 }}>
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "space-between",
+          paddingHorizontal: 20,
+          paddingVertical: 40,
+        }}
+      >
         <View style={{ marginBottom: 40, alignItems: "center" }}>
-          <Text variant="headlineLarge" style={{ marginBottom: 8, fontWeight: "bold", color: "#1f2937" }}>AWS Exchange</Text>
-          <Text variant="bodyMedium" style={{ color: "#6b7280" }}>ログイン</Text>
+          <Text
+            variant="headlineLarge"
+            style={{ marginBottom: 8, fontWeight: "bold", color: "#1f2937" }}
+          >
+            AWS Exchange
+          </Text>
+          <Text variant="bodyMedium" style={{ color: "#6b7280" }}>
+            ログイン
+          </Text>
         </View>
 
         <View style={{ marginBottom: 32 }}>
           <View style={{ marginBottom: 20 }}>
-            <Text variant="labelLarge" style={{ marginBottom: 8, color: "#1f2937" }}>メールアドレス</Text>
+            <Text variant="labelLarge" style={{ marginBottom: 8, color: "#1f2937" }}>
+              メールアドレス
+            </Text>
             <TextInput
               mode="outlined"
               placeholder="example@example.com"
+              textColor="#111827"
+              placeholderTextColor="#6b7280"
               value={email}
               onChangeText={setEmail}
               disabled={loading}
@@ -51,10 +69,14 @@ export function LoginScreen() {
             />
           </View>
           <View style={{ marginBottom: 20 }}>
-            <Text variant="labelLarge" style={{ marginBottom: 8, color: "#1f2937" }}>パスワード</Text>
+            <Text variant="labelLarge" style={{ marginBottom: 8, color: "#1f2937" }}>
+              パスワード
+            </Text>
             <TextInput
               mode="outlined"
               placeholder="8文字以上"
+              textColor="#111827"
+              placeholderTextColor="#6b7280"
               value={password}
               onChangeText={setPassword}
               secureTextEntry
@@ -80,7 +102,9 @@ export function LoginScreen() {
         </View>
 
         <View style={{ marginBottom: 32, alignItems: "center" }}>
-          <Text variant="bodySmall" style={{ marginBottom: 4, color: "#6b7280" }}>アカウントをお持ちでないですか？</Text>
+          <Text variant="bodySmall" style={{ marginBottom: 4, color: "#6b7280" }}>
+            アカウントをお持ちでないですか？
+          </Text>
           <Button mode="text" onPress={() => router.push("/auth/signup")} disabled={loading}>
             新規登録へ
           </Button>
@@ -89,4 +113,3 @@ export function LoginScreen() {
     </View>
   );
 }
-

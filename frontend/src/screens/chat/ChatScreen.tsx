@@ -611,22 +611,56 @@ export function ChatScreen({ route }: any) {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
-      style={{ flex: 1, backgroundColor: '#ffffff' }}
+      style={{ flex: 1, backgroundColor: "#ffffff" }}
     >
-      <View style={{ height: 52, flexDirection: 'row', alignItems: 'center', gap: 8, borderBottomWidth: 1, borderColor: '#e5e7eb', paddingHorizontal: 12 }}>
+      <View
+        style={{
+          height: 52,
+          flexDirection: "row",
+          alignItems: "center",
+          gap: 8,
+          borderBottomWidth: 1,
+          borderColor: "#e5e7eb",
+          paddingHorizontal: 12,
+        }}
+      >
         <ScreenBackButton onPress={handleBackPress} compact />
-        <Text style={{ fontSize: 16, fontWeight: '700', color: '#111827' }}>{partnerName}</Text>
+        <Text style={{ fontSize: 16, fontWeight: "700", color: "#111827" }}>{partnerName}</Text>
       </View>
 
       {showSnackbar && (
-        <View style={{ marginHorizontal: 12, marginBottom: 4, marginTop: 8, borderRadius: 8, backgroundColor: '#dcfce7', paddingHorizontal: 12, paddingVertical: 10 }}>
-          <Text style={{ textAlign: 'center', fontSize: 12, fontWeight: '600', color: '#ffffff' }}>{snackbarMessage}</Text>
+        <View
+          style={{
+            marginHorizontal: 12,
+            marginBottom: 4,
+            marginTop: 8,
+            borderRadius: 8,
+            backgroundColor: "#dcfce7",
+            paddingHorizontal: 12,
+            paddingVertical: 10,
+          }}
+        >
+          <Text style={{ textAlign: "center", fontSize: 12, fontWeight: "600", color: "#ffffff" }}>
+            {snackbarMessage}
+          </Text>
         </View>
       )}
 
       {messageQuota && (
-        <View style={{ marginHorizontal: 12, marginBottom: 4, marginTop: 8, borderRadius: 8, borderWidth: 1, borderColor: '#ddd6fe', backgroundColor: '#f5f3ff', paddingHorizontal: 10, paddingVertical: 8 }}>
-          <Text style={{ textAlign: 'center', fontSize: 12, fontWeight: '600', color: '#1f2937' }}>
+        <View
+          style={{
+            marginHorizontal: 12,
+            marginBottom: 4,
+            marginTop: 8,
+            borderRadius: 8,
+            borderWidth: 1,
+            borderColor: "#ddd6fe",
+            backgroundColor: "#f5f3ff",
+            paddingHorizontal: 10,
+            paddingVertical: 8,
+          }}
+        >
+          <Text style={{ textAlign: "center", fontSize: 12, fontWeight: "600", color: "#1f2937" }}>
             {messageQuota.isUnlimited
               ? `本日の送信: ${messageQuota.usedToday}通 / 無制限 (Rank ${messageQuota.currentRank})`
               : `本日の送信: ${messageQuota.usedToday}/${messageQuota.dailyLimit}通（残り ${messageQuota.remainingToday}通） (Rank ${messageQuota.currentRank})`}
@@ -655,7 +689,7 @@ export function ChatScreen({ route }: any) {
 
       <View style={{ paddingHorizontal: 12, paddingTop: 10 }}>
         {meetRequestRole === "receiver" && meetRequestStatus === "pending" ? (
-          <View style={{ flexDirection: 'row', gap: 8 }}>
+          <View style={{ flexDirection: "row", gap: 8 }}>
             <Button
               mode="contained"
               buttonColor="#16a34a"
@@ -836,16 +870,22 @@ export function ChatScreen({ route }: any) {
         renderItem={({ item }) => (
           <View>
             <View
-              style={{ margin: 10, maxWidth: '80%', borderRadius: 24, alignSelf: item.isSender ? 'flex-end' : 'flex-start', backgroundColor: item.isSender ? '#ef4444' : '#f3f4f6' }}
+              style={{
+                margin: 10,
+                maxWidth: "80%",
+                borderRadius: 24,
+                alignSelf: item.isSender ? "flex-end" : "flex-start",
+                backgroundColor: item.isSender ? "#ef4444" : "#f3f4f6",
+              }}
             >
-              <Text style={{ padding: 10, color: item.isSender ? '#ffffff' : '#000000' }}>
+              <Text style={{ padding: 10, color: item.isSender ? "#ffffff" : "#000000" }}>
                 {item.message}
               </Text>
             </View>
             {item.isSender && (
-              <View style={{ margin: 10, maxWidth: '80%', alignSelf: 'flex-end' }}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-                  <Text style={{ fontSize: 12, fontWeight: '600', color: '#6b7280' }}>
+              <View style={{ margin: 10, maxWidth: "80%", alignSelf: "flex-end" }}>
+                <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
+                  <Text style={{ fontSize: 12, fontWeight: "600", color: "#6b7280" }}>
                     {item.isRead ? "既読" : "未読"}
                   </Text>
                 </View>
@@ -854,17 +894,23 @@ export function ChatScreen({ route }: any) {
           </View>
         )}
         ListEmptyComponent={
-          <Text style={{ marginTop: 20, textAlign: 'center', color: '#4b5563' }}>メッセージはありません</Text>
+          <Text style={{ marginTop: 20, textAlign: "center", color: "#4b5563" }}>
+            メッセージはありません
+          </Text>
         }
       />
 
-      <View style={{ flexDirection: 'row', padding: 10, borderTopWidth: 1, borderTopColor: '#e5e7eb' }}>
+      <View
+        style={{ flexDirection: "row", padding: 10, borderTopWidth: 1, borderTopColor: "#e5e7eb" }}
+      >
         <PaperTextInput
           mode="outlined"
           dense
           value={input}
           onChangeText={setInput}
           placeholder="メッセージを入力..."
+          textColor="#111827"
+          placeholderTextColor="#6b7280"
           editable={!sending}
           style={{ flex: 1, marginRight: 10, backgroundColor: "#ffffff" }}
           outlineStyle={{ borderRadius: 20 }}
@@ -888,39 +934,68 @@ export function ChatScreen({ route }: any) {
         animationType="fade"
         onRequestClose={() => setMeetModalVisible(false)}
       >
-        <View style={{ flex: 1, justifyContent: 'center', padding: 20 }}>
-          <View style={{ borderRadius: 12, backgroundColor: '#ffffff', padding: 16 }}>
-            <Text style={{ marginBottom: 12, fontSize: 16, fontWeight: '700' }}>デート申込</Text>
+        <View style={{ flex: 1, justifyContent: "center", padding: 20 }}>
+          <View style={{ borderRadius: 12, backgroundColor: "#ffffff", padding: 16 }}>
+            <Text style={{ marginBottom: 12, fontSize: 16, fontWeight: "700" }}>デート申込</Text>
             <TouchableOpacity
-              style={{ marginBottom: 10, borderRadius: 8, borderWidth: 1, borderColor: '#d1d5db', backgroundColor: '#ffffff', paddingHorizontal: 12, paddingVertical: 10 }}
+              style={{
+                marginBottom: 10,
+                borderRadius: 8,
+                borderWidth: 1,
+                borderColor: "#d1d5db",
+                backgroundColor: "#ffffff",
+                paddingHorizontal: 12,
+                paddingVertical: 10,
+              }}
               onPress={openCalendar}
             >
-              <Text style={{ marginBottom: 2, fontSize: 12, color: '#6b7280' }}>日付</Text>
-              <Text style={{ fontSize: 16, fontWeight: '600', color: '#111827' }}>
+              <Text style={{ marginBottom: 2, fontSize: 12, color: "#6b7280" }}>日付</Text>
+              <Text style={{ fontSize: 16, fontWeight: "600", color: "#111827" }}>
                 {meetDate || "日付を選択"}
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={{ marginBottom: 10, borderRadius: 8, borderWidth: 1, borderColor: '#d1d5db', backgroundColor: '#ffffff', paddingHorizontal: 12, paddingVertical: 10 }}
+              style={{
+                marginBottom: 10,
+                borderRadius: 8,
+                borderWidth: 1,
+                borderColor: "#d1d5db",
+                backgroundColor: "#ffffff",
+                paddingHorizontal: 12,
+                paddingVertical: 10,
+              }}
               onPress={() => setTimePickerVisible(true)}
             >
-              <Text style={{ marginBottom: 2, fontSize: 12, color: '#6b7280' }}>時刻</Text>
-              <Text style={{ fontSize: 16, fontWeight: '600', color: '#111827' }}>
+              <Text style={{ marginBottom: 2, fontSize: 12, color: "#6b7280" }}>時刻</Text>
+              <Text style={{ fontSize: 16, fontWeight: "600", color: "#111827" }}>
                 {meetTime || "時刻を選択"}
               </Text>
             </TouchableOpacity>
-            <Text style={{ marginBottom: 8, fontSize: 12, fontWeight: '600', color: '#374151' }}>待ち合わせ場所</Text>
-            <View style={{ marginBottom: 10, flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+            <Text style={{ marginBottom: 8, fontSize: 12, fontWeight: "600", color: "#374151" }}>
+              待ち合わせ場所
+            </Text>
+            <View style={{ marginBottom: 10, flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
               {MEET_SPOTS.map((spot) => {
                 const selected = spot.key === selectedMeetSpotKey;
                 return (
                   <TouchableOpacity
                     key={spot.key}
-                    style={{ borderRadius: 8, borderWidth: 1, paddingHorizontal: 10, paddingVertical: 8, borderColor: selected ? '#3b82f6' : '#d1d5db', backgroundColor: selected ? '#dbeafe' : '#f9fafb' }}
+                    style={{
+                      borderRadius: 8,
+                      borderWidth: 1,
+                      paddingHorizontal: 10,
+                      paddingVertical: 8,
+                      borderColor: selected ? "#3b82f6" : "#d1d5db",
+                      backgroundColor: selected ? "#dbeafe" : "#f9fafb",
+                    }}
                     onPress={() => setSelectedMeetSpotKey(spot.key)}
                   >
                     <Text
-                      style={{ fontSize: 12, fontWeight: '600', color: selected ? '#2563eb' : '#374151' }}
+                      style={{
+                        fontSize: 12,
+                        fontWeight: "600",
+                        color: selected ? "#2563eb" : "#374151",
+                      }}
                     >
                       {spot.label}
                     </Text>
@@ -938,9 +1013,13 @@ export function ChatScreen({ route }: any) {
               🔍 場所を検索して選ぶ
             </Button>
             {selectedMeetSpotKey === "custom" && customMeetCoordinates && (
-              <Text style={{ marginBottom: 8, fontSize: 12, color: '#374151' }}>📍 {customMeetCoordinates.label}</Text>
+              <Text style={{ marginBottom: 8, fontSize: 12, color: "#374151" }}>
+                📍 {customMeetCoordinates.label}
+              </Text>
             )}
-            <View style={{ marginTop: 4, flexDirection: 'row', justifyContent: 'flex-end', gap: 8 }}>
+            <View
+              style={{ marginTop: 4, flexDirection: "row", justifyContent: "flex-end", gap: 8 }}
+            >
               <Button
                 mode="contained"
                 buttonColor="#9ca3af"
@@ -970,41 +1049,62 @@ export function ChatScreen({ route }: any) {
         animationType="fade"
         onRequestClose={() => setCalendarVisible(false)}
       >
-        <View style={{ flex: 1, justifyContent: 'center', padding: 20 }}>
-          <View style={{ borderRadius: 12, backgroundColor: '#ffffff', padding: 16 }}>
-            <View style={{ marginBottom: 10, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+        <View style={{ flex: 1, justifyContent: "center", padding: 20 }}>
+          <View style={{ borderRadius: 12, backgroundColor: "#ffffff", padding: 16 }}>
+            <View
+              style={{
+                marginBottom: 10,
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
+            >
               <TouchableOpacity
-                style={{ height: 32, width: 32, alignItems: 'center', justifyContent: 'center', borderRadius: 9999, backgroundColor: '#e5e7eb' }}
+                style={{
+                  height: 32,
+                  width: 32,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  borderRadius: 9999,
+                  backgroundColor: "#e5e7eb",
+                }}
                 onPress={() => changeCalendarMonth(-1)}
               >
-                <Text style={{ fontWeight: '700', color: '#374151' }}>◀</Text>
+                <Text style={{ fontWeight: "700", color: "#374151" }}>◀</Text>
               </TouchableOpacity>
-              <Text style={{ fontSize: 16, fontWeight: '700', color: '#111827' }}>
+              <Text style={{ fontSize: 16, fontWeight: "700", color: "#111827" }}>
                 {calendarMonth.getFullYear()}年{calendarMonth.getMonth() + 1}月
               </Text>
               <TouchableOpacity
-                style={{ height: 32, width: 32, alignItems: 'center', justifyContent: 'center', borderRadius: 9999, backgroundColor: '#e5e7eb' }}
+                style={{
+                  height: 32,
+                  width: 32,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  borderRadius: 9999,
+                  backgroundColor: "#e5e7eb",
+                }}
                 onPress={() => changeCalendarMonth(1)}
               >
-                <Text style={{ fontWeight: '700', color: '#374151' }}>▶</Text>
+                <Text style={{ fontWeight: "700", color: "#374151" }}>▶</Text>
               </TouchableOpacity>
             </View>
 
-            <View style={{ marginBottom: 8, flexDirection: 'row' }}>
+            <View style={{ marginBottom: 8, flexDirection: "row" }}>
               {["日", "月", "火", "水", "木", "金", "土"].map((label) => (
                 <Text
                   key={label}
-                  style={{ textAlign: 'center', fontSize: 12, fontWeight: '600', color: '#6b7280' }}
+                  style={{ textAlign: "center", fontSize: 12, fontWeight: "600", color: "#6b7280" }}
                 >
                   {label}
                 </Text>
               ))}
             </View>
 
-            <View style={{ marginBottom: 12, flexDirection: 'row', flexWrap: 'wrap' }}>
+            <View style={{ marginBottom: 12, flexDirection: "row", flexWrap: "wrap" }}>
               {calendarCells.map((cell, index) => {
                 if (!cell) {
-                  return <View key={`blank-${index}`} style={{ height: 36, width: '14.2857%' }} />;
+                  return <View key={`blank-${index}`} style={{ height: 36, width: "14.2857%" }} />;
                 }
 
                 const selected =
@@ -1012,11 +1112,22 @@ export function ChatScreen({ route }: any) {
                 return (
                   <TouchableOpacity
                     key={formatLocalDate(cell)}
-                    style={{ height: 36, width: '14.2857%', alignItems: 'center', justifyContent: 'center', borderRadius: 9999, backgroundColor: selected ? '#3b82f6' : 'transparent' }}
+                    style={{
+                      height: 36,
+                      width: "14.2857%",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      borderRadius: 9999,
+                      backgroundColor: selected ? "#3b82f6" : "transparent",
+                    }}
                     onPress={() => handleSelectDate(cell)}
                   >
                     <Text
-                      style={{ fontSize: 14, fontWeight: '600', color: selected ? '#ffffff' : '#111827' }}
+                      style={{
+                        fontSize: 14,
+                        fontWeight: "600",
+                        color: selected ? "#ffffff" : "#111827",
+                      }}
                     >
                       {cell.getDate()}
                     </Text>
@@ -1026,10 +1137,15 @@ export function ChatScreen({ route }: any) {
             </View>
 
             <TouchableOpacity
-              style={{ alignItems: 'center', borderRadius: 8, backgroundColor: '#9ca3af', paddingVertical: 10 }}
+              style={{
+                alignItems: "center",
+                borderRadius: 8,
+                backgroundColor: "#9ca3af",
+                paddingVertical: 10,
+              }}
               onPress={() => setCalendarVisible(false)}
             >
-              <Text style={{ color: '#ffffff', fontWeight: '700' }}>閉じる</Text>
+              <Text style={{ color: "#ffffff", fontWeight: "700" }}>閉じる</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -1041,20 +1157,32 @@ export function ChatScreen({ route }: any) {
         animationType="slide"
         onRequestClose={() => setTimePickerVisible(false)}
       >
-        <View style={{ flex: 1, justifyContent: 'center', padding: 20 }}>
-          <View style={{ borderRadius: 12, backgroundColor: '#ffffff', padding: 16 }}>
-            <Text style={{ marginBottom: 12, fontSize: 16, fontWeight: '700' }}>時刻を選択</Text>
-            <ScrollView style={{ marginBottom: 12}}>
+        <View style={{ flex: 1, justifyContent: "center", padding: 20 }}>
+          <View style={{ borderRadius: 12, backgroundColor: "#ffffff", padding: 16 }}>
+            <Text style={{ marginBottom: 12, fontSize: 16, fontWeight: "700" }}>時刻を選択</Text>
+            <ScrollView style={{ marginBottom: 12 }}>
               {timeOptions.map((time) => {
                 const selected = meetTime === time;
                 return (
                   <TouchableOpacity
                     key={time}
-                    style={{ marginBottom: 8, alignItems: 'center', borderRadius: 8, borderWidth: 1, paddingVertical: 10, borderColor: selected ? '#3b82f6' : '#e5e7eb', backgroundColor: selected ? '#dbeafe' : '#f9fafb' }}
+                    style={{
+                      marginBottom: 8,
+                      alignItems: "center",
+                      borderRadius: 8,
+                      borderWidth: 1,
+                      paddingVertical: 10,
+                      borderColor: selected ? "#3b82f6" : "#e5e7eb",
+                      backgroundColor: selected ? "#dbeafe" : "#f9fafb",
+                    }}
                     onPress={() => handleSelectTime(time)}
                   >
                     <Text
-                      style={{ fontSize: 14, fontWeight: '600', color: selected ? '#2563eb' : '#374151' }}
+                      style={{
+                        fontSize: 14,
+                        fontWeight: "600",
+                        color: selected ? "#2563eb" : "#374151",
+                      }}
                     >
                       {time}
                     </Text>
@@ -1063,10 +1191,15 @@ export function ChatScreen({ route }: any) {
               })}
             </ScrollView>
             <TouchableOpacity
-              style={{ alignItems: 'center', borderRadius: 8, backgroundColor: '#9ca3af', paddingVertical: 10 }}
+              style={{
+                alignItems: "center",
+                borderRadius: 8,
+                backgroundColor: "#9ca3af",
+                paddingVertical: 10,
+              }}
               onPress={() => setTimePickerVisible(false)}
             >
-              <Text style={{ color: '#ffffff', fontWeight: '700' }}>閉じる</Text>
+              <Text style={{ color: "#ffffff", fontWeight: "700" }}>閉じる</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -1078,16 +1211,18 @@ export function ChatScreen({ route }: any) {
         animationType="slide"
         onRequestClose={() => setPlaceSearchVisible(false)}
       >
-        <View style={{ flex: 1, justifyContent: 'flex-end'}}>
-          <View style={{ backgroundColor: '#ffffff', padding: 16 }}>
-            <Text style={{ marginBottom: 12, fontSize: 16, fontWeight: '700' }}>場所を検索</Text>
-            <View style={{ marginBottom: 12, flexDirection: 'row', gap: 8 }}>
+        <View style={{ flex: 1, justifyContent: "flex-end" }}>
+          <View style={{ backgroundColor: "#ffffff", padding: 16 }}>
+            <Text style={{ marginBottom: 12, fontSize: 16, fontWeight: "700" }}>場所を検索</Text>
+            <View style={{ marginBottom: 12, flexDirection: "row", gap: 8 }}>
               <PaperTextInput
                 mode="outlined"
                 dense
                 value={placeSearchQuery}
                 onChangeText={setPlaceSearchQuery}
                 placeholder="例: 渋谷スクランブル交差点"
+                textColor="#111827"
+                placeholderTextColor="#6b7280"
                 autoFocus
                 onSubmitEditing={handlePlaceSearch}
                 returnKeyType="search"
@@ -1108,16 +1243,25 @@ export function ChatScreen({ route }: any) {
             <FlatList
               data={placeSearchResults}
               keyExtractor={(item) => String(item.place_id)}
-              style={{ /* max-h-80 */ }}
+              style={
+                {
+                  /* max-h-80 */
+                }
+              }
               renderItem={({ item }) => (
                 <TouchableOpacity
-                  style={{ borderBottomWidth: 1, borderColor: '#f3f4f6', paddingHorizontal: 4, paddingVertical: 10 }}
+                  style={{
+                    borderBottomWidth: 1,
+                    borderColor: "#f3f4f6",
+                    paddingHorizontal: 4,
+                    paddingVertical: 10,
+                  }}
                   onPress={() => handleSelectPlace(item)}
                 >
-                  <Text style={{ fontSize: 14, fontWeight: '700', color: '#111827' }}>
+                  <Text style={{ fontSize: 14, fontWeight: "700", color: "#111827" }}>
                     {item.display_name.split(",")[0]}
                   </Text>
-                  <Text style={{ marginTop: 2, fontSize: 12, color: '#6b7280' }} numberOfLines={1}>
+                  <Text style={{ marginTop: 2, fontSize: 12, color: "#6b7280" }} numberOfLines={1}>
                     {item.display_name}
                   </Text>
                 </TouchableOpacity>

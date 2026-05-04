@@ -59,6 +59,8 @@ export function SignupScreen() {
             <TextInput
               mode="outlined"
               placeholder="example@example.com"
+              textColor="#111827"
+              placeholderTextColor="#6b7280"
               value={email}
               onChangeText={setEmail}
               disabled={loading}
@@ -75,6 +77,8 @@ export function SignupScreen() {
             <TextInput
               mode="outlined"
               placeholder="8文字以上"
+              textColor="#111827"
+              placeholderTextColor="#6b7280"
               value={password}
               onChangeText={setPassword}
               secureTextEntry
@@ -90,6 +94,8 @@ export function SignupScreen() {
             <TextInput
               mode="outlined"
               placeholder="Taro Yamada"
+              textColor="#111827"
+              placeholderTextColor="#6b7280"
               value={displayName}
               onChangeText={setDisplayName}
               disabled={loading}
