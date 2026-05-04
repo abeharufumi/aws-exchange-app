@@ -232,9 +232,21 @@ INSERT INTO notifications (user_id, content, type, is_read, created_at) VALUES
 (12, '誰かがあなたを検索中です！', 'notification', false, NOW() - INTERVAL '2 hours'),
 (26, '新しいユーザーがアプリに参加しました', 'notification', false, NOW() - INTERVAL '1 hour');
 
+-- アイコンフレームマスタ
+INSERT INTO icon_frames (id, name, description, image_url, price_jpy, is_free, rarity) VALUES
+(1, 'スタンダード', 'デフォルトのシンプルなフレーム', '/frames/standard.png', 0, true, 'common'),
+(2, 'ゴールド', '輝くゴールドのフレーム', '/frames/gold.png', 300, false, 'rare'),
+(3, 'シルバー', '上品なシルバーのフレーム', '/frames/silver.png', 200, false, 'uncommon'),
+(4, 'ダイヤモンド', '最高級のダイヤモンドフレーム', '/frames/diamond.png', 500, false, 'legendary'),
+(5, 'ハート', 'かわいいハートのフレーム', '/frames/heart.png', 100, false, 'common'),
+(6, 'スター', '輝くスターのフレーム', '/frames/star.png', 150, false, 'uncommon'),
+(7, 'フラワー', '華やかなフラワーフレーム', '/frames/flower.png', 100, false, 'common'),
+(8, 'ロイヤル', '王冠をあしらったロイヤルフレーム', '/frames/royal.png', 400, false, 'rare');
+
 -- シーケンスをリセット
 SELECT setval('users_id_seq', (SELECT MAX(id) FROM users));
 SELECT setval('matching_requests_id_seq', (SELECT MAX(id) FROM matching_requests));
+SELECT setval('icon_frames_id_seq', (SELECT MAX(id) FROM icon_frames));
 
 -- 完了メッセージ
 DO $$
