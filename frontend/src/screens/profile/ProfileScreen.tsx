@@ -3,6 +3,7 @@ import {
   ActivityIndicator,
   Alert,
   FlatList,
+  Platform,
   ScrollView,
   Share,
   Text,
@@ -166,12 +167,24 @@ export function ProfileScreen() {
   };
 
   const handleLogout = async () => {
+    if (Platform.OS === "web") {
+      const confirmed =
+        typeof window !== "undefined" ? window.confirm("本当にログアウトしますか？") : true;
+      if (!confirmed) {
+        return;
+      }
+      await logout();
+      router.replace("/auth");
+      return;
+    }
+
     Alert.alert("ログアウト", "本当にログアウトしますか？", [
       { text: "キャンセル" },
       {
         text: "ログアウト",
         onPress: async () => {
           await logout();
+          router.replace("/auth");
         },
       },
     ]);
