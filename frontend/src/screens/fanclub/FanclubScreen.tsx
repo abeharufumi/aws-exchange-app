@@ -5,6 +5,7 @@ import { ActionButton } from "../../components/common/ActionButton";
 import { EmptyState } from "../../components/common/EmptyState";
 import { LoadingState } from "../../components/common/LoadingState";
 import { ScreenBackButton } from "../../components/common/ScreenBackButton";
+import { SegmentedTab } from "../../components/common/SegmentedTab";
 import apiClient from "../../services/api";
 import {
   CreatorRestrictionDetail,
@@ -29,6 +30,11 @@ function formatRankProgressLabelForAlert(progress?: RankProgress): string | null
   const suffix = targetItem.unit ? targetItem.unit : "";
   return `${targetItem.label}: ${targetItem.currentValue}/${targetItem.requiredValue}${suffix}`;
 }
+
+const FANCLUB_TABS = [
+  { key: "subscriptions", label: "加入中" },
+  { key: "members", label: "自分のメンバー" },
+] as const;
 
 export function FanclubScreen() {
   const router = useRouter();
@@ -142,22 +148,12 @@ export function FanclubScreen() {
         <Text style={{ color: "#6b7280" }}>加入一覧と自分のメンバーを確認できます</Text>
       </View>
 
-      <View style={{ flexDirection: "row", borderBottomWidth: 1, borderBottomColor: "#e5e7eb" }}>
-        {(["subscriptions", "members"] as const).map((item) => (
-          <TouchableOpacity
-            key={item}
-            style={[
-              { flex: 1, alignItems: "center", paddingVertical: 10 },
-              tab === item && { borderBottomWidth: 2, borderBottomColor: "#7c3aed" },
-            ]}
-            onPress={() => setTab(item)}
-          >
-            <Text style={{ color: tab === item ? "#7c3aed" : "#6b7280", fontWeight: "700" }}>
-              {item === "subscriptions" ? "加入中" : "自分のメンバー"}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </View>
+      <SegmentedTab
+        items={FANCLUB_TABS}
+        value={tab}
+        onChange={setTab}
+        containerStyle={{ paddingHorizontal: 12, paddingVertical: 10, backgroundColor: "#ffffff" }}
+      />
 
       {loading ? (
         <LoadingState

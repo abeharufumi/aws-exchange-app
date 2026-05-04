@@ -270,16 +270,7 @@ export function IconFrameShopScreen() {
         items={ICON_FRAME_TABS}
         value={tab}
         onChange={setTab}
-        containerStyle={{
-          flexDirection: "row",
-          backgroundColor: "#fff",
-          borderBottomWidth: 1,
-          borderBottomColor: "#e5e7eb",
-        }}
-        itemStyle={{ flex: 1, paddingVertical: 12, alignItems: "center" }}
-        activeItemStyle={{ borderBottomWidth: 2, borderBottomColor: "#e74c3c" }}
-        textStyle={{ fontSize: 14, color: "#9ca3af", fontWeight: "500" }}
-        activeTextStyle={{ color: "#e74c3c", fontWeight: "700" }}
+        containerStyle={{ paddingHorizontal: 12, paddingVertical: 10, backgroundColor: "#ffffff" }}
       />
 
       {loading ? (

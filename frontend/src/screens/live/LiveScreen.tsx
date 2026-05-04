@@ -270,15 +270,7 @@ export function LiveScreen() {
         items={LIVE_TABS}
         value={tab}
         onChange={setTab}
-        containerStyle={{
-          flexDirection: "row",
-          borderBottomWidth: 1,
-          borderBottomColor: "#2d2d2d",
-        }}
-        itemStyle={{ flex: 1, alignItems: "center", paddingVertical: 10 }}
-        activeItemStyle={{ borderBottomWidth: 2, borderBottomColor: "#ef4444" }}
-        textStyle={{ color: "#6b7280", fontWeight: "700" }}
-        activeTextStyle={{ color: "#ef4444" }}
+        containerStyle={{ paddingHorizontal: 12, paddingVertical: 10, backgroundColor: "#1a1a1a" }}
       />
 
       {loading ? (

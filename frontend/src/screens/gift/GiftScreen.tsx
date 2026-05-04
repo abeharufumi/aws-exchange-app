@@ -152,15 +152,7 @@ export function GiftScreen() {
         items={GIFT_TABS}
         value={tab}
         onChange={setTab}
-        containerStyle={{
-          flexDirection: "row",
-          borderBottomWidth: 1,
-          borderBottomColor: "#e5e7eb",
-        }}
-        itemStyle={{ flex: 1, alignItems: "center", paddingVertical: 10 }}
-        activeItemStyle={{ borderBottomWidth: 2, borderBottomColor: "#ec4899" }}
-        textStyle={{ color: "#6b7280", fontWeight: "700" }}
-        activeTextStyle={{ color: "#ec4899" }}
+        containerStyle={{ paddingHorizontal: 12, paddingVertical: 10, backgroundColor: "#ffffff" }}
       />
 
       {loading ? (

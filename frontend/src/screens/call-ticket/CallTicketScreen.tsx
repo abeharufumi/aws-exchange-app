@@ -29,7 +29,10 @@ export function CallTicketScreen() {
   const [tab, setTab] = useState<"available" | "purchased" | "sell">("available");
   const [availableTickets, setAvailableTickets] = useState<CallTicketItem[]>([]);
   const [purchasedTickets, setPurchasedTickets] = useState<PurchasedTicketItem[]>([]);
-  const [myProfile, setMyProfile] = useState<Pick<UserProfile, "gender" | "rank" | "rankProgress"> | null>(null);
+  const [myProfile, setMyProfile] = useState<Pick<
+    UserProfile,
+    "gender" | "rank" | "rankProgress"
+  > | null>(null);
   const [loading, setLoading] = useState(true);
   const [duration, setDuration] = useState("30");
   const [price, setPrice] = useState("500");
@@ -47,7 +50,11 @@ export function CallTicketScreen() {
       setPurchasedTickets(purchasedResponse.data || []);
       setMyProfile(
         profileResponse?.data
-          ? { gender: profileResponse.data.gender, rank: Number(profileResponse.data.rank || 1), rankProgress: profileResponse.data.rankProgress }
+          ? {
+              gender: profileResponse.data.gender,
+              rank: Number(profileResponse.data.rank || 1),
+              rankProgress: profileResponse.data.rankProgress,
+            }
           : null,
       );
     } catch (error) {
@@ -78,7 +85,9 @@ export function CallTicketScreen() {
           text: "購入する",
           onPress: async () => {
             try {
-              await apiClient.post<CallTicketPurchaseResponse>(`/call-tickets/purchase/${ticket.id}`);
+              await apiClient.post<CallTicketPurchaseResponse>(
+                `/call-tickets/purchase/${ticket.id}`,
+              );
               await fetchData();
             } catch (error: any) {
               Alert.alert("エラー", error?.response?.data?.detail || "購入に失敗しました");
@@ -129,7 +138,10 @@ export function CallTicketScreen() {
     }
     try {
       setCreating(true);
-      await apiClient.post("/call-tickets/create", { ticket_duration_minutes: durationNum, price_jpy: priceNum });
+      await apiClient.post("/call-tickets/create", {
+        ticket_duration_minutes: durationNum,
+        price_jpy: priceNum,
+      });
       Alert.alert("作成完了", "通話チケットを作成しました");
       setDuration("30");
       setPrice("500");
@@ -137,8 +149,11 @@ export function CallTicketScreen() {
       setTab("available");
     } catch (error: any) {
       const rawDetail = error?.response?.data?.detail;
-      const detailObj: CallTicketCreateErrorDetail | null = rawDetail && typeof rawDetail === "object" ? rawDetail : null;
-      const baseMessage = (typeof rawDetail === "string" ? rawDetail : detailObj?.message) || "チケット作成に失敗しました";
+      const detailObj: CallTicketCreateErrorDetail | null =
+        rawDetail && typeof rawDetail === "object" ? rawDetail : null;
+      const baseMessage =
+        (typeof rawDetail === "string" ? rawDetail : detailObj?.message) ||
+        "チケット作成に失敗しました";
       const progressText = formatRankProgressLabel(detailObj?.rankProgress);
       if (error?.response?.status === 403 && detailObj?.requiredRank === 5) {
         Alert.alert(
@@ -146,7 +161,10 @@ export function CallTicketScreen() {
           progressText ? `${baseMessage}\n\n次ランク条件: ${progressText}` : baseMessage,
           [
             { text: "閉じる", style: "cancel" },
-            { text: "次ランク条件を見る", onPress: () => router.push("/(tabs)/profile?focus=rank") },
+            {
+              text: "次ランク条件を見る",
+              onPress: () => router.push("/(tabs)/profile?focus=rank"),
+            },
           ],
         );
       } else {
@@ -170,26 +188,35 @@ export function CallTicketScreen() {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#ffffff' }}>
-      <View style={{ borderBottomWidth: 1, borderColor: '#f3f4f6', paddingHorizontal: 16, paddingTop: 20, paddingBottom: 12 }}>
+    <View style={{ flex: 1, backgroundColor: "#ffffff" }}>
+      <View
+        style={{
+          borderBottomWidth: 1,
+          borderColor: "#f3f4f6",
+          paddingHorizontal: 16,
+          paddingTop: 20,
+          paddingBottom: 12,
+        }}
+      >
         <ScreenBackButton onPress={() => router.back()} style={{ paddingRight: 12 }} />
-        <Text style={{ marginBottom: 4, fontSize: 24, fontWeight: '700', color: '#111827' }}>📞 通話チケット</Text>
-        <Text style={{ fontSize: 14, color: '#6b7280' }}>チケットの購入・使用・販売ができます</Text>
+        <Text style={{ marginBottom: 4, fontSize: 24, fontWeight: "700", color: "#111827" }}>
+          📞 通話チケット
+        </Text>
+        <Text style={{ fontSize: 14, color: "#6b7280" }}>チケットの購入・使用・販売ができます</Text>
       </View>
 
       <SegmentedTab
         items={CALL_TICKET_TABS}
         value={tab}
         onChange={setTab}
-        containerStyle={{ flexDirection: "row", borderBottomWidth: 1, borderBottomColor: "#e5e7eb" }}
-        itemStyle={{ flex: 1, alignItems: "center", paddingVertical: 10 }}
-        activeItemStyle={{ borderBottomWidth: 2, borderBottomColor: "#2563eb" }}
-        textStyle={{ color: "#6b7280", fontWeight: "700" }}
-        activeTextStyle={{ color: "#2563eb" }}
+        containerStyle={{ paddingHorizontal: 12, paddingVertical: 10, backgroundColor: "#ffffff" }}
       />
 
       {loading && tab !== "sell" ? (
-        <LoadingState color="#2563eb" containerStyle={{ flex: 1, justifyContent: "center", alignItems: "center" }} />
+        <LoadingState
+          color="#2563eb"
+          containerStyle={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+        />
       ) : tab === "available" ? (
         <FlatList
           data={availableTickets}
@@ -197,15 +224,43 @@ export function CallTicketScreen() {
           onRefresh={fetchData}
           refreshing={loading}
           renderItem={({ item }) => (
-            <SectionCard style={{ marginHorizontal: 16, marginVertical: 6, borderRadius: 12, padding: 14, backgroundColor: "#f0f9ff", borderWidth: 1, borderColor: "#bae6fd" }}>
-              <View style={{ marginBottom: 6, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                <Text style={{ fontSize: 20, fontWeight: '700'}}>{item.ticket_duration_minutes}分</Text>
-                <Text style={{ fontSize: 16, fontWeight: '700', color: '#2563eb' }}>¥{item.price_jpy.toLocaleString()}</Text>
+            <SectionCard
+              style={{
+                marginHorizontal: 16,
+                marginVertical: 6,
+                borderRadius: 12,
+                padding: 14,
+                backgroundColor: "#f0f9ff",
+                borderWidth: 1,
+                borderColor: "#bae6fd",
+              }}
+            >
+              <View
+                style={{
+                  marginBottom: 6,
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                }}
+              >
+                <Text style={{ fontSize: 20, fontWeight: "700" }}>
+                  {item.ticket_duration_minutes}分
+                </Text>
+                <Text style={{ fontSize: 16, fontWeight: "700", color: "#2563eb" }}>
+                  ¥{item.price_jpy.toLocaleString()}
+                </Text>
               </View>
-              <Text style={{ marginBottom: 12, fontSize: 14, color: '#6b7280' }}>販売者: {item.seller_name}</Text>
+              <Text style={{ marginBottom: 12, fontSize: 14, color: "#6b7280" }}>
+                販売者: {item.seller_name}
+              </Text>
               <ActionButton
                 label="購入する"
-                style={{ backgroundColor: "#2563eb", borderRadius: 8, paddingVertical: 10, alignItems: "center" }}
+                style={{
+                  backgroundColor: "#2563eb",
+                  borderRadius: 8,
+                  paddingVertical: 10,
+                  alignItems: "center",
+                }}
                 textStyle={{ color: "#fff", fontSize: 14, fontWeight: "700" }}
                 onPress={() => handlePurchase(item)}
               />
@@ -214,7 +269,12 @@ export function CallTicketScreen() {
           ListEmptyComponent={
             <EmptyState
               message="購入可能なチケットはありません"
-              containerStyle={{ flex: 1, justifyContent: "center", alignItems: "center", paddingTop: 80 }}
+              containerStyle={{
+                flex: 1,
+                justifyContent: "center",
+                alignItems: "center",
+                paddingTop: 80,
+              }}
               textStyle={{ fontSize: 14, color: "#9ca3af", textAlign: "center" }}
             />
           }
@@ -226,18 +286,49 @@ export function CallTicketScreen() {
           onRefresh={fetchData}
           refreshing={loading}
           renderItem={({ item }) => (
-            <SectionCard style={{ marginHorizontal: 16, marginVertical: 6, borderRadius: 12, padding: 14, backgroundColor: "#f9fafb", borderWidth: 1, borderColor: "#e5e7eb" }}>
-              <Text style={{ marginBottom: 4, fontSize: 16, fontWeight: '600', color: '#1f2937' }}>{item.seller_name}</Text>
-              <Text style={{ marginBottom: 2, fontSize: 14, color: '#6b7280' }}>{item.ticket_duration_minutes}分 / ¥{item.amount_jpy.toLocaleString()}</Text>
-              <Text style={{ marginBottom: 12, fontSize: 14, color: '#6b7280' }}>購入日: {new Date(item.purchased_at).toLocaleDateString("ja-JP")}</Text>
+            <SectionCard
+              style={{
+                marginHorizontal: 16,
+                marginVertical: 6,
+                borderRadius: 12,
+                padding: 14,
+                backgroundColor: "#f9fafb",
+                borderWidth: 1,
+                borderColor: "#e5e7eb",
+              }}
+            >
+              <Text style={{ marginBottom: 4, fontSize: 16, fontWeight: "600", color: "#1f2937" }}>
+                {item.seller_name}
+              </Text>
+              <Text style={{ marginBottom: 2, fontSize: 14, color: "#6b7280" }}>
+                {item.ticket_duration_minutes}分 / ¥{item.amount_jpy.toLocaleString()}
+              </Text>
+              <Text style={{ marginBottom: 12, fontSize: 14, color: "#6b7280" }}>
+                購入日: {new Date(item.purchased_at).toLocaleDateString("ja-JP")}
+              </Text>
               {item.is_used ? (
-                <View style={{ alignSelf: 'flex-start', borderRadius: 9999, backgroundColor: '#e5e7eb', paddingHorizontal: 12, paddingVertical: 4 }}>
-                  <Text style={{ fontSize: 12, fontWeight: '700', color: '#6b7280' }}>使用済み</Text>
+                <View
+                  style={{
+                    alignSelf: "flex-start",
+                    borderRadius: 9999,
+                    backgroundColor: "#e5e7eb",
+                    paddingHorizontal: 12,
+                    paddingVertical: 4,
+                  }}
+                >
+                  <Text style={{ fontSize: 12, fontWeight: "700", color: "#6b7280" }}>
+                    使用済み
+                  </Text>
                 </View>
               ) : (
                 <ActionButton
                   label="使用済みにする"
-                  style={{ backgroundColor: "#7c3aed", borderRadius: 8, paddingVertical: 10, alignItems: "center" }}
+                  style={{
+                    backgroundColor: "#7c3aed",
+                    borderRadius: 8,
+                    paddingVertical: 10,
+                    alignItems: "center",
+                  }}
                   textStyle={{ color: "#fff", fontSize: 14, fontWeight: "700" }}
                   onPress={() => handleUse(item.purchase_id)}
                 />
@@ -247,17 +338,35 @@ export function CallTicketScreen() {
           ListEmptyComponent={
             <EmptyState
               message="購入済みチケットはありません"
-              containerStyle={{ flex: 1, justifyContent: "center", alignItems: "center", paddingTop: 80 }}
+              containerStyle={{
+                flex: 1,
+                justifyContent: "center",
+                alignItems: "center",
+                paddingTop: 80,
+              }}
               textStyle={{ fontSize: 14, color: "#9ca3af", textAlign: "center" }}
             />
           }
         />
       ) : (
-        <SectionCard style={{ margin: 16, borderRadius: 12, padding: 16, backgroundColor: "#f9fafb", borderWidth: 1, borderColor: "#e5e7eb" }}>
-          <Text style={{ marginBottom: 16, fontSize: 16, fontWeight: '700', color: '#111827' }}>通話チケットを販売する</Text>
+        <SectionCard
+          style={{
+            margin: 16,
+            borderRadius: 12,
+            padding: 16,
+            backgroundColor: "#f9fafb",
+            borderWidth: 1,
+            borderColor: "#e5e7eb",
+          }}
+        >
+          <Text style={{ marginBottom: 16, fontSize: 16, fontWeight: "700", color: "#111827" }}>
+            通話チケットを販売する
+          </Text>
           {canSell ? (
             <>
-              <Text style={{ marginBottom: 6, fontSize: 12, fontWeight: '600', color: '#6b7280' }}>通話時間（分）</Text>
+              <Text style={{ marginBottom: 6, fontSize: 12, fontWeight: "600", color: "#6b7280" }}>
+                通話時間（分）
+              </Text>
               <TextInput
                 style={inputStyle}
                 value={duration}
@@ -266,7 +375,9 @@ export function CallTicketScreen() {
                 placeholder="例: 30"
                 placeholderTextColor="#9ca3af"
               />
-              <Text style={{ marginBottom: 6, fontSize: 12, fontWeight: '600', color: '#6b7280' }}>価格（円）</Text>
+              <Text style={{ marginBottom: 6, fontSize: 12, fontWeight: "600", color: "#6b7280" }}>
+                価格（円）
+              </Text>
               <TextInput
                 style={inputStyle}
                 value={price}
@@ -278,7 +389,12 @@ export function CallTicketScreen() {
               <ActionButton
                 label={creating ? "作成中..." : "チケットを作成する"}
                 style={[
-                  { backgroundColor: "#2563eb", borderRadius: 8, paddingVertical: 12, alignItems: "center" },
+                  {
+                    backgroundColor: "#2563eb",
+                    borderRadius: 8,
+                    paddingVertical: 12,
+                    alignItems: "center",
+                  },
                   creating ? { opacity: 0.5 } : undefined,
                 ]}
                 textStyle={{ color: "#fff", fontSize: 15, fontWeight: "700" }}
@@ -288,14 +404,19 @@ export function CallTicketScreen() {
             </>
           ) : (
             <>
-              <Text style={{ marginBottom: 12, fontSize: 14, color: '#6b7280' }}>
-                {canSellByGender ? `現在ランク: Rank ${currentRank}（Rank5で販売解放）` : "男性ユーザーのみ販売できます"}
+              <Text style={{ marginBottom: 12, fontSize: 14, color: "#6b7280" }}>
+                {canSellByGender
+                  ? `現在ランク: Rank ${currentRank}（Rank5で販売解放）`
+                  : "男性ユーザーのみ販売できます"}
               </Text>
               {canSellByGender && myProfile?.rankProgress && !myProfile.rankProgress.isMaxRank
                 ? myProfile.rankProgress.items.map((item) => {
                     const unit = item.unit || "";
                     return (
-                      <Text key={item.key} style={{ marginBottom: 4, fontSize: 12, color: '#9ca3af' }}>
+                      <Text
+                        key={item.key}
+                        style={{ marginBottom: 4, fontSize: 12, color: "#9ca3af" }}
+                      >
                         {item.done ? "✓" : "・"} {item.label} {item.currentValue}
                         {unit}/{item.requiredValue}
                         {unit}
@@ -307,7 +428,16 @@ export function CallTicketScreen() {
                 <ActionButton
                   label="次ランク条件を見る"
                   variant="neutral"
-                  style={{ marginTop: 8, alignSelf: "flex-start", borderRadius: 8, backgroundColor: "#f3f4f6", borderWidth: 1, borderColor: "#e5e7eb", paddingVertical: 8, paddingHorizontal: 12 }}
+                  style={{
+                    marginTop: 8,
+                    alignSelf: "flex-start",
+                    borderRadius: 8,
+                    backgroundColor: "#f3f4f6",
+                    borderWidth: 1,
+                    borderColor: "#e5e7eb",
+                    paddingVertical: 8,
+                    paddingHorizontal: 12,
+                  }}
                   textStyle={{ fontSize: 12, color: "#374151", fontWeight: "700" }}
                   onPress={() => router.push("/(tabs)/profile?focus=rank")}
                 />
