@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { AuthErrorResponse, AuthLogoutResponse, AuthTokenResponse, AuthUser } from "../types/auth";
 import { clearAuth, persistAuth, readAuthToken, readAuthUser } from "../utils/authStorage";
-import { API_BASE_URL } from "../constants/apiConstants";
+import { API_FULL_BASE_URL } from "../constants/apiConstants";
 
 /**
  * 認証コンテキストの型定義
@@ -50,7 +50,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = async (email: string, password: string) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/auth/login`, {
+      const response = await fetch(`${API_FULL_BASE_URL}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -85,7 +85,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signup = async (email: string, password: string, gender: string, displayName: string) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/auth/signup`, {
+      const response = await fetch(`${API_FULL_BASE_URL}/auth/signup`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -126,7 +126,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       // オプション: バックエンドにログアウト通知
       if (token) {
-        await fetch(`${API_BASE_URL}/auth/logout`, {
+        await fetch(`${API_FULL_BASE_URL}/auth/logout`, {
           method: "POST",
           headers: {
             Authorization: `Bearer ${token}`,

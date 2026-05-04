@@ -152,6 +152,7 @@ app.add_middleware(
 
 # ルーターを登録
 app.include_router(auth.router)
+app.include_router(auth.router, prefix="/api")
 app.include_router(users.router)
 app.include_router(matches.router)
 app.include_router(notifications.router)
