@@ -148,12 +148,7 @@ export function GiftScreen() {
         <Text style={{ fontSize: 14, color: "#6b7280" }}>ギフト送信・受信履歴を管理できます</Text>
       </View>
 
-      <SegmentedTab
-        items={GIFT_TABS}
-        value={tab}
-        onChange={setTab}
-        containerStyle={{ paddingHorizontal: 12, paddingVertical: 10, backgroundColor: "#ffffff" }}
-      />
+      <SegmentedTab items={GIFT_TABS} value={tab} onChange={setTab} />
 
       {loading ? (
         <LoadingState

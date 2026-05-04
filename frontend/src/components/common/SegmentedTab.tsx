@@ -28,7 +28,12 @@ export function SegmentedTab<T extends string>({
   activeTextStyle,
 }: SegmentedTabProps<T>) {
   return (
-    <View style={[{ flexDirection: "row", gap: 8 }, containerStyle]}>
+    <View
+      style={[
+        { flexDirection: "row", borderBottomWidth: 1, borderBottomColor: "#e5e7eb" },
+        containerStyle,
+      ]}
+    >
       {items.map((item) => {
         const active = item.key === value;
         return (
@@ -38,13 +43,12 @@ export function SegmentedTab<T extends string>({
             style={[
               {
                 flex: 1,
-                borderRadius: 10,
                 alignItems: "center",
                 justifyContent: "center",
                 paddingVertical: 10,
-                borderWidth: active ? 0 : 1,
-                borderColor: "#d1d5db",
-                backgroundColor: active ? "#2563eb" : "transparent",
+                borderBottomWidth: 2,
+                borderBottomColor: active ? "#7c3aed" : "transparent",
+                marginBottom: -1,
               },
               itemStyle,
               active && activeItemStyle,
@@ -53,7 +57,7 @@ export function SegmentedTab<T extends string>({
           >
             <Text
               style={[
-                { fontSize: 13, fontWeight: "600", color: active ? "#ffffff" : "#374151" },
+                { fontSize: 14, fontWeight: "700", color: active ? "#7c3aed" : "#6b7280" },
                 textStyle,
                 active && activeTextStyle,
               ]}

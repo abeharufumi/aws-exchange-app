@@ -266,12 +266,7 @@ export function IconFrameShopScreen() {
         <Text style={{ color: "#6b7280" }}>プロフィールアイコンに装飾フレームを付けよう</Text>
       </View>
 
-      <SegmentedTab
-        items={ICON_FRAME_TABS}
-        value={tab}
-        onChange={setTab}
-        containerStyle={{ paddingHorizontal: 12, paddingVertical: 10, backgroundColor: "#ffffff" }}
-      />
+      <SegmentedTab items={ICON_FRAME_TABS} value={tab} onChange={setTab} />
 
       {loading ? (
         <LoadingState

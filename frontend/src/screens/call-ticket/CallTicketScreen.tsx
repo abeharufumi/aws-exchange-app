@@ -205,12 +205,7 @@ export function CallTicketScreen() {
         <Text style={{ fontSize: 14, color: "#6b7280" }}>チケットの購入・使用・販売ができます</Text>
       </View>
 
-      <SegmentedTab
-        items={CALL_TICKET_TABS}
-        value={tab}
-        onChange={setTab}
-        containerStyle={{ paddingHorizontal: 12, paddingVertical: 10, backgroundColor: "#ffffff" }}
-      />
+      <SegmentedTab items={CALL_TICKET_TABS} value={tab} onChange={setTab} />
 
       {loading && tab !== "sell" ? (
         <LoadingState

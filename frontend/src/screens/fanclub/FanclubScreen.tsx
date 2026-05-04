@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Alert, FlatList, Text, TouchableOpacity, View } from "react-native";
+import { Alert, FlatList, Text, View } from "react-native";
 import { useRouter } from "expo-router";
 import { ActionButton } from "../../components/common/ActionButton";
 import { EmptyState } from "../../components/common/EmptyState";
@@ -148,12 +148,7 @@ export function FanclubScreen() {
         <Text style={{ color: "#6b7280" }}>加入一覧と自分のメンバーを確認できます</Text>
       </View>
 
-      <SegmentedTab
-        items={FANCLUB_TABS}
-        value={tab}
-        onChange={setTab}
-        containerStyle={{ paddingHorizontal: 12, paddingVertical: 10, backgroundColor: "#ffffff" }}
-      />
+      <SegmentedTab items={FANCLUB_TABS} value={tab} onChange={setTab} />
 
       {loading ? (
         <LoadingState

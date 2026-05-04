@@ -266,12 +266,7 @@ export function LiveScreen() {
         </View>
       )}
 
-      <SegmentedTab
-        items={LIVE_TABS}
-        value={tab}
-        onChange={setTab}
-        containerStyle={{ paddingHorizontal: 12, paddingVertical: 10, backgroundColor: "#1a1a1a" }}
-      />
+      <SegmentedTab items={LIVE_TABS} value={tab} onChange={setTab} />
 
       {loading ? (
         <LoadingState
