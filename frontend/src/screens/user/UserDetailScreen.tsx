@@ -321,17 +321,15 @@ export function UserDetailScreen({ route }: any) {
             </ActionButtonRow>
 
             {/* 通話チケット */}
-            {ticketLoading ? (
-              <ActivityIndicator size="small" color="#e74c3c" style={{ marginTop: 12 }} />
-            ) : sellerTickets.length > 0 ? (
-              <View>
-                <Text
-                  style={{ marginBottom: 6, fontSize: 14, fontWeight: "700", color: "#111827" }}
-                >
-                  通話チケット
-                </Text>
-                {sellerTickets.map((ticket) => (
-                  <View key={ticket.id} style={{ flexDirection: "row", gap: 10, marginTop: 20 }}>
+            <View style={{ marginTop: 20 }}>
+              <Text style={{ marginBottom: 6, fontSize: 14, fontWeight: "700", color: "#111827" }}>
+                通話チケット
+              </Text>
+              {ticketLoading ? (
+                <ActivityIndicator size="small" color="#e74c3c" style={{ marginTop: 12 }} />
+              ) : sellerTickets.length > 0 ? (
+                sellerTickets.map((ticket) => (
+                  <View key={ticket.id} style={{ flexDirection: "row", gap: 10, marginTop: 12 }}>
                     <Text style={{ flex: 1, color: "#333" }}>
                       {ticket.ticket_duration_minutes}分 / ¥{ticket.price_jpy.toLocaleString()}
                     </Text>
@@ -354,9 +352,13 @@ export function UserDetailScreen({ route }: any) {
                       textStyle={{ color: "#fff", fontSize: 14, fontWeight: "700" }}
                     />
                   </View>
-                ))}
-              </View>
-            ) : null}
+                ))
+              ) : (
+                <Text style={{ fontSize: 13, color: "#6b7280" }}>
+                  販売中の通話チケットはありません
+                </Text>
+              )}
+            </View>
           </View>
         </ScrollView>
       )}

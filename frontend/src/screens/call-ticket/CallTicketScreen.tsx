@@ -138,7 +138,7 @@ export function CallTicketScreen() {
     }
     try {
       setCreating(true);
-      await apiClient.post("/call-tickets/create", {
+      await apiClient.post("/call-tickets", {
         ticket_duration_minutes: durationNum,
         price_jpy: priceNum,
       });
