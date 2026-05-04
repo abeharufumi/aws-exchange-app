@@ -26,7 +26,10 @@ const GIFT_TABS = [
 
 export function GiftScreen() {
   const router = useRouter();
-  const { recipientId: initialRecipientId } = useLocalSearchParams<{ recipientId?: string }>();
+  const { recipientId: initialRecipientId, tab: initialTab } = useLocalSearchParams<{
+    recipientId?: string;
+    tab?: string;
+  }>();
   const [tab, setTab] = useState<"send" | "received" | "sent">("send");
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
@@ -68,6 +71,15 @@ export function GiftScreen() {
       setTab("send");
     }
   }, [initialRecipientId]);
+
+  useEffect(() => {
+    if (!initialTab || initialRecipientId) {
+      return;
+    }
+    if (initialTab === "received" || initialTab === "sent" || initialTab === "send") {
+      setTab(initialTab);
+    }
+  }, [initialTab, initialRecipientId]);
 
   useEffect(() => {
     setSendRestriction(null);

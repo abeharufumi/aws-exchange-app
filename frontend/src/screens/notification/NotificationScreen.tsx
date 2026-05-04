@@ -190,7 +190,7 @@ export function NotificationScreen() {
     }
 
     if (item.type === "gift") {
-      router.push("/gifts");
+      router.push({ pathname: "/gifts", params: { tab: "received" } });
       return;
     }
 
