@@ -3,6 +3,7 @@ import { ActivityIndicator, Alert, ScrollView, Text, View } from "react-native";
 import { useRouter } from "expo-router";
 import { ActionButton } from "../../components/common/ActionButton";
 import { ActionButtonRow } from "../../components/common/ActionButtonRow";
+import { AvatarWithFrame } from "../../components/common/AvatarWithFrame";
 import { EmptyState } from "../../components/common/EmptyState";
 import { LoadingState } from "../../components/common/LoadingState";
 import { ScreenBackButton } from "../../components/common/ScreenBackButton";
@@ -181,13 +182,23 @@ export function UserDetailScreen({ route }: any) {
       ) : (
         <ScrollView contentContainerStyle={{ padding: 20 }}>
           <View style={{ borderRadius: 16, borderWidth: 1, borderColor: '#fecaca', backgroundColor: '#fef2f2', padding: 20 }}>
-            <Text style={{ marginBottom: 8, fontSize: 24, fontWeight: '700', color: '#111827' }}>
-              {profile.displayName}
-              {profile.age ? `, ${profile.age}` : ""}
-            </Text>
-            <Text style={{ marginBottom: 8, fontSize: 14, fontWeight: '600', color: '#374151' }}>
-              {profile.location || "場所未設定"} / Rank {profile.rank || 1}
-            </Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 16, marginBottom: 12 }}>
+              <AvatarWithFrame
+                avatarUrl={profile.avatarUrl}
+                iconFrameImageUrl={profile.iconFrameImageUrl}
+                size={80}
+                initials={profile.displayName?.[0]}
+              />
+              <View style={{ flex: 1 }}>
+                <Text style={{ marginBottom: 4, fontSize: 24, fontWeight: '700', color: '#111827' }}>
+                  {profile.displayName}
+                  {profile.age ? `, ${profile.age}` : ""}
+                </Text>
+                <Text style={{ fontSize: 14, fontWeight: '600', color: '#374151' }}>
+                  {profile.location || "場所未設定"} / Rank {profile.rank || 1}
+                </Text>
+              </View>
+            </View>
             <Text style={{ marginBottom: 8, fontSize: 14, fontWeight: '600', color: '#374151' }}>
               ⭐ {Number(profile.reviewAvg || 0).toFixed(2)} / 🤝 {profile.meetsCount || 0}回
             </Text>

@@ -42,6 +42,7 @@ export interface UserProfile {
   canUseRankFilter?: boolean;
   receiveFilter?: ReceiveFilter;
   rankProgress?: RankProgress;
+  iconFrameImageUrl?: string;
 }
 
 export interface ProfileUpdateResponse {

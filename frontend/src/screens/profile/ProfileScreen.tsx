@@ -13,6 +13,7 @@ import {
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { ActionButton } from "../../components/common/ActionButton";
 import { ActionButtonRow } from "../../components/common/ActionButtonRow";
+import { AvatarWithFrame } from "../../components/common/AvatarWithFrame";
 import { ReceiveFilterToggle } from "../../components/common/ReceiveFilterToggle";
 import apiClient from "../../services/api";
 import { useAuth } from "../../contexts/auth";
@@ -334,13 +335,23 @@ export function ProfileScreen() {
               paddingTop: 20,
             }}
           >
-            <Text style={{ marginBottom: 10, fontSize: 24, fontWeight: "700", color: "#111827" }}>
-              {profile.displayName}
-            </Text>
-            <Text style={{ marginBottom: 4, fontSize: 16, color: "#6b7280" }}>
-              {profile.age ? `${profile.age}歳` : "年齢未設定"} •
-              {profile.gender === "male" ? "男性" : "女性"}
-            </Text>
+            <View style={{ flexDirection: "row", alignItems: "center", gap: 16, marginBottom: 16 }}>
+              <AvatarWithFrame
+                avatarUrl={profile.avatarUrl}
+                iconFrameImageUrl={profile.iconFrameImageUrl}
+                size={80}
+                initials={profile.displayName?.[0]}
+              />
+              <View style={{ flex: 1 }}>
+                <Text style={{ marginBottom: 4, fontSize: 24, fontWeight: "700", color: "#111827" }}>
+                  {profile.displayName}
+                </Text>
+                <Text style={{ fontSize: 14, color: "#6b7280" }}>
+                  {profile.age ? `${profile.age}歳` : "年齢未設定"} •
+                  {profile.gender === "male" ? "男性" : "女性"}
+                </Text>
+              </View>
+            </View>
             <Text style={{ marginBottom: 4, fontSize: 16, color: "#6b7280" }}>
               ⭐ レビュー平均: {Number(profile.reviewAvg || 0).toFixed(2)}
             </Text>

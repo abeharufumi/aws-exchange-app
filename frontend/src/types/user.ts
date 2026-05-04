@@ -20,6 +20,7 @@ export interface PublicUserProfile {
   rank?: number;
   meetsCount?: number;
   reviewAvg?: number;
+  iconFrameImageUrl?: string;
 }
 
 export interface FootprintItem {
