@@ -14,10 +14,10 @@ interface AvatarWithFrameProps {
 
 /** レアリティに応じたドーナツリングの色設定 */
 const RARITY_RING: Record<string, { color: string; width: number; glow?: string }> = {
-  common:    { color: "#9ca3af", width: 3 },
-  uncommon:  { color: "#10b981", width: 3 },
-  rare:      { color: "#3b82f6", width: 4 },
-  epic:      { color: "#8b5cf6", width: 4 },
+  common: { color: "#9ca3af", width: 3 },
+  uncommon: { color: "#10b981", width: 3 },
+  rare: { color: "#3b82f6", width: 4 },
+  epic: { color: "#8b5cf6", width: 4 },
   legendary: { color: "#f59e0b", width: 5 },
 };
 
@@ -32,7 +32,7 @@ export function AvatarWithFrame({
   size = 80,
   initials,
 }: AvatarWithFrameProps) {
-  const ring = iconFrameRarity ? RARITY_RING[iconFrameRarity] ?? RARITY_RING.common : null;
+  const ring = iconFrameRarity ? (RARITY_RING[iconFrameRarity] ?? RARITY_RING.common) : null;
   // リングがある場合、内側のアバターはリング幅+ギャップ分だけ小さくする
   const gap = ring ? 3 : 0;
   const innerSize = ring ? size - (ring.width + gap) * 2 : size;
@@ -77,9 +77,7 @@ export function AvatarWithFrame({
             justifyContent: "center",
           }}
         >
-          <Text style={{ fontSize: innerSize * 0.4, color: "#9ca3af" }}>
-            {initials || "👤"}
-          </Text>
+          <Text style={{ fontSize: innerSize * 0.4, color: "#9ca3af" }}>{initials || "👤"}</Text>
         </View>
       )}
     </View>
