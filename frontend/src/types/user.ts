@@ -21,6 +21,8 @@ export interface PublicUserProfile {
   meetsCount?: number;
   reviewAvg?: number;
   iconFrameImageUrl?: string;
+  iconFrameRarity?: string;
+  iconFrameName?: string;
 }
 
 export interface FootprintItem {

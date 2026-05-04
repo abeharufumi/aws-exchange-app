@@ -324,7 +324,9 @@ def get_me(current_user: dict = Depends(get_current_user), db: Session = Depends
              user_ranks.review_avg AS "reviewAvg",
              user_ranks.reply_rate AS "replyRate",
              user_ranks.manner_points AS "mannerPoints",
-             icon_frames.image_url AS "iconFrameImageUrl"
+             icon_frames.image_url AS "iconFrameImageUrl",
+             icon_frames.rarity AS "iconFrameRarity",
+             icon_frames.name AS "iconFrameName"
          FROM users
          JOIN user_profiles ON users.id = user_profiles.user_id
          JOIN user_ranks ON users.id = user_ranks.user_id
@@ -476,7 +478,9 @@ def get_user_profile(
              user_ranks.current_rank AS "rank",
              user_ranks.meets_count AS "meetsCount",
              user_ranks.review_avg AS "reviewAvg",
-             icon_frames.image_url AS "iconFrameImageUrl"
+             icon_frames.image_url AS "iconFrameImageUrl",
+             icon_frames.rarity AS "iconFrameRarity",
+             icon_frames.name AS "iconFrameName"
         FROM users
         JOIN user_profiles ON users.id = user_profiles.user_id
         JOIN user_ranks ON users.id = user_ranks.user_id

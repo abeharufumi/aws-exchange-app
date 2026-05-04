@@ -161,8 +161,17 @@ export function UserDetailScreen({ route }: any) {
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#ffffff' }}>
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, borderBottomWidth: 1, borderColor: '#e5e7eb', paddingHorizontal: 12 }}>
+    <View style={{ flex: 1, backgroundColor: "#ffffff" }}>
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          gap: 8,
+          borderBottomWidth: 1,
+          borderColor: "#e5e7eb",
+          paddingHorizontal: 12,
+        }}
+      >
         <ScreenBackButton
           compact
           label="<"
@@ -170,7 +179,7 @@ export function UserDetailScreen({ route }: any) {
           style={{ width: 32, height: 32, alignItems: "center", justifyContent: "center" }}
           textStyle={{ fontSize: 24, fontWeight: "700", color: "#111827", lineHeight: 24 }}
         />
-        <Text style={{ fontSize: 16, fontWeight: '700', color: '#111827' }}>プロフィール</Text>
+        <Text style={{ fontSize: 16, fontWeight: "700", color: "#111827" }}>プロフィール</Text>
       </View>
 
       {!profile ? (
@@ -181,30 +190,43 @@ export function UserDetailScreen({ route }: any) {
         />
       ) : (
         <ScrollView contentContainerStyle={{ padding: 20 }}>
-          <View style={{ borderRadius: 16, borderWidth: 1, borderColor: '#fecaca', backgroundColor: '#fef2f2', padding: 20 }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 16, marginBottom: 12 }}>
+          <View
+            style={{
+              borderRadius: 16,
+              borderWidth: 1,
+              borderColor: "#fecaca",
+              backgroundColor: "#fef2f2",
+              padding: 20,
+            }}
+          >
+            <View style={{ flexDirection: "row", alignItems: "center", gap: 16, marginBottom: 12 }}>
               <AvatarWithFrame
                 avatarUrl={profile.avatarUrl}
-                iconFrameImageUrl={profile.iconFrameImageUrl}
+                iconFrameRarity={profile.iconFrameRarity}
+                iconFrameName={profile.iconFrameName}
                 size={80}
                 initials={profile.displayName?.[0]}
               />
               <View style={{ flex: 1 }}>
-                <Text style={{ marginBottom: 4, fontSize: 24, fontWeight: '700', color: '#111827' }}>
+                <Text
+                  style={{ marginBottom: 4, fontSize: 24, fontWeight: "700", color: "#111827" }}
+                >
                   {profile.displayName}
                   {profile.age ? `, ${profile.age}` : ""}
                 </Text>
-                <Text style={{ fontSize: 14, fontWeight: '600', color: '#374151' }}>
+                <Text style={{ fontSize: 14, fontWeight: "600", color: "#374151" }}>
                   {profile.location || "場所未設定"} / Rank {profile.rank || 1}
                 </Text>
               </View>
             </View>
-            <Text style={{ marginBottom: 8, fontSize: 14, fontWeight: '600', color: '#374151' }}>
+            <Text style={{ marginBottom: 8, fontSize: 14, fontWeight: "600", color: "#374151" }}>
               ⭐ {Number(profile.reviewAvg || 0).toFixed(2)} / 🤝 {profile.meetsCount || 0}回
             </Text>
 
-            <Text style={{ marginBottom: 6, fontSize: 14, fontWeight: '700', color: '#111827' }}>自己紹介</Text>
-            <Text style={{ fontSize: 14, color: '#4b5563' }}>
+            <Text style={{ marginBottom: 6, fontSize: 14, fontWeight: "700", color: "#111827" }}>
+              自己紹介
+            </Text>
+            <Text style={{ fontSize: 14, color: "#4b5563" }}>
               {profile.bio || "自己紹介はありません"}
             </Text>
 
@@ -300,7 +322,11 @@ export function UserDetailScreen({ route }: any) {
               <ActivityIndicator size="small" color="#e74c3c" style={{ marginTop: 12 }} />
             ) : sellerTickets.length > 0 ? (
               <View>
-                <Text style={{ marginBottom: 6, fontSize: 14, fontWeight: '700', color: '#111827' }}>通話チケット</Text>
+                <Text
+                  style={{ marginBottom: 6, fontSize: 14, fontWeight: "700", color: "#111827" }}
+                >
+                  通話チケット
+                </Text>
                 {sellerTickets.map((ticket) => (
                   <View key={ticket.id} style={{ flexDirection: "row", gap: 10, marginTop: 20 }}>
                     <Text style={{ flex: 1, color: "#333" }}>

@@ -43,6 +43,8 @@ export interface UserProfile {
   receiveFilter?: ReceiveFilter;
   rankProgress?: RankProgress;
   iconFrameImageUrl?: string;
+  iconFrameRarity?: string;
+  iconFrameName?: string;
 }
 
 export interface ProfileUpdateResponse {

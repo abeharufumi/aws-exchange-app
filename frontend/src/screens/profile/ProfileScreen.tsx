@@ -338,12 +338,15 @@ export function ProfileScreen() {
             <View style={{ flexDirection: "row", alignItems: "center", gap: 16, marginBottom: 16 }}>
               <AvatarWithFrame
                 avatarUrl={profile.avatarUrl}
-                iconFrameImageUrl={profile.iconFrameImageUrl}
+                iconFrameRarity={profile.iconFrameRarity}
+                iconFrameName={profile.iconFrameName}
                 size={80}
                 initials={profile.displayName?.[0]}
               />
               <View style={{ flex: 1 }}>
-                <Text style={{ marginBottom: 4, fontSize: 24, fontWeight: "700", color: "#111827" }}>
+                <Text
+                  style={{ marginBottom: 4, fontSize: 24, fontWeight: "700", color: "#111827" }}
+                >
                   {profile.displayName}
                 </Text>
                 <Text style={{ fontSize: 14, color: "#6b7280" }}>
