@@ -5,6 +5,7 @@ import {
   KeyboardAvoidingView,
   Modal,
   Platform,
+  Pressable,
   Text,
   TouchableOpacity,
   type ViewToken,
@@ -868,6 +869,17 @@ export function ChatScreen({ route }: any) {
         onRequestClose={() => setMeetModalVisible(false)}
       >
         <View style={{ flex: 1, justifyContent: "center", padding: 20 }}>
+          <Pressable
+            style={{
+              position: "absolute",
+              top: 0,
+              right: 0,
+              bottom: 0,
+              left: 0,
+              backgroundColor: "rgba(17, 24, 39, 0.24)",
+            }}
+            onPress={() => setMeetModalVisible(false)}
+          />
           <View style={{ borderRadius: 12, backgroundColor: "#ffffff", padding: 16 }}>
             <Text style={{ marginBottom: 12, fontSize: 16, fontWeight: "700" }}>デート申込</Text>
             <TouchableOpacity
