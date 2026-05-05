@@ -663,6 +663,4 @@ def get_my_footprints(
         ORDER BY footprints.viewed_at DESC
         LIMIT ?
     """
-    return execQuery.execute_select(
-        query, [current_user["id"], limit], db, response_model=FootprintResponse
-    )
+    return execQuery.execute_select(query, [current_user["id"], limit], db)
