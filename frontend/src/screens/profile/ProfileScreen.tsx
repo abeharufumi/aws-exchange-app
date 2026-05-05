@@ -266,11 +266,16 @@ export function ProfileScreen() {
 
   const rankProgress = profile?.rankProgress;
   const rankProgressItems: RankProgressItem[] = rankProgress?.items || [];
+  const toUtcDate = (value: string): Date => {
+    // タイムゾーン情報がない場合はUTCとして解釈する（DBはUTCで保存）
+    return new Date(value.endsWith("Z") || value.includes("+") ? value : value + "Z");
+  };
+
   const calcRemainingDays = (value?: string | null): number | null => {
     if (!value) {
       return null;
     }
-    const end = new Date(value).getTime();
+    const end = toUtcDate(value).getTime();
     if (!Number.isFinite(end)) {
       return null;
     }
@@ -287,7 +292,7 @@ export function ProfileScreen() {
   const isPremiumCancelled = premiumStatus?.status === "cancelled";
   const premiumStateLabel = isPremiumActive ? "有効" : isPremiumCancelled ? "解約予定" : "未加入";
   const premiumEndsAt = premiumStatus?.ends_at
-    ? new Date(premiumStatus.ends_at).toLocaleDateString("ja-JP")
+    ? toUtcDate(premiumStatus.ends_at).toLocaleDateString("ja-JP")
     : null;
 
   const [boostCountdown, setBoostCountdown] = useState("");
@@ -298,7 +303,7 @@ export function ProfileScreen() {
       return;
     }
     const update = () => {
-      const diff = new Date(activeBoost.expires_at).getTime() - Date.now();
+      const diff = toUtcDate(activeBoost.expires_at).getTime() - Date.now();
       if (diff <= 0) {
         setBoostCountdown("期限切れ");
         return;
