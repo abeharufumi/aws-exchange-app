@@ -7,7 +7,7 @@ import { EmptyState } from "../../components/common/EmptyState";
 import { LoadingState } from "../../components/common/LoadingState";
 import { SectionCard } from "../../components/common/SectionCard";
 import { SegmentedTab } from "../../components/common/SegmentedTab";
-import { ScreenBackButton } from "../../components/common/ScreenBackButton";
+import { ScreenBackHeader } from "../../components/common/ScreenBackButton";
 import { TimePickerModal } from "../../components/common/TimePickerModal";
 import apiClient from "../../services/api";
 import {
@@ -250,21 +250,12 @@ export function CallTicketScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: "#ffffff" }}>
-      <View
-        style={{
-          borderBottomWidth: 1,
-          borderColor: "#f3f4f6",
-          paddingHorizontal: 16,
-          paddingTop: 20,
-          paddingBottom: 12,
-        }}
-      >
-        <ScreenBackButton onPress={() => router.back()} style={{ paddingRight: 12 }} />
-        <Text style={{ marginBottom: 4, fontSize: 24, fontWeight: "700", color: "#111827" }}>
-          📞 通話チケット
-        </Text>
-        <Text style={{ fontSize: 14, color: "#6b7280" }}>チケットの購入・使用・販売ができます</Text>
-      </View>
+      <ScreenBackHeader
+        title="📞 通話チケット"
+        subtitle="チケットの購入・使用・販売ができます"
+        onPress={() => router.back()}
+        titleStyle={{ fontSize: 24 }}
+      />
 
       <SegmentedTab items={CALL_TICKET_TABS} value={tab} onChange={setTab} />
 

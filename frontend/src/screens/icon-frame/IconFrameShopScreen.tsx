@@ -3,7 +3,7 @@ import { Alert, FlatList, Modal, Pressable, Text, TouchableOpacity, View } from 
 import { useRouter } from "expo-router";
 import { EmptyState } from "../../components/common/EmptyState";
 import { LoadingState } from "../../components/common/LoadingState";
-import { ScreenBackButton } from "../../components/common/ScreenBackButton";
+import { ScreenBackHeader } from "../../components/common/ScreenBackButton";
 import { SegmentedTab } from "../../components/common/SegmentedTab";
 import apiClient from "../../services/api";
 import {
@@ -285,26 +285,12 @@ export function IconFrameShopScreen() {
           </Pressable>
         </Pressable>
       </Modal>
-      <ScreenBackButton
+      <ScreenBackHeader
+        title="🖼️ アイコンフレームショップ"
+        subtitle="プロフィールアイコンに装飾フレームを付けよう"
         onPress={() => router.back()}
-        style={{ paddingHorizontal: 20, paddingTop: 12, paddingBottom: 4 }}
-        textStyle={{ fontSize: 15, color: "#e74c3c", fontWeight: "600" }}
+        style={{ borderColor: "#e5e7eb", paddingHorizontal: 20 }}
       />
-
-      <View
-        style={{
-          borderBottomWidth: 1,
-          borderColor: "#e5e7eb",
-          backgroundColor: "#ffffff",
-          paddingHorizontal: 20,
-          paddingTop: 20,
-        }}
-      >
-        <Text style={{ marginBottom: 4, fontWeight: "700", color: "#1f2937" }}>
-          🖼️ アイコンフレームショップ
-        </Text>
-        <Text style={{ color: "#6b7280" }}>プロフィールアイコンに装飾フレームを付けよう</Text>
-      </View>
 
       <SegmentedTab items={ICON_FRAME_TABS} value={tab} onChange={setTab} />
 

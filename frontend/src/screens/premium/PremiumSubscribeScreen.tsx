@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Alert, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { useRouter } from "expo-router";
+import { ScreenBackHeader } from "@/src/components/common/ScreenBackButton";
 import apiClient from "@/src/services/api";
 import { PremiumSubscriptionResponse } from "@/src/types/premium";
 
@@ -72,17 +73,17 @@ export function PremiumSubscribeScreen() {
   };
 
   return (
-    <ScrollView
-      style={{ flex: 1, backgroundColor: "#ffffff", paddingHorizontal: 16, paddingVertical: 20 }}
-    >
-      <View style={{ marginBottom: 32, alignItems: "center" }}>
-        <Text style={{ marginBottom: 8, fontSize: 30, fontWeight: "700", color: "#1f2937" }}>
-          プレミアム会員になる
-        </Text>
-        <Text style={{ textAlign: "center", fontSize: 14, color: "#6b7280" }}>
-          送信上限 +20 通 / すべての受信設定が解放されます
-        </Text>
-      </View>
+    <View style={{ flex: 1, backgroundColor: "#ffffff" }}>
+      <ScreenBackHeader title="プレミアム購入" onPress={() => router.back()} />
+      <ScrollView style={{ flex: 1, paddingHorizontal: 16, paddingVertical: 20 }}>
+        <View style={{ marginBottom: 32, alignItems: "center" }}>
+          <Text style={{ marginBottom: 8, fontSize: 30, fontWeight: "700", color: "#1f2937" }}>
+            プレミアム会員になる
+          </Text>
+          <Text style={{ textAlign: "center", fontSize: 14, color: "#6b7280" }}>
+            送信上限 +20 通 / すべての受信設定が解放されます
+          </Text>
+        </View>
 
       <View
         style={{
@@ -201,38 +202,26 @@ export function PremiumSubscribeScreen() {
         <Text style={{ marginBottom: 4, fontSize: 12, color: "#6b7280" }}>• 返金はできません</Text>
       </View>
 
-      <TouchableOpacity
-        style={[
-          {
-            marginBottom: 12,
-            alignItems: "center",
-            borderRadius: 8,
-            backgroundColor: "#f97316",
-            paddingVertical: 14,
-          },
-          isProcessing ? { opacity: 0.6 } : undefined,
-        ]}
-        onPress={handleSubscribe}
-        disabled={isProcessing}
-      >
-        <Text style={{ fontSize: 16, fontWeight: "700", color: "#ffffff" }}>
-          {isProcessing ? "処理中..." : `¥${current_plan.price_jpy.toLocaleString()} で加入`}
-        </Text>
-      </TouchableOpacity>
+        <TouchableOpacity
+          style={[
+            {
+              marginBottom: 12,
+              alignItems: "center",
+              borderRadius: 8,
+              backgroundColor: "#f97316",
+              paddingVertical: 14,
+            },
+            isProcessing ? { opacity: 0.6 } : undefined,
+          ]}
+          onPress={handleSubscribe}
+          disabled={isProcessing}
+        >
+          <Text style={{ fontSize: 16, fontWeight: "700", color: "#ffffff" }}>
+            {isProcessing ? "処理中..." : `¥${current_plan.price_jpy.toLocaleString()} で加入`}
+          </Text>
+        </TouchableOpacity>
 
-      <TouchableOpacity
-        style={{
-          marginBottom: 20,
-          alignItems: "center",
-          borderRadius: 8,
-          borderWidth: 1,
-          borderColor: "#d1d5db",
-          paddingVertical: 14,
-        }}
-        onPress={() => router.back()}
-      >
-        <Text style={{ fontSize: 16, fontWeight: "600", color: "#6b7280" }}>キャンセル</Text>
-      </TouchableOpacity>
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 }

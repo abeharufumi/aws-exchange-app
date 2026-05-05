@@ -12,7 +12,7 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 import { CameraView, useCameraPermissions, BarcodeScanningResult } from "expo-camera";
-import { ScreenBackButton } from "../../components/common/ScreenBackButton";
+import { ScreenBackHeader } from "../../components/common/ScreenBackButton";
 import apiClient from "../../services/api";
 import {
   MeetTroubleActionResponse,
@@ -505,19 +505,7 @@ export function QRScreen({ route }: any) {
 
   return (
     <View style={{ flex: 1, backgroundColor: "#ffffff" }}>
-      <View
-        style={{
-          borderBottomWidth: 1,
-          borderColor: "#f3f4f6",
-          backgroundColor: "#ffffff",
-          paddingHorizontal: 16,
-          paddingTop: 12,
-          paddingBottom: 12,
-        }}
-      >
-        <ScreenBackButton onPress={() => router.back()} style={{ paddingBottom: 6 }} />
-        <Text style={{ fontSize: 20, fontWeight: "700", color: "#111827" }}>QR確認</Text>
-      </View>
+      <ScreenBackHeader title="QR確認" onPress={() => router.back()} />
 
       <View
         style={{

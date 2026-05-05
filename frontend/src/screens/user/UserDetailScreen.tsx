@@ -7,7 +7,7 @@ import { AvatarWithFrame } from "../../components/common/AvatarWithFrame";
 import { UserPresenceStatus } from "../../components/common";
 import { EmptyState } from "../../components/common/EmptyState";
 import { LoadingState } from "../../components/common/LoadingState";
-import { ScreenBackButton } from "../../components/common/ScreenBackButton";
+import { ScreenBackHeader } from "../../components/common/ScreenBackButton";
 import apiClient from "../../services/api";
 import { PublicUserProfile } from "../../types/user";
 import { LikeActionResponse, PassActionResponse } from "../../types/match";
@@ -174,24 +174,12 @@ export function UserDetailScreen({ route }: any) {
 
   return (
     <View style={{ flex: 1, backgroundColor: "#ffffff" }}>
-      <View
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          gap: 8,
-          borderBottomWidth: 1,
-          borderColor: "#e5e7eb",
-          paddingHorizontal: 12,
-        }}
-      >
-        <ScreenBackButton
-          compact
-          onPress={handleBack}
-          style={{ width: 32, height: 32, alignItems: "center", justifyContent: "center" }}
-          textStyle={{ fontSize: 24, fontWeight: "700", color: "#111827", lineHeight: 24 }}
-        />
-        <Text style={{ fontSize: 16, fontWeight: "700", color: "#111827" }}>プロフィール</Text>
-      </View>
+      <ScreenBackHeader
+        title="プロフィール"
+        onPress={handleBack}
+        style={{ borderColor: "#e5e7eb", paddingHorizontal: 12 }}
+        titleStyle={{ fontSize: 16 }}
+      />
 
       {!profile ? (
         <EmptyState

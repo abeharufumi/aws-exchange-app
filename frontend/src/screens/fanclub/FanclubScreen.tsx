@@ -4,7 +4,7 @@ import { useRouter } from "expo-router";
 import { ActionButton } from "../../components/common/ActionButton";
 import { EmptyState } from "../../components/common/EmptyState";
 import { LoadingState } from "../../components/common/LoadingState";
-import { ScreenBackButton } from "../../components/common/ScreenBackButton";
+import { ScreenBackHeader } from "../../components/common/ScreenBackButton";
 import { SegmentedTab } from "../../components/common/SegmentedTab";
 import apiClient from "../../services/api";
 import {
@@ -128,25 +128,11 @@ export function FanclubScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: "#f9fafb" }}>
-      <View
-        style={{
-          borderBottomWidth: 1,
-          borderColor: "#f3f4f6",
-          backgroundColor: "#ffffff",
-          paddingHorizontal: 16,
-          paddingTop: 20,
-        }}
-      >
-        <ScreenBackButton
-          onPress={() => router.back()}
-          style={{ paddingBottom: 10 }}
-          textStyle={{ color: "#6b7280", fontSize: 15 }}
-        />
-        <Text style={{ marginBottom: 4, fontWeight: "700", color: "#111827" }}>
-          💜 ファンクラブ
-        </Text>
-        <Text style={{ color: "#6b7280" }}>加入一覧と自分のメンバーを確認できます</Text>
-      </View>
+      <ScreenBackHeader
+        title="💜 ファンクラブ"
+        subtitle="加入一覧と自分のメンバーを確認できます"
+        onPress={() => router.back()}
+      />
 
       <SegmentedTab items={FANCLUB_TABS} value={tab} onChange={setTab} />
 
@@ -410,24 +396,7 @@ export function FanclubCreatorScreen({ creatorId }: { creatorId: number }) {
   if (!info) {
     return (
       <View style={{ flex: 1, backgroundColor: "#f9fafb" }}>
-        <View
-          style={{
-            borderBottomWidth: 1,
-            borderColor: "#f3f4f6",
-            backgroundColor: "#ffffff",
-            paddingHorizontal: 16,
-            paddingTop: 20,
-          }}
-        >
-          <ScreenBackButton
-            onPress={() => router.back()}
-            style={{ paddingBottom: 10 }}
-            textStyle={{ color: "#6b7280", fontSize: 15 }}
-          />
-          <Text style={{ marginBottom: 4, fontWeight: "700", color: "#111827" }}>
-            💜 ファンクラブ
-          </Text>
-        </View>
+        <ScreenBackHeader title="💜 ファンクラブ" onPress={() => router.back()} />
         <EmptyState
           message="ファンクラブ情報が見つかりません"
           textStyle={{ textAlign: "center", color: "#9ca3af", paddingTop: 40, fontSize: 14 }}
@@ -438,25 +407,11 @@ export function FanclubCreatorScreen({ creatorId }: { creatorId: number }) {
 
   return (
     <View style={{ flex: 1, backgroundColor: "#f9fafb" }}>
-      <View
-        style={{
-          borderBottomWidth: 1,
-          borderColor: "#f3f4f6",
-          backgroundColor: "#ffffff",
-          paddingHorizontal: 16,
-          paddingTop: 20,
-        }}
-      >
-        <ScreenBackButton
-          onPress={() => router.back()}
-          style={{ paddingBottom: 10 }}
-          textStyle={{ color: "#6b7280", fontSize: 15 }}
-        />
-        <Text style={{ marginBottom: 4, fontWeight: "700", color: "#111827" }}>
-          💜 ファンクラブ
-        </Text>
-        <Text style={{ color: "#6b7280" }}>クリエーターを継続支援できます</Text>
-      </View>
+      <ScreenBackHeader
+        title="💜 ファンクラブ"
+        subtitle="クリエーターを継続支援できます"
+        onPress={() => router.back()}
+      />
 
       <View
         style={{

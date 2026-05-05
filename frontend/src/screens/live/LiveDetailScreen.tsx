@@ -3,7 +3,7 @@ import { Alert, Text, TouchableOpacity, View } from "react-native";
 import { useFocusEffect, useRouter } from "expo-router";
 import { EmptyState } from "../../components/common/EmptyState";
 import { LoadingState } from "../../components/common/LoadingState";
-import { ScreenBackButton } from "../../components/common/ScreenBackButton";
+import { ScreenBackHeader } from "../../components/common/ScreenBackButton";
 import apiClient from "../../services/api";
 import { useAuth } from "../../contexts/auth";
 import {
@@ -152,23 +152,7 @@ export function LiveDetailScreen({ route }: { route: { params: { streamId: strin
   if (!stream) {
     return (
       <View style={{ flex: 1, backgroundColor: "#030712" }}>
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            backgroundColor: "#0a0a0a",
-            paddingHorizontal: 16,
-            paddingBottom: 12,
-            paddingTop: 16,
-          }}
-        >
-          <ScreenBackButton
-            onPress={() => router.back()}
-            style={{ paddingRight: 12 }}
-            textStyle={{ color: "#9ca3af", fontSize: 16 }}
-            variant="dark"
-          />
-        </View>
+        <ScreenBackHeader title="ライブ詳細" onPress={() => router.back()} variant="dark" />
         <EmptyState
           message="配信が見つかりません"
           containerStyle={{ flex: 1 }}
@@ -182,29 +166,12 @@ export function LiveDetailScreen({ route }: { route: { params: { streamId: strin
 
   return (
     <View style={{ flex: 1, backgroundColor: "#030712" }}>
-      <View
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          backgroundColor: "#0a0a0a",
-          paddingHorizontal: 16,
-          paddingBottom: 12,
-          paddingTop: 16,
-        }}
-      >
-        <ScreenBackButton
-          onPress={() => router.back()}
-          style={{ paddingRight: 12 }}
-          textStyle={{ color: "#9ca3af", fontSize: 16 }}
-          variant="dark"
-        />
-        <Text
-          style={{ flex: 1, fontSize: 16, fontWeight: "700", color: "#ffffff" }}
-          numberOfLines={1}
-        >
-          {stream.title}
-        </Text>
-      </View>
+      <ScreenBackHeader
+        title={stream.title}
+        onPress={() => router.back()}
+        variant="dark"
+        titleStyle={{ flex: 1, fontSize: 16 }}
+      />
 
       <Text style={{ marginTop: 8, paddingHorizontal: 16, color: "#9ca3af" }}>
         配信者: {stream.broadcaster_name}

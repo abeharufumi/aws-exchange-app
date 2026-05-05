@@ -4,7 +4,7 @@ import { useFocusEffect, useRouter } from "expo-router";
 import { ActionButton } from "../../components/common/ActionButton";
 import { EmptyState } from "../../components/common/EmptyState";
 import { LoadingState } from "../../components/common/LoadingState";
-import { ScreenBackButton } from "../../components/common/ScreenBackButton";
+import { ScreenBackHeader } from "../../components/common/ScreenBackButton";
 import { SegmentedTab } from "../../components/common/SegmentedTab";
 import { SectionCard } from "../../components/common/SectionCard";
 import apiClient from "../../services/api";
@@ -129,27 +129,13 @@ export function LiveScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: "#0f0f0f" }}>
-      <View
-        style={{
-          paddingHorizontal: 16,
-          paddingTop: 20,
-          paddingBottom: 12,
-          backgroundColor: "#1a1a1a",
-        }}
-      >
-        <ScreenBackButton
-          onPress={() => router.back()}
-          variant="dark"
-          style={{ paddingRight: 12 }}
-          textStyle={{ color: "#9ca3af", fontSize: 16 }}
-        />
-        <Text style={{ marginBottom: 4, fontSize: 24, fontWeight: "700", color: "#ffffff" }}>
-          🔴 ライブ配信
-        </Text>
-        <Text style={{ fontSize: 14, color: "#9ca3af" }}>
-          配信一覧の閲覧と、自分の配信管理ができます
-        </Text>
-      </View>
+      <ScreenBackHeader
+        title="🔴 ライブ配信"
+        subtitle="配信一覧の閲覧と、自分の配信管理ができます"
+        onPress={() => router.back()}
+        variant="dark"
+        titleStyle={{ fontSize: 24 }}
+      />
 
       <TouchableOpacity
         style={{
