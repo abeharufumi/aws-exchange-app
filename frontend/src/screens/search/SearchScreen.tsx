@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { FlatList, Text, TouchableOpacity, View } from "react-native";
-import { Button, Surface, TextInput } from "react-native-paper";
+import { ActivityIndicator, Button, Surface, TextInput } from "react-native-paper";
 import { useRouter } from "expo-router";
 import { UserPresenceStatus } from "../../components/common";
 import apiClient from "../../services/api";
@@ -11,6 +11,7 @@ export function SearchScreen() {
   const [maxAge, setMaxAge] = useState("50");
   const [users, setUsers] = useState<UserCard[]>([]);
   const [searching, setSearching] = useState(false);
+  const [searched, setSearched] = useState(false);
   const router = useRouter();
 
   const getMembershipLabel = (item: UserCard): string => {
@@ -33,6 +34,7 @@ export function SearchScreen() {
         },
       });
       setUsers(response.data);
+      setSearched(true);
     } catch (error) {
       console.error("Search error:", error);
     } finally {
@@ -88,68 +90,85 @@ export function SearchScreen() {
         </Button>
       </Surface>
 
-      <FlatList
-        data={users}
-        keyExtractor={(item) => String(item.id)}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            activeOpacity={0.7}
-            onPress={() => router.push(`/user/${item.id}`)}
+      <View style={{ flex: 1, position: "relative" }}>
+        {searching && (
+          <View
             style={{
-              borderBottomWidth: 1,
-              borderBottomColor: "#e5e7eb",
-              paddingHorizontal: 4,
-              paddingVertical: 16,
+              position: "absolute",
+              inset: 0,
+              zIndex: 10,
+              alignItems: "center",
+              justifyContent: "center",
+              backgroundColor: "rgba(255,255,255,0.7)",
             }}
           >
-            <Text style={{ marginBottom: 4, fontSize: 16, fontWeight: "bold", color: "#111827" }}>
-              {item.displayName}, {item.age}
-            </Text>
-            <View style={{ marginBottom: 6, flexDirection: "row", alignItems: "center", gap: 6 }}>
-              <View
-                style={{
-                  borderRadius: 9999,
-                  backgroundColor: "#e5e7eb",
-                  paddingHorizontal: 8,
-                  paddingVertical: 3,
-                }}
-              >
-                <Text style={{ fontSize: 11, fontWeight: "700", color: "#374151" }}>
-                  Rank {item.rank || 1}
-                </Text>
-              </View>
-              <View
-                style={{
-                  borderRadius: 9999,
-                  backgroundColor: item.isPremiumActive
-                    ? "#ede9fe"
-                    : item.isBoostActive
-                      ? "#dbeafe"
-                      : "#f3f4f6",
-                  paddingHorizontal: 8,
-                  paddingVertical: 3,
-                }}
-              >
-                <Text
+            <ActivityIndicator animating color="#e74c3c" size="large" />
+          </View>
+        )}
+        <FlatList
+          style={{ opacity: searching ? 0.4 : 1 }}
+          data={users}
+          keyExtractor={(item) => String(item.id)}
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              activeOpacity={0.7}
+              onPress={() => router.push(`/user/${item.id}`)}
+              style={{
+                borderBottomWidth: 1,
+                borderBottomColor: "#e5e7eb",
+                paddingHorizontal: 4,
+                paddingVertical: 16,
+              }}
+            >
+              <Text style={{ marginBottom: 4, fontSize: 16, fontWeight: "bold", color: "#111827" }}>
+                {item.displayName}, {item.age}
+              </Text>
+              <View style={{ marginBottom: 6, flexDirection: "row", alignItems: "center", gap: 6 }}>
+                <View
                   style={{
-                    fontSize: 11,
-                    fontWeight: "700",
-                    color: item.isPremiumActive
-                      ? "#6d28d9"
-                      : item.isBoostActive
-                        ? "#1d4ed8"
-                        : "#6b7280",
+                    borderRadius: 9999,
+                    backgroundColor: "#e5e7eb",
+                    paddingHorizontal: 8,
+                    paddingVertical: 3,
                   }}
                 >
-                  {getMembershipLabel(item)}
-                </Text>
+                  <Text style={{ fontSize: 11, fontWeight: "700", color: "#374151" }}>
+                    Rank {item.rank || 1}
+                  </Text>
+                </View>
+                <View
+                  style={{
+                    borderRadius: 9999,
+                    backgroundColor: item.isPremiumActive
+                      ? "#ede9fe"
+                      : item.isBoostActive
+                        ? "#dbeafe"
+                        : "#f3f4f6",
+                    paddingHorizontal: 8,
+                    paddingVertical: 3,
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: 11,
+                      fontWeight: "700",
+                      color: item.isPremiumActive
+                        ? "#6d28d9"
+                        : item.isBoostActive
+                          ? "#1d4ed8"
+                          : "#6b7280",
+                    }}
+                  >
+                    {getMembershipLabel(item)}
+                  </Text>
+                </View>
               </View>
-            </View>
-            <UserPresenceStatus status={item.onlineStatus} lastActiveAt={item.lastActiveAt} />
-            <Text style={{ fontSize: 14, color: "#6b7280" }}>{item.bio}</Text>
-          </TouchableOpacity>
-        )}
-      />
+              <UserPresenceStatus status={item.onlineStatus} lastActiveAt={item.lastActiveAt} />
+              <Text style={{ fontSize: 14, color: "#6b7280" }}>{item.bio}</Text>
+            </TouchableOpacity>
+          )}
+        />
+      </View>
     </View>
   );
 }
