@@ -3,13 +3,24 @@ import { FlatList, Text, TouchableOpacity, View } from "react-native";
 import { Button, Surface, TextInput } from "react-native-paper";
 import { useRouter } from "expo-router";
 import apiClient from "../../services/api";
+import { UserCard } from "../../types/user";
 
 export function SearchScreen() {
   const [minAge, setMinAge] = useState("18");
   const [maxAge, setMaxAge] = useState("50");
-  const [users, setUsers] = useState<any[]>([]);
+  const [users, setUsers] = useState<UserCard[]>([]);
   const [searching, setSearching] = useState(false);
   const router = useRouter();
+
+  const getMembershipLabel = (item: UserCard): string => {
+    if (item.isPremiumActive) {
+      return "Premium";
+    }
+    if (item.isBoostActive) {
+      return "Boost";
+    }
+    return "通常";
+  };
 
   const handleSearch = async () => {
     try {
@@ -93,6 +104,46 @@ export function SearchScreen() {
             <Text style={{ marginBottom: 4, fontSize: 16, fontWeight: "bold", color: "#111827" }}>
               {item.displayName}, {item.age}
             </Text>
+            <View style={{ marginBottom: 6, flexDirection: "row", alignItems: "center", gap: 6 }}>
+              <View
+                style={{
+                  borderRadius: 9999,
+                  backgroundColor: "#e5e7eb",
+                  paddingHorizontal: 8,
+                  paddingVertical: 3,
+                }}
+              >
+                <Text style={{ fontSize: 11, fontWeight: "700", color: "#374151" }}>
+                  Rank {item.rank || 1}
+                </Text>
+              </View>
+              <View
+                style={{
+                  borderRadius: 9999,
+                  backgroundColor: item.isPremiumActive
+                    ? "#ede9fe"
+                    : item.isBoostActive
+                      ? "#dbeafe"
+                      : "#f3f4f6",
+                  paddingHorizontal: 8,
+                  paddingVertical: 3,
+                }}
+              >
+                <Text
+                  style={{
+                    fontSize: 11,
+                    fontWeight: "700",
+                    color: item.isPremiumActive
+                      ? "#6d28d9"
+                      : item.isBoostActive
+                        ? "#1d4ed8"
+                        : "#6b7280",
+                  }}
+                >
+                  {getMembershipLabel(item)}
+                </Text>
+              </View>
+            </View>
             <Text style={{ fontSize: 14, color: "#6b7280" }}>{item.bio}</Text>
           </TouchableOpacity>
         )}

@@ -132,6 +132,8 @@ class UserCardResponse(BaseModel):
         None  # 自分からこのユーザーへの依頼状態: 'pending'/'matched'/'passed'/'expired'
     )
     requestCreatedAt: Optional[datetime] = None  # 依頼作成日時（期限表示用）
+    isPremiumActive: Optional[bool] = None  # Premium有効中か（true/false）
+    isBoostActive: Optional[bool] = None  # Boost有効中か（true/false）
 
 
 class ProfileUpdateRequest(BaseModel):
@@ -161,6 +163,21 @@ def discover_users(
                              user_profiles.bio,
                              user_ranks.current_rank AS rank,
                              user_ranks.review_avg AS "reviewAvg",
+                                                         EXISTS (
+                                                                SELECT 1
+                                                                FROM premium_subscriptions ps
+                                                                WHERE ps.user_id = users.id
+                                                                    AND ps.status = 'active'
+                                                                    AND (ps.ends_at IS NULL OR ps.ends_at > NOW())
+                                                         ) AS "isPremiumActive",
+                                                         EXISTS (
+                                                                SELECT 1
+                                                                FROM boost_purchases bp2
+                                                                WHERE bp2.user_id = users.id
+                                                                    AND bp2.payment_status = 'completed'
+                                                                    AND bp2.activated_at IS NOT NULL
+                                                                    AND (bp2.expires_at IS NULL OR bp2.expires_at > NOW())
+                                                         ) AS "isBoostActive",
                              req.status AS "requestStatus",
                              req.created_at AS "requestCreatedAt"
                 FROM users
@@ -238,6 +255,21 @@ def search_users(
                user_profiles.bio,
                user_ranks.current_rank AS rank,
                user_ranks.review_avg AS "reviewAvg",
+                             EXISTS (
+                                     SELECT 1
+                                     FROM premium_subscriptions ps
+                                     WHERE ps.user_id = users.id
+                                         AND ps.status = 'active'
+                                         AND (ps.ends_at IS NULL OR ps.ends_at > NOW())
+                             ) AS "isPremiumActive",
+                             EXISTS (
+                                     SELECT 1
+                                     FROM boost_purchases bp2
+                                     WHERE bp2.user_id = users.id
+                                         AND bp2.payment_status = 'completed'
+                                         AND bp2.activated_at IS NOT NULL
+                                         AND (bp2.expires_at IS NULL OR bp2.expires_at > NOW())
+                             ) AS "isBoostActive",
                    req.status AS "requestStatus",
                    req.created_at AS "requestCreatedAt"
         FROM users

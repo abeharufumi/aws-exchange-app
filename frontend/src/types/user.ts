@@ -5,6 +5,8 @@ export interface UserCard {
   location?: string;
   bio?: string;
   rank?: number;
+  isPremiumActive?: boolean;
+  isBoostActive?: boolean;
   reviewAvg?: number;
   requestStatus?: "pending" | "matched" | "passed" | "expired" | string;
   requestCreatedAt?: string;
