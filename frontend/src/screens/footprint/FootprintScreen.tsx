@@ -54,7 +54,8 @@ export function FootprintScreen() {
 
   const formatViewedAt = (timestamp: string): string => {
     try {
-      const date = new Date(timestamp);
+      const utc = timestamp.endsWith("Z") ? timestamp : timestamp + "Z";
+      const date = new Date(utc);
       const now = new Date();
       const diffMs = now.getTime() - date.getTime();
       const diffMins = Math.floor(diffMs / 60000);
@@ -76,23 +77,59 @@ export function FootprintScreen() {
 
   if (!canView) {
     return (
-      <View style={{ flex: 1, backgroundColor: '#ffffff' }}>
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 24 }}>
-          <Text style={{ fontSize: 24, fontWeight: '700', color: '#1f2937', marginBottom: 12 }}>足跡機能</Text>
-          <Text style={{ fontSize: 14, fontWeight: '600', color: '#374151', textAlign: 'center', marginBottom: 12 }}>{limitMessage}</Text>
+      <View style={{ flex: 1, backgroundColor: "#ffffff" }}>
+        <View
+          style={{ flex: 1, justifyContent: "center", alignItems: "center", paddingHorizontal: 24 }}
+        >
+          <Text style={{ fontSize: 24, fontWeight: "700", color: "#1f2937", marginBottom: 12 }}>
+            足跡機能
+          </Text>
+          <Text
+            style={{
+              fontSize: 14,
+              fontWeight: "600",
+              color: "#374151",
+              textAlign: "center",
+              marginBottom: 12,
+            }}
+          >
+            {limitMessage}
+          </Text>
           {lockProgressMessage ? (
-            <Text style={{ fontSize: 12, fontWeight: '700', color: '#374151', textAlign: 'center', marginBottom: 10 }}>
+            <Text
+              style={{
+                fontSize: 12,
+                fontWeight: "700",
+                color: "#374151",
+                textAlign: "center",
+                marginBottom: 10,
+              }}
+            >
               次ランク条件: {lockProgressMessage}
             </Text>
           ) : null}
-          <Text style={{ fontSize: 12, color: '#6b7280', textAlign: 'center', lineHeight: 28, marginBottom: 12 }}>
+          <Text
+            style={{
+              fontSize: 12,
+              color: "#6b7280",
+              textAlign: "center",
+              lineHeight: 28,
+              marginBottom: 12,
+            }}
+          >
             Rank3以上になると自分のプロフィールを訪問してくれたユーザーが表示されます
           </Text>
           <TouchableOpacity
-            style={{ marginTop: 4, borderRadius: 8, backgroundColor: '#374151', paddingVertical: 10, paddingHorizontal: 12 }}
+            style={{
+              marginTop: 4,
+              borderRadius: 8,
+              backgroundColor: "#374151",
+              paddingVertical: 10,
+              paddingHorizontal: 12,
+            }}
             onPress={() => router.push("/(tabs)/profile?focus=rank")}
           >
-            <Text style={{ fontSize: 14, fontWeight: '700' }}>次ランク条件を見る</Text>
+            <Text style={{ fontSize: 14, fontWeight: "700" }}>次ランク条件を見る</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -100,7 +137,7 @@ export function FootprintScreen() {
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#ffffff' }}>
+    <View style={{ flex: 1, backgroundColor: "#ffffff" }}>
       {footprints.length === 0 ? (
         <EmptyState
           message="足跡がまだありません"
@@ -113,12 +150,26 @@ export function FootprintScreen() {
           keyExtractor={(item) => `${item.visitorId}-${item.viewedAt}`}
           renderItem={({ item }) => (
             <TouchableOpacity
-              style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 12, paddingHorizontal: 16, borderBottomWidth: 1, borderColor: '#f3f4f6' }}
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-between",
+                paddingVertical: 12,
+                paddingHorizontal: 16,
+                borderBottomWidth: 1,
+                borderColor: "#f3f4f6",
+              }}
               onPress={() => router.push(`/user/${item.visitorId}`)}
             >
               <View style={{ flex: 1 }}>
-                <Text style={{ fontSize: 14, fontWeight: '600', color: '#1f2937', marginBottom: 4 }}>{item.visitorName}</Text>
-                <Text style={{ fontSize: 12, color: '#9ca3af' }}>{formatViewedAt(item.viewedAt)}</Text>
+                <Text
+                  style={{ fontSize: 14, fontWeight: "600", color: "#1f2937", marginBottom: 4 }}
+                >
+                  {item.visitorName}
+                </Text>
+                <Text style={{ fontSize: 12, color: "#9ca3af" }}>
+                  {formatViewedAt(item.viewedAt)}
+                </Text>
               </View>
               <Text style={{ fontSize: 20, marginLeft: 8 }}>›</Text>
             </TouchableOpacity>
