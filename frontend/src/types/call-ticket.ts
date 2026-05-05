@@ -7,6 +7,9 @@ export interface CallTicketItem {
   ticket_duration_minutes: number;
   price_jpy: number;
   is_available: boolean;
+  scheduled_date: string;
+  start_time: string;
+  end_time: string;
 }
 
 export interface PurchasedTicketItem {
@@ -15,6 +18,9 @@ export interface PurchasedTicketItem {
   seller_id: number;
   seller_name: string;
   ticket_duration_minutes: number;
+  scheduled_date: string;
+  start_time: string;
+  end_time: string;
   amount_jpy: number;
   purchased_at: string;
   used_at?: string;
@@ -27,6 +33,9 @@ export interface CreatedTicketItem {
   ticket_duration_minutes: number;
   price_jpy: number;
   is_available: boolean;
+  scheduled_date: string;
+  start_time: string;
+  end_time: string;
   created_at: string;
   sold_at?: string;
   buyer_id?: number;

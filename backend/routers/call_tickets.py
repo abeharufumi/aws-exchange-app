@@ -21,6 +21,9 @@ class CreateTicketPayload(BaseModel):
 
     ticket_duration_minutes: int  # 通話時間（分）
     price_jpy: int  # 価格（円）
+    scheduled_date: str  # 利用予定日（YYYY-MM-DD）
+    start_time: str  # 開始時間（HH:MM）
+    end_time: str  # 終了時間（HH:MM）
 
 
 class CallTicketItem(BaseModel):
@@ -32,6 +35,9 @@ class CallTicketItem(BaseModel):
     ticket_duration_minutes: int  # 通話時間（分）
     price_jpy: int  # 価格（円）
     is_available: bool  # 購入可能か
+    scheduled_date: str  # 利用予定日（YYYY-MM-DD）
+    start_time: str  # 開始時間（HH:MM）
+    end_time: str  # 終了時間（HH:MM）
 
 
 class PurchasedTicketItem(BaseModel):
@@ -42,6 +48,9 @@ class PurchasedTicketItem(BaseModel):
     seller_id: int  # 販売者ユーザーID
     seller_name: str  # 販売者表示名
     ticket_duration_minutes: int  # 通話時間（分）
+    scheduled_date: str  # 利用予定日（YYYY-MM-DD）
+    start_time: str  # 開始時間（HH:MM）
+    end_time: str  # 終了時間（HH:MM）
     amount_jpy: int  # 購入金額（円）
     purchased_at: str  # 購入日時
     used_at: Optional[str] = None  # 使用日時（未使用は None）
@@ -56,6 +65,9 @@ class CreatedTicketItem(BaseModel):
     ticket_duration_minutes: int  # 通話時間（分）
     price_jpy: int  # 価格（円）
     is_available: bool  # 販売中フラグ（True=販売中, False=販売済み）
+    scheduled_date: str  # 利用予定日（YYYY-MM-DD）
+    start_time: str  # 開始時間（HH:MM）
+    end_time: str  # 終了時間（HH:MM）
     created_at: str  # 作成日時
     sold_at: Optional[str] = None  # 売却日時（未売却は None）
     buyer_id: Optional[int] = None  # 購入者ユーザーID
@@ -125,11 +137,27 @@ def create_ticket(
 
     ticket_id = execQuery.execute_insert(
         """
-        INSERT INTO call_tickets (seller_id, ticket_duration_minutes, price_jpy, is_available, created_at)
-        VALUES (?, ?, ?, TRUE, NOW())
+        INSERT INTO call_tickets (
+            seller_id,
+            ticket_duration_minutes,
+            price_jpy,
+            scheduled_date,
+            start_time,
+            end_time,
+            is_available,
+            created_at
+        )
+        VALUES (?, ?, ?, ?, ?, ?, TRUE, NOW())
         RETURNING id
         """,
-        [current_user["id"], payload.ticket_duration_minutes, payload.price_jpy],
+        [
+            current_user["id"],
+            payload.ticket_duration_minutes,
+            payload.price_jpy,
+            payload.scheduled_date,
+            payload.start_time,
+            payload.end_time,
+        ],
         db,
     )
 
@@ -160,7 +188,10 @@ def list_seller_tickets(
     rows = execQuery.execute_select(
         """
         SELECT ct.id, ct.seller_id, up.display_name AS seller_name,
-               ct.ticket_duration_minutes, ct.price_jpy, ct.is_available
+             ct.ticket_duration_minutes, ct.price_jpy, ct.is_available,
+             ct.scheduled_date::text AS scheduled_date,
+             ct.start_time::text AS start_time,
+             ct.end_time::text AS end_time
         FROM call_tickets ct
         JOIN user_profiles up ON up.user_id = ct.seller_id
         WHERE ct.seller_id = ? AND ct.is_available = TRUE
@@ -181,7 +212,10 @@ def list_available_tickets(
     rows = execQuery.execute_select(
         """
         SELECT ct.id, ct.seller_id, up.display_name AS seller_name,
-               ct.ticket_duration_minutes, ct.price_jpy, ct.is_available
+             ct.ticket_duration_minutes, ct.price_jpy, ct.is_available,
+             ct.scheduled_date::text AS scheduled_date,
+             ct.start_time::text AS start_time,
+             ct.end_time::text AS end_time
         FROM call_tickets ct
         JOIN user_profiles up ON up.user_id = ct.seller_id
         JOIN user_ranks ur ON ur.user_id = ct.seller_id
@@ -274,7 +308,11 @@ def my_purchases(
         """
         SELECT ctp.id AS purchase_id, ctp.ticket_id, ctp.seller_id,
                up.display_name AS seller_name,
-               ct.ticket_duration_minutes, ctp.amount_jpy,
+             ct.ticket_duration_minutes,
+             ct.scheduled_date::text AS scheduled_date,
+             ct.start_time::text AS start_time,
+             ct.end_time::text AS end_time,
+             ctp.amount_jpy,
                ctp.purchased_at::text AS purchased_at,
                ctp.used_at::text AS used_at,
                CASE WHEN ctp.used_at IS NOT NULL THEN TRUE ELSE FALSE END AS is_used
@@ -303,6 +341,9 @@ def my_created_tickets(
                ct.ticket_duration_minutes,
                ct.price_jpy,
                ct.is_available,
+             ct.scheduled_date::text AS scheduled_date,
+             ct.start_time::text AS start_time,
+             ct.end_time::text AS end_time,
                ct.created_at::text AS created_at,
                ctp.purchased_at::text AS sold_at,
                ctp.buyer_id,

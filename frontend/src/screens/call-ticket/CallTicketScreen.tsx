@@ -39,6 +39,9 @@ export function CallTicketScreen() {
   const [loading, setLoading] = useState(true);
   const [duration, setDuration] = useState("30");
   const [price, setPrice] = useState("500");
+  const [scheduledDate, setScheduledDate] = useState("");
+  const [startTime, setStartTime] = useState("");
+  const [endTime, setEndTime] = useState("");
   const [creating, setCreating] = useState(false);
 
   const fetchData = useCallback(async () => {
@@ -143,15 +146,33 @@ export function CallTicketScreen() {
       Alert.alert("入力エラー", "価格を正しく入力してください");
       return;
     }
+    if (!scheduledDate.trim()) {
+      Alert.alert("入力エラー", "日付を入力してください（例: 2026-05-06）");
+      return;
+    }
+    if (!startTime.trim()) {
+      Alert.alert("入力エラー", "開始時間を入力してください（例: 19:00）");
+      return;
+    }
+    if (!endTime.trim()) {
+      Alert.alert("入力エラー", "終了時間を入力してください（例: 19:30）");
+      return;
+    }
     try {
       setCreating(true);
       await apiClient.post("/call-tickets", {
         ticket_duration_minutes: durationNum,
         price_jpy: priceNum,
+        scheduled_date: scheduledDate.trim(),
+        start_time: startTime.trim(),
+        end_time: endTime.trim(),
       });
       Alert.alert("作成完了", "通話チケットを作成しました");
       setDuration("30");
       setPrice("500");
+      setScheduledDate("");
+      setStartTime("");
+      setEndTime("");
       await fetchData();
       setTab("created");
     } catch (error: any) {
@@ -255,6 +276,12 @@ export function CallTicketScreen() {
               <Text style={{ marginBottom: 12, fontSize: 14, color: "#6b7280" }}>
                 販売者: {item.seller_name}
               </Text>
+              <Text style={{ marginBottom: 2, fontSize: 12, color: "#6b7280" }}>
+                日付: {item.scheduled_date}
+              </Text>
+              <Text style={{ marginBottom: 10, fontSize: 12, color: "#6b7280" }}>
+                時間: {item.start_time}〜{item.end_time}
+              </Text>
               <ActionButton
                 label="購入する"
                 style={{
@@ -304,6 +331,12 @@ export function CallTicketScreen() {
               </Text>
               <Text style={{ marginBottom: 2, fontSize: 14, color: "#6b7280" }}>
                 {item.ticket_duration_minutes}分 / ¥{item.amount_jpy.toLocaleString()}
+              </Text>
+              <Text style={{ marginBottom: 2, fontSize: 12, color: "#6b7280" }}>
+                日付: {item.scheduled_date}
+              </Text>
+              <Text style={{ marginBottom: 2, fontSize: 12, color: "#6b7280" }}>
+                時間: {item.start_time}〜{item.end_time}
               </Text>
               <Text style={{ marginBottom: 12, fontSize: 14, color: "#6b7280" }}>
                 購入日: {new Date(item.purchased_at).toLocaleDateString("ja-JP")}
@@ -386,6 +419,36 @@ export function CallTicketScreen() {
                 onChangeText={setPrice}
                 keyboardType="number-pad"
                 placeholder="例: 500"
+                placeholderTextColor="#9ca3af"
+              />
+              <Text style={{ marginBottom: 6, fontSize: 12, fontWeight: "600", color: "#6b7280" }}>
+                日付（YYYY-MM-DD）
+              </Text>
+              <TextInput
+                style={inputStyle}
+                value={scheduledDate}
+                onChangeText={setScheduledDate}
+                placeholder="例: 2026-05-06"
+                placeholderTextColor="#9ca3af"
+              />
+              <Text style={{ marginBottom: 6, fontSize: 12, fontWeight: "600", color: "#6b7280" }}>
+                開始時間（HH:MM）
+              </Text>
+              <TextInput
+                style={inputStyle}
+                value={startTime}
+                onChangeText={setStartTime}
+                placeholder="例: 19:00"
+                placeholderTextColor="#9ca3af"
+              />
+              <Text style={{ marginBottom: 6, fontSize: 12, fontWeight: "600", color: "#6b7280" }}>
+                終了時間（HH:MM）
+              </Text>
+              <TextInput
+                style={inputStyle}
+                value={endTime}
+                onChangeText={setEndTime}
+                placeholder="例: 19:30"
                 placeholderTextColor="#9ca3af"
               />
               <ActionButton
@@ -483,6 +546,12 @@ export function CallTicketScreen() {
               </View>
               <Text style={{ marginBottom: 2, fontSize: 14, color: "#374151" }}>
                 {item.ticket_duration_minutes}分 / ¥{item.price_jpy.toLocaleString()}
+              </Text>
+              <Text style={{ marginBottom: 2, fontSize: 12, color: "#6b7280" }}>
+                日付: {item.scheduled_date}
+              </Text>
+              <Text style={{ marginBottom: 2, fontSize: 12, color: "#6b7280" }}>
+                時間: {item.start_time}〜{item.end_time}
               </Text>
               <Text style={{ marginBottom: 2, fontSize: 12, color: "#6b7280" }}>
                 作成日: {new Date(item.created_at).toLocaleDateString("ja-JP")}

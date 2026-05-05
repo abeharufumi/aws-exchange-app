@@ -328,6 +328,9 @@ CREATE TABLE call_tickets (
     seller_id BIGINT NOT NULL REFERENCES users(id),
     ticket_duration_minutes INTEGER NOT NULL,
     price_jpy INTEGER NOT NULL,
+    scheduled_date DATE NOT NULL,
+    start_time TIME NOT NULL,
+    end_time TIME NOT NULL,
     is_available BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
