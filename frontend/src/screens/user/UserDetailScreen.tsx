@@ -4,6 +4,7 @@ import { useRouter } from "expo-router";
 import { ActionButton } from "../../components/common/ActionButton";
 import { ActionButtonRow } from "../../components/common/ActionButtonRow";
 import { AvatarWithFrame } from "../../components/common/AvatarWithFrame";
+import { UserPresenceStatus } from "../../components/common";
 import { EmptyState } from "../../components/common/EmptyState";
 import { LoadingState } from "../../components/common/LoadingState";
 import { ScreenBackButton } from "../../components/common/ScreenBackButton";
@@ -228,6 +229,13 @@ export function UserDetailScreen({ route }: any) {
                 <Text style={{ fontSize: 14, fontWeight: "600", color: "#374151" }}>
                   {profile.location || "場所未設定"} / Rank {profile.rank || 1}
                 </Text>
+                <View style={{ marginTop: 6 }}>
+                  <UserPresenceStatus
+                    status={profile.onlineStatus}
+                    lastActiveAt={profile.lastActiveAt}
+                    textColor="#4b5563"
+                  />
+                </View>
               </View>
             </View>
             <Text style={{ marginBottom: 8, fontSize: 14, fontWeight: "600", color: "#374151" }}>

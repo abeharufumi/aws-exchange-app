@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 from pydantic import BaseModel
 from typing import Optional
 from database import get_db
+from utils.dependencies import get_current_user
 from utils.security import hash_password, verify_password, create_access_token
 import execQuery
 
@@ -123,8 +124,17 @@ def signup(payload: SignupRequest, db: Session = Depends(get_db)):
     # ユーザー作成
     hashed_password = hash_password(payload.password)
     user_query = """
-        INSERT INTO users (gender, phone_number, email, password_hash, status)
-        VALUES (?, ?, ?, ?, ?)
+        INSERT INTO users (
+            gender,
+            phone_number,
+            email,
+            password_hash,
+            last_login,
+            last_active_at,
+            presence_status,
+            status
+        )
+        VALUES (?, ?, ?, ?, NOW(), NOW(), 'online', ?)
         RETURNING id
     """
     user_params = [payload.gender, phone_number, normalized_email, hashed_password, "active"]
@@ -226,6 +236,19 @@ def login(payload: LoginRequest, db: Session = Depends(get_db)):
     if status != "active":
         raise HTTPException(status_code=403, detail="Account is inactive")
 
+    execQuery.execute_update(
+        """
+            UPDATE users
+            SET last_login = NOW(),
+                last_active_at = NOW(),
+                last_logout_at = NULL,
+                presence_status = 'online'
+            WHERE id = ?
+        """,
+        [user_id],
+        db,
+    )
+
     # トークン生成
     access_token = create_access_token(user_id)
     return TokenResponse(
@@ -241,10 +264,25 @@ def login(payload: LoginRequest, db: Session = Depends(get_db)):
 
 
 @router.post("/logout")
-def logout():
+def logout(
+    current_user: dict = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
     """
     ログアウト
-    クライアント側でトークンを破棄する方式のため、サーバー側は成功レスポンスのみ返す
+    クライアント側でトークンを破棄しつつ、サーバー側のプレゼンス状態も更新する
     """
+
+    execQuery.execute_update(
+        """
+            UPDATE users
+            SET last_logout_at = NOW(),
+                last_active_at = NOW(),
+                presence_status = 'logged_out'
+            WHERE id = ?
+        """,
+        [current_user["id"]],
+        db,
+    )
 
     return {"status": "ok"}

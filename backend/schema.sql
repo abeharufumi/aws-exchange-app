@@ -44,12 +44,16 @@ CREATE TABLE users (
     password_hash VARCHAR(255) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     last_login TIMESTAMP,
+    last_active_at TIMESTAMP,
+    last_logout_at TIMESTAMP,
+    presence_status VARCHAR(20) DEFAULT 'logged_out',
     status VARCHAR(20) DEFAULT 'active'
 );
 
 CREATE INDEX idx_users_phone ON users(phone_number);
 CREATE INDEX idx_users_email ON users(email);
 CREATE INDEX idx_users_created_at ON users(created_at);
+CREATE INDEX idx_users_presence_last_active ON users(presence_status, last_active_at DESC);
 
 -- ユーザープロフィール
 CREATE TABLE user_profiles (

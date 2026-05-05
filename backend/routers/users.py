@@ -37,6 +37,57 @@ LOCATION_KEYWORD_ALIASES = {
     "Hakata": ["博多", "福岡"],
 }
 
+PRESENCE_ONLINE_THRESHOLD_MINUTES = 5
+
+
+def _boost_active_clause(user_alias: str = "users") -> str:
+    return f"""
+        EXISTS (
+            SELECT 1
+            FROM boost_purchases bp
+            WHERE bp.user_id = {user_alias}.id
+              AND bp.payment_status = 'completed'
+              AND bp.activated_at IS NOT NULL
+              AND (bp.expires_at IS NULL OR bp.expires_at > NOW())
+        )
+    """
+
+
+def _premium_active_clause(user_alias: str = "users") -> str:
+    return f"""
+        EXISTS (
+            SELECT 1
+            FROM premium_subscriptions ps
+            WHERE ps.user_id = {user_alias}.id
+              AND ps.status = 'active'
+              AND (ps.ends_at IS NULL OR ps.ends_at > NOW())
+        )
+    """
+
+
+def _presence_status_case(user_alias: str = "users") -> str:
+    return f"""
+        CASE
+            WHEN {user_alias}.presence_status = 'logged_out' THEN 'logged_out'
+            WHEN {user_alias}.last_active_at IS NOT NULL
+                 AND {user_alias}.last_active_at >= NOW() - INTERVAL '{PRESENCE_ONLINE_THRESHOLD_MINUTES} minutes'
+                THEN 'online'
+            ELSE 'offline'
+        END
+    """
+
+
+def _activity_order_clause(user_alias: str = "users") -> str:
+    return f"""
+        CASE
+            WHEN {_presence_status_case(user_alias)} = 'online' THEN 0
+            WHEN {_presence_status_case(user_alias)} = 'offline' THEN 1
+            ELSE 2
+        END ASC,
+        COALESCE({user_alias}.last_active_at, {user_alias}.last_login, {user_alias}.created_at) DESC,
+        {user_alias}.id DESC
+    """
+
 
 def _resolve_target_gender(current_gender: str) -> str:
     """検索対象性別を解決（male→female, それ以外→male）"""
@@ -134,6 +185,9 @@ class UserCardResponse(BaseModel):
     requestCreatedAt: Optional[datetime] = None  # 依頼作成日時（期限表示用）
     isPremiumActive: Optional[bool] = None  # Premium有効中か（true/false）
     isBoostActive: Optional[bool] = None  # Boost有効中か（true/false）
+    onlineStatus: Optional[str] = None  # オンライン状態: 'online'/'offline'/'logged_out'
+    lastActiveAt: Optional[datetime] = None  # 最終アクティブ日時
+    lastLogoutAt: Optional[datetime] = None  # 最終ログアウト日時
 
 
 class ProfileUpdateRequest(BaseModel):
@@ -155,7 +209,7 @@ def discover_users(
     ユーザー発見（タイムラインスワイプ用） (🔴P1-07)
     全ユーザーを取得（地域・フィルター条件なし）
     """
-    query = """
+    query = f"""
                 SELECT users.id,
                              user_profiles.display_name AS "displayName",
                              user_profiles.age,
@@ -163,21 +217,11 @@ def discover_users(
                              user_profiles.bio,
                              user_ranks.current_rank AS rank,
                              user_ranks.review_avg AS "reviewAvg",
-                                                         EXISTS (
-                                                                SELECT 1
-                                                                FROM premium_subscriptions ps
-                                                                WHERE ps.user_id = users.id
-                                                                    AND ps.status = 'active'
-                                                                    AND (ps.ends_at IS NULL OR ps.ends_at > NOW())
-                                                         ) AS "isPremiumActive",
-                                                         EXISTS (
-                                                                SELECT 1
-                                                                FROM boost_purchases bp2
-                                                                WHERE bp2.user_id = users.id
-                                                                    AND bp2.payment_status = 'completed'
-                                                                    AND bp2.activated_at IS NOT NULL
-                                                                    AND (bp2.expires_at IS NULL OR bp2.expires_at > NOW())
-                                                         ) AS "isBoostActive",
+                             {_premium_active_clause('users')} AS "isPremiumActive",
+                             {_boost_active_clause('users')} AS "isBoostActive",
+                             {_presence_status_case('users')} AS "onlineStatus",
+                             COALESCE(users.last_active_at, users.last_login, users.created_at) AS "lastActiveAt",
+                             users.last_logout_at AS "lastLogoutAt",
                              req.status AS "requestStatus",
                              req.created_at AS "requestCreatedAt"
                 FROM users
@@ -212,17 +256,17 @@ def discover_users(
     """
     map_params.append(current_user["id"])
 
-    # Boost アクティブユーザーを上位表示（activated_at が有効期限内）
-    query += """
+    # 案B: Boost中 → Rank5 → Rank4 → Rank3 → Rank1-2、各順位帯の中ではアクティブユーザー順
+    query += f"""
         ORDER BY
-            CASE WHEN EXISTS (
-                SELECT 1 FROM boost_purchases bp
-                WHERE bp.user_id = users.id
-                  AND bp.payment_status = 'completed'
-                  AND bp.activated_at IS NOT NULL
-                  AND (bp.expires_at IS NULL OR bp.expires_at > NOW())
-            ) THEN 0 ELSE 1 END ASC,
-            users.id DESC
+            CASE
+                WHEN {_boost_active_clause('users')} THEN 0
+                WHEN user_ranks.current_rank = 5 THEN 1
+                WHEN user_ranks.current_rank = 4 THEN 2
+                WHEN user_ranks.current_rank = 3 THEN 3
+                ELSE 4
+            END ASC,
+            {_activity_order_clause('users')}
         LIMIT 100
     """
     return execQuery.execute_select(query, map_params, db)
@@ -247,7 +291,7 @@ def search_users(
     """
 
     # ユーザー検索クエリ
-    query = """
+    query = f"""
         SELECT users.id,
                user_profiles.display_name AS "displayName",
                COALESCE(user_profiles.age, 0) AS age,
@@ -255,21 +299,11 @@ def search_users(
                user_profiles.bio,
                user_ranks.current_rank AS rank,
                user_ranks.review_avg AS "reviewAvg",
-                             EXISTS (
-                                     SELECT 1
-                                     FROM premium_subscriptions ps
-                                     WHERE ps.user_id = users.id
-                                         AND ps.status = 'active'
-                                         AND (ps.ends_at IS NULL OR ps.ends_at > NOW())
-                             ) AS "isPremiumActive",
-                             EXISTS (
-                                     SELECT 1
-                                     FROM boost_purchases bp2
-                                     WHERE bp2.user_id = users.id
-                                         AND bp2.payment_status = 'completed'
-                                         AND bp2.activated_at IS NOT NULL
-                                         AND (bp2.expires_at IS NULL OR bp2.expires_at > NOW())
-                             ) AS "isBoostActive",
+               {_premium_active_clause('users')} AS "isPremiumActive",
+               {_boost_active_clause('users')} AS "isBoostActive",
+               {_presence_status_case('users')} AS "onlineStatus",
+               COALESCE(users.last_active_at, users.last_login, users.created_at) AS "lastActiveAt",
+               users.last_logout_at AS "lastLogoutAt",
                    req.status AS "requestStatus",
                    req.created_at AS "requestCreatedAt"
         FROM users
@@ -332,7 +366,18 @@ def search_users(
         query += " AND user_ranks.current_rank >= ?"
         map_params.append(rank_min)
 
-    query += " LIMIT 50"
+    query += f"""
+        ORDER BY
+            CASE
+                WHEN {_boost_active_clause('users')} THEN 0
+                WHEN user_ranks.current_rank = 5 THEN 1
+                WHEN user_ranks.current_rank = 4 THEN 2
+                WHEN user_ranks.current_rank = 3 THEN 3
+                ELSE 4
+            END ASC,
+            {_activity_order_clause('users')}
+        LIMIT 50
+    """
 
     return execQuery.execute_select(query, map_params, db)
 
@@ -500,7 +545,7 @@ def get_user_profile(
     プロフィール閲覧 (🔴P1-16)
     足跡を記録
     """
-    query = """
+    query = f"""
         SELECT ? AS id,
              user_profiles.display_name AS "displayName",
              user_profiles.age AS "age",
@@ -510,6 +555,9 @@ def get_user_profile(
              user_ranks.current_rank AS "rank",
              user_ranks.meets_count AS "meetsCount",
              user_ranks.review_avg AS "reviewAvg",
+               {_presence_status_case('users')} AS "onlineStatus",
+               COALESCE(users.last_active_at, users.last_login, users.created_at) AS "lastActiveAt",
+               users.last_logout_at AS "lastLogoutAt",
              icon_frames.image_url AS "iconFrameImageUrl",
              icon_frames.rarity AS "iconFrameRarity",
              icon_frames.name AS "iconFrameName"

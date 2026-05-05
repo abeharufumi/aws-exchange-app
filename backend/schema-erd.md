@@ -36,6 +36,9 @@ erDiagram
         varchar password_hash "パスワードハッシュ"
         timestamp created_at "作成日時"
         timestamp last_login "最終ログイン"
+        timestamp last_active_at "最終アクティブ日時"
+        timestamp last_logout_at "最終ログアウト日時"
+        varchar presence_status "オンライン状態(online/logged_out)"
         varchar status "ステータス(active/inactive/banned)"
     }
 

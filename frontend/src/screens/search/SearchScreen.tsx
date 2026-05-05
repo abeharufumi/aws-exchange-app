@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { FlatList, Text, TouchableOpacity, View } from "react-native";
 import { Button, Surface, TextInput } from "react-native-paper";
 import { useRouter } from "expo-router";
+import { UserPresenceStatus } from "../../components/common";
 import apiClient from "../../services/api";
 import { UserCard } from "../../types/user";
 
@@ -144,6 +145,7 @@ export function SearchScreen() {
                 </Text>
               </View>
             </View>
+            <UserPresenceStatus status={item.onlineStatus} lastActiveAt={item.lastActiveAt} />
             <Text style={{ fontSize: 14, color: "#6b7280" }}>{item.bio}</Text>
           </TouchableOpacity>
         )}

@@ -37,4 +37,15 @@ def get_current_user(
     if not results:
         raise HTTPException(status_code=404, detail="User not found")
 
+    execQuery.execute_update(
+        """
+            UPDATE users
+            SET last_active_at = NOW(),
+                presence_status = 'online'
+            WHERE id = ?
+        """,
+        [user_id],
+        db,
+    )
+
     return results[0]

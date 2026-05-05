@@ -7,6 +7,9 @@ export interface UserCard {
   rank?: number;
   isPremiumActive?: boolean;
   isBoostActive?: boolean;
+  onlineStatus?: "online" | "offline" | "logged_out" | string;
+  lastActiveAt?: string;
+  lastLogoutAt?: string;
   reviewAvg?: number;
   requestStatus?: "pending" | "matched" | "passed" | "expired" | string;
   requestCreatedAt?: string;
@@ -22,6 +25,9 @@ export interface PublicUserProfile {
   rank?: number;
   meetsCount?: number;
   reviewAvg?: number;
+  onlineStatus?: "online" | "offline" | "logged_out" | string;
+  lastActiveAt?: string;
+  lastLogoutAt?: string;
   iconFrameImageUrl?: string;
   iconFrameRarity?: string;
   iconFrameName?: string;

@@ -560,19 +560,21 @@ end
     subgraph SortLogic [表示順位の決定ロジック]
         Direction[並び替え実行]
 
-        Priority1[① 最優先枠]
-        Priority2[② 上位枠]
-        Priority3[③ 一般枠]
+        Priority1[① Boost中]
+        Priority2[② Rank5]
+        Priority3[③ Rank4]
+        Priority4[④ Rank3]
+        Priority5[⑤ Rank1-2]
     end
 
-    U1 --> Priority1
-    U2 --> Priority1
     U3 --> Priority1
+    U1 --> Priority2
+    U2 --> Priority2
 
-    NoteBox["真の王様と、広告(ブースト)が<br>混ざって最上位に表示される。<br>ただしCさんには「PR」マークがつく。"]
+    NoteBox["Boost中のユーザーが30分間だけ最上位に表示される。<br>表示ラベルは『Boost』のまま。<br>各順位帯の中ではアクティブユーザー順で並ぶ。"]
     Priority1 -.- NoteBox
 
-    U4 --> Priority3
+    U4 --> Priority5
 
     subgraph PrivilegeCheck ["権限チェック (クリック後)"]
         Click1[Aさんをクリック] --> AllowLive[ライブ視聴OK<br>ファンクラブOK]
