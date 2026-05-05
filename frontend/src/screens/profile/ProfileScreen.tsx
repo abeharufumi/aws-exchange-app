@@ -3,7 +3,9 @@ import {
   ActivityIndicator,
   Alert,
   FlatList,
+  Modal,
   Platform,
+  Pressable,
   ScrollView,
   Share,
   Text,
@@ -585,77 +587,12 @@ export function ProfileScreen() {
             </View>
           </View>
 
-          {isEditing && (
-            <View style={{ marginBottom: 20, gap: 12 }}>
-              <View>
-                <Text style={{ fontSize: 13, fontWeight: "600", color: "#333", marginBottom: 4 }}>
-                  表示名
-                </Text>
-                <TextInput
-                  style={inputStyle}
-                  value={form.displayName}
-                  onChangeText={(text) => setForm((prev) => ({ ...prev, displayName: text }))}
-                />
-              </View>
-              <View>
-                <Text style={{ fontSize: 13, fontWeight: "600", color: "#333", marginBottom: 4 }}>
-                  年齢
-                </Text>
-                <TextInput
-                  style={inputStyle}
-                  value={form.age}
-                  onChangeText={(text) => setForm((prev) => ({ ...prev, age: text }))}
-                  keyboardType="number-pad"
-                />
-              </View>
-              <View>
-                <Text style={{ fontSize: 13, fontWeight: "600", color: "#333", marginBottom: 4 }}>
-                  居住地
-                </Text>
-                <TextInput
-                  style={inputStyle}
-                  value={form.location}
-                  onChangeText={(text) => setForm((prev) => ({ ...prev, location: text }))}
-                />
-              </View>
-              <View>
-                <Text style={{ fontSize: 13, fontWeight: "600", color: "#333", marginBottom: 4 }}>
-                  自己紹介
-                </Text>
-                <TextInput
-                  style={inputStyle}
-                  value={form.bio}
-                  onChangeText={(text) => setForm((prev) => ({ ...prev, bio: text }))}
-                  multiline
-                />
-              </View>
-            </View>
-          )}
-
-          {isEditing ? (
-            <ActionButtonRow style={{ flexDirection: "row", gap: 12, marginTop: 4 }}>
-              <ActionButton
-                label="キャンセル"
-                variant="secondary"
-                onPress={handleCancel}
-                style={secondaryButtonStyle}
-                textStyle={buttonTextStyle}
-              />
-              <ActionButton
-                label="保存"
-                onPress={handleSave}
-                style={primaryButtonStyle}
-                textStyle={buttonTextStyle}
-              />
-            </ActionButtonRow>
-          ) : (
-            <ActionButton
-              label="プロフィール編集"
-              onPress={() => setIsEditing(true)}
-              style={{ ...primaryButtonStyle, marginBottom: 10 }}
-              textStyle={buttonTextStyle}
-            />
-          )}
+          <ActionButton
+            label="プロフィール編集"
+            onPress={() => setIsEditing(true)}
+            style={{ ...primaryButtonStyle, marginBottom: 10 }}
+            textStyle={buttonTextStyle}
+          />
 
           <ActionButtonRow style={{ flexDirection: "row", gap: 12, marginTop: 4 }}>
             <TouchableOpacity
@@ -863,6 +800,86 @@ export function ProfileScreen() {
           プロフィールが見つかりません
         </Text>
       )}
+      <Modal visible={isEditing} transparent animationType="fade" onRequestClose={handleCancel}>
+        <View style={{ flex: 1, justifyContent: "center", padding: 20 }}>
+          <Pressable
+            style={{
+              position: "absolute",
+              top: 0,
+              right: 0,
+              bottom: 0,
+              left: 0,
+              backgroundColor: "rgba(17, 24, 39, 0.24)",
+            }}
+            onPress={handleCancel}
+          />
+          <View style={{ borderRadius: 12, backgroundColor: "#ffffff", padding: 16 }}>
+            <Text style={{ marginBottom: 12, fontSize: 16, fontWeight: "700", color: "#111827" }}>
+              プロフィール編集
+            </Text>
+            <View style={{ marginBottom: 20, gap: 12 }}>
+              <View>
+                <Text style={{ fontSize: 13, fontWeight: "600", color: "#333", marginBottom: 4 }}>
+                  表示名
+                </Text>
+                <TextInput
+                  style={inputStyle}
+                  value={form.displayName}
+                  onChangeText={(text) => setForm((prev) => ({ ...prev, displayName: text }))}
+                />
+              </View>
+              <View>
+                <Text style={{ fontSize: 13, fontWeight: "600", color: "#333", marginBottom: 4 }}>
+                  年齢
+                </Text>
+                <TextInput
+                  style={inputStyle}
+                  value={form.age}
+                  onChangeText={(text) => setForm((prev) => ({ ...prev, age: text }))}
+                  keyboardType="number-pad"
+                />
+              </View>
+              <View>
+                <Text style={{ fontSize: 13, fontWeight: "600", color: "#333", marginBottom: 4 }}>
+                  居住地
+                </Text>
+                <TextInput
+                  style={inputStyle}
+                  value={form.location}
+                  onChangeText={(text) => setForm((prev) => ({ ...prev, location: text }))}
+                />
+              </View>
+              <View>
+                <Text style={{ fontSize: 13, fontWeight: "600", color: "#333", marginBottom: 4 }}>
+                  自己紹介
+                </Text>
+                <TextInput
+                  style={inputStyle}
+                  value={form.bio}
+                  onChangeText={(text) => setForm((prev) => ({ ...prev, bio: text }))}
+                  multiline
+                />
+              </View>
+            </View>
+
+            <ActionButtonRow style={{ flexDirection: "row", gap: 12, marginTop: 4 }}>
+              <ActionButton
+                label="キャンセル"
+                variant="secondary"
+                onPress={handleCancel}
+                style={secondaryButtonStyle}
+                textStyle={buttonTextStyle}
+              />
+              <ActionButton
+                label="保存"
+                onPress={handleSave}
+                style={primaryButtonStyle}
+                textStyle={buttonTextStyle}
+              />
+            </ActionButtonRow>
+          </View>
+        </View>
+      </Modal>
     </ScrollView>
   );
 }
