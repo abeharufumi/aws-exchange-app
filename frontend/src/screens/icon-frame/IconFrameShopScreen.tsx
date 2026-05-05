@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Alert, FlatList, Text, TouchableOpacity, View } from "react-native";
+import { Alert, FlatList, Modal, Pressable, Text, TouchableOpacity, View } from "react-native";
 import { useRouter } from "expo-router";
 import { EmptyState } from "../../components/common/EmptyState";
 import { LoadingState } from "../../components/common/LoadingState";
@@ -37,6 +37,7 @@ export function IconFrameShopScreen() {
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState<"all" | "owned">("all");
   const [processingId, setProcessingId] = useState<number | null>(null);
+  const [confirmFrame, setConfirmFrame] = useState<IconFrameItem | null>(null);
 
   const fetchFrames = useCallback(async () => {
     try {
@@ -56,8 +57,10 @@ export function IconFrameShopScreen() {
     fetchFrames();
   }, [fetchFrames]);
 
-  const handlePurchase = async (frame: IconFrameItem) => {
-    if (processingId !== null) return;
+  const handlePurchaseConfirm = async () => {
+    if (!confirmFrame || processingId !== null) return;
+    const frame = confirmFrame;
+    setConfirmFrame(null);
     try {
       setProcessingId(frame.id);
       const response = await apiClient.post<IconFramePurchaseResponse>(
@@ -65,11 +68,6 @@ export function IconFrameShopScreen() {
       );
       if (response.data?.status === "already_owned") {
         Alert.alert("所有済み", "このフレームはすでに所有しています");
-      } else {
-        Alert.alert("購入完了", `「${frame.name}」を購入しました！\n装備ボタンから装備できます`, [
-          { text: "OK", onPress: fetchFrames },
-        ]);
-        return;
       }
       fetchFrames();
     } catch (error) {
@@ -231,7 +229,7 @@ export function IconFrameShopScreen() {
                 paddingVertical: 10,
               }}
               disabled={isProcessing}
-              onPress={() => handlePurchase(item)}
+              onPress={() => setConfirmFrame(item)}
             >
               <Text style={{ fontSize: 14, fontWeight: "700", color: "#ffffff" }}>
                 {isProcessing ? "処理中..." : `¥${item.price_jpy.toLocaleString()} で購入`}
@@ -245,6 +243,48 @@ export function IconFrameShopScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: "#f3f4f6" }}>
+      <Modal
+        visible={confirmFrame !== null}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setConfirmFrame(null)}
+      >
+        <Pressable
+          style={{
+            flex: 1,
+            backgroundColor: "rgba(17, 24, 39, 0.24)",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+          onPress={() => setConfirmFrame(null)}
+        >
+          <Pressable
+            style={{ backgroundColor: "#ffffff", borderRadius: 12, padding: 24, width: 300 }}
+            onPress={() => {}}
+          >
+            <Text style={{ fontSize: 16, fontWeight: "700", color: "#1f2937", marginBottom: 8 }}>
+              フレームを購入しますか？
+            </Text>
+            <Text style={{ fontSize: 14, color: "#6b7280", marginBottom: 4 }}>
+              {confirmFrame?.name}
+            </Text>
+            <Text style={{ fontSize: 14, fontWeight: "700", color: "#ef4444", marginBottom: 20 }}>
+              ¥{confirmFrame?.price_jpy.toLocaleString()}
+            </Text>
+            <TouchableOpacity
+              style={{
+                backgroundColor: "#ef4444",
+                borderRadius: 8,
+                paddingVertical: 12,
+                alignItems: "center",
+              }}
+              onPress={handlePurchaseConfirm}
+            >
+              <Text style={{ fontSize: 14, fontWeight: "700", color: "#ffffff" }}>購入する</Text>
+            </TouchableOpacity>
+          </Pressable>
+        </Pressable>
+      </Modal>
       <ScreenBackButton
         onPress={() => router.back()}
         style={{ paddingHorizontal: 20, paddingTop: 12, paddingBottom: 4 }}
