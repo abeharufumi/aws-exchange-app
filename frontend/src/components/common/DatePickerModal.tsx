@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Modal, Text, TouchableOpacity, View } from "react-native";
+import { Modal, Pressable, Text, TouchableOpacity, View } from "react-native";
 
 type DatePickerModalProps = {
   visible: boolean;
@@ -85,6 +85,17 @@ export function DatePickerModal({
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
       <View style={{ flex: 1, justifyContent: "center", padding: 20 }}>
+        <Pressable
+          style={{
+            position: "absolute",
+            top: 0,
+            right: 0,
+            bottom: 0,
+            left: 0,
+            backgroundColor: "rgba(17, 24, 39, 0.24)",
+          }}
+          onPress={onClose}
+        />
         <View style={{ borderRadius: 12, backgroundColor: "#ffffff", padding: 16 }}>
           <Text style={{ marginBottom: 10, fontSize: 16, fontWeight: "700", color: "#111827" }}>
             {title}
@@ -179,18 +190,6 @@ export function DatePickerModal({
               );
             })}
           </View>
-
-          <TouchableOpacity
-            style={{
-              alignItems: "center",
-              borderRadius: 8,
-              backgroundColor: "#9ca3af",
-              paddingVertical: 10,
-            }}
-            onPress={onClose}
-          >
-            <Text style={{ color: "#ffffff", fontWeight: "700" }}>閉じる</Text>
-          </TouchableOpacity>
         </View>
       </View>
     </Modal>
