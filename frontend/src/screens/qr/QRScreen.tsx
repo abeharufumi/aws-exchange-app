@@ -8,6 +8,7 @@ import {
   Image,
   Modal,
   Platform,
+  Pressable,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { CameraView, useCameraPermissions, BarcodeScanningResult } from "expo-camera";
@@ -837,6 +838,17 @@ export function QRScreen({ route }: any) {
         onRequestClose={() => setScannerVisible(false)}
       >
         <View style={{ flex: 1, justifyContent: "center", paddingHorizontal: 16 }}>
+          <Pressable
+            style={{
+              position: "absolute",
+              top: 0,
+              right: 0,
+              bottom: 0,
+              left: 0,
+              backgroundColor: "rgba(17, 24, 39, 0.24)",
+            }}
+            onPress={() => setScannerVisible(false)}
+          />
           <View style={{ borderRadius: 12, backgroundColor: "#ffffff", padding: 14 }}>
             <Text
               style={{ textAlign: "center", fontSize: 18, fontWeight: "700", color: "#111827" }}
@@ -860,24 +872,11 @@ export function QRScreen({ route }: any) {
                 height: 320,
                 borderRadius: 10,
                 overflow: "hidden",
-                marginBottom: 10,
               }}
               facing="back"
               barcodeScannerSettings={{ barcodeTypes: ["qr"] }}
               onBarcodeScanned={handleBarcodeScanned}
             />
-            <TouchableOpacity
-              style={{
-                width: "100%",
-                alignItems: "center",
-                borderRadius: 8,
-                backgroundColor: "#6b7280",
-                paddingVertical: 14,
-              }}
-              onPress={() => setScannerVisible(false)}
-            >
-              <Text style={{ fontSize: 16, fontWeight: "700", color: "#ffffff" }}>閉じる</Text>
-            </TouchableOpacity>
           </View>
         </View>
       </Modal>

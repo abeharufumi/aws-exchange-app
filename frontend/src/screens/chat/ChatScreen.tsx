@@ -967,15 +967,6 @@ export function ChatScreen({ route }: any) {
             >
               <Button
                 mode="contained"
-                buttonColor="#9ca3af"
-                textColor="#ffffff"
-                style={{ borderRadius: 8 }}
-                onPress={() => setMeetModalVisible(false)}
-              >
-                キャンセル
-              </Button>
-              <Button
-                mode="contained"
                 buttonColor="#2563eb"
                 textColor="#ffffff"
                 style={{ borderRadius: 8 }}
@@ -1009,6 +1000,17 @@ export function ChatScreen({ route }: any) {
         onRequestClose={() => setPlaceSearchVisible(false)}
       >
         <View style={{ flex: 1, justifyContent: "flex-end" }}>
+          <Pressable
+            style={{
+              position: "absolute",
+              top: 0,
+              right: 0,
+              bottom: 0,
+              left: 0,
+              backgroundColor: "rgba(17, 24, 39, 0.24)",
+            }}
+            onPress={() => setPlaceSearchVisible(false)}
+          />
           <View style={{ backgroundColor: "#ffffff", padding: 16 }}>
             <Text style={{ marginBottom: 12, fontSize: 16, fontWeight: "700" }}>場所を検索</Text>
             <View style={{ marginBottom: 12, flexDirection: "row", gap: 8 }}>
@@ -1065,15 +1067,6 @@ export function ChatScreen({ route }: any) {
               )}
               ListEmptyComponent={placeSearchResults.length === 0 && !placeSearching ? null : null}
             />
-            <Button
-              mode="contained"
-              buttonColor="#9ca3af"
-              textColor="#ffffff"
-              style={{ borderRadius: 8, marginTop: 12 }}
-              onPress={() => setPlaceSearchVisible(false)}
-            >
-              キャンセル
-            </Button>
           </View>
         </View>
       </Modal>

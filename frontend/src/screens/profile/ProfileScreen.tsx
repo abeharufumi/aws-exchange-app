@@ -862,21 +862,12 @@ export function ProfileScreen() {
               </View>
             </View>
 
-            <ActionButtonRow style={{ flexDirection: "row", gap: 12, marginTop: 4 }}>
-              <ActionButton
-                label="キャンセル"
-                variant="secondary"
-                onPress={handleCancel}
-                style={secondaryButtonStyle}
-                textStyle={buttonTextStyle}
-              />
-              <ActionButton
-                label="保存"
-                onPress={handleSave}
-                style={primaryButtonStyle}
-                textStyle={buttonTextStyle}
-              />
-            </ActionButtonRow>
+            <ActionButton
+              label="保存"
+              onPress={handleSave}
+              style={primaryButtonStyle}
+              textStyle={buttonTextStyle}
+            />
           </View>
         </View>
       </Modal>
