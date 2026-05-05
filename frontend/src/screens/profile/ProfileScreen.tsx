@@ -283,16 +283,38 @@ export function ProfileScreen() {
   };
 
   const premiumRemainingDays = calcRemainingDays(premiumStatus?.ends_at);
-  const boostRemainingDays = calcRemainingDays(activeBoost?.expires_at);
   const isPremiumActive = premiumStatus?.status === "active";
   const isPremiumCancelled = premiumStatus?.status === "cancelled";
   const premiumStateLabel = isPremiumActive ? "有効" : isPremiumCancelled ? "解約予定" : "未加入";
   const premiumEndsAt = premiumStatus?.ends_at
     ? new Date(premiumStatus.ends_at).toLocaleDateString("ja-JP")
     : null;
-  const boostEndsAt = activeBoost?.expires_at
-    ? new Date(activeBoost.expires_at).toLocaleDateString("ja-JP")
-    : null;
+
+  const [boostCountdown, setBoostCountdown] = useState("");
+
+  useEffect(() => {
+    if (!activeBoost?.expires_at) {
+      setBoostCountdown("");
+      return;
+    }
+    const update = () => {
+      const diff = new Date(activeBoost.expires_at).getTime() - Date.now();
+      if (diff <= 0) {
+        setBoostCountdown("期限切れ");
+        return;
+      }
+      const totalSeconds = Math.floor(diff / 1000);
+      const hours = Math.floor(totalSeconds / 3600);
+      const minutes = Math.floor((totalSeconds % 3600) / 60);
+      const seconds = totalSeconds % 60;
+      setBoostCountdown(
+        `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`,
+      );
+    };
+    update();
+    const timer = setInterval(update, 1000);
+    return () => clearInterval(timer);
+  }, [activeBoost?.expires_at]);
 
   const formatRankProgressLabel = (item: RankProgressItem): string => {
     const unit = item.unit || "";
@@ -580,8 +602,8 @@ export function ProfileScreen() {
                 {activeBoost ? "有効" : "未有効"}
               </Text>
               <Text style={{ marginTop: 4, fontSize: 12, color: "#6b7280" }}>
-                {boostEndsAt
-                  ? `有効期限: ${boostEndsAt}${boostRemainingDays !== null ? `（残り${boostRemainingDays}日）` : ""}`
+                {boostCountdown
+                  ? `残り時間: ${boostCountdown}`
                   : "有効化するとチャット送信上限が増加します"}
               </Text>
             </View>
