@@ -330,9 +330,14 @@ export function UserDetailScreen({ route }: any) {
               ) : sellerTickets.length > 0 ? (
                 sellerTickets.map((ticket) => (
                   <View key={ticket.id} style={{ flexDirection: "row", gap: 10, marginTop: 12 }}>
-                    <Text style={{ flex: 1, color: "#333" }}>
-                      {ticket.ticket_duration_minutes}分 / ¥{ticket.price_jpy.toLocaleString()}
-                    </Text>
+                    <View style={{ flex: 1 }}>
+                      <Text style={{ fontSize: 12, fontWeight: "700", color: "#111827" }}>
+                        チケットNo. #{ticket.id}
+                      </Text>
+                      <Text style={{ color: "#333" }}>
+                        {ticket.ticket_duration_minutes}分 / ¥{ticket.price_jpy.toLocaleString()}
+                      </Text>
+                    </View>
                     <ActionButton
                       label="購入"
                       onPress={() =>
