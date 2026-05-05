@@ -35,7 +35,16 @@ export function getUserPresenceText(status?: string, lastActiveAt?: string): str
 
   if (status === "offline") {
     const minutes = getMinutesSinceOnline(lastActiveAt);
-    return minutes !== null ? `${minutes}分前にオンライン` : "少し前にオンライン";
+    if (minutes === null) return "少し前にオンライン";
+    if (minutes >= 60 * 24) {
+      const days = Math.floor(minutes / (60 * 24));
+      return `${days}日前にオンライン`;
+    }
+    if (minutes >= 60) {
+      const hours = Math.floor(minutes / 60);
+      return `${hours}時間前にオンライン`;
+    }
+    return `${minutes}分前にオンライン`;
   }
 
   if (status === "logged_out") {
