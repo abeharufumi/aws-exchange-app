@@ -59,7 +59,9 @@ class ChatQuotaResponse(BaseModel):
     remainingToday: Optional[int] = None  # 本日の残り送信可能通数（無制限はNone）
     isUnlimited: bool  # 無制限かどうか（Rank4以上はTrue）
     hasPremium: bool = False  # プレミアム会員かどうか
-    hasBoost: bool = False  # 有効なブーストを所持しているかどうか
+    hasBoost: bool = False  # 表示優先が有効なBoostを所持しているかどうか
+    boostBonusRemaining: int = 0  # Boost追加メッセージの残数（期限なし・使い切り）
+    canSendWithBoostBonus: bool = False  # 日次上限超過時にBoost追加メッセージで送信可能か
     rankProgress: Optional[dict] = (
         None  # 次ランク到達までの進捗情報（currentRank, nextRank, items）
     )
@@ -77,6 +79,47 @@ class ChatSendMessageResponse(BaseModel):
 
     message_id: int  # 送信メッセージID
     status: str  # 'sent'
+
+
+def _get_boost_bonus_remaining(user_id: int, db: Session) -> int:
+    """有効化済みBoostの追加メッセージ残数を取得（期限なし・使い切り）"""
+    query = """
+        SELECT COALESCE(SUM(GREATEST(COALESCE(bonus_messages_total, 0) - COALESCE(bonus_messages_used, 0), 0)), 0) AS remaining
+        FROM boost_purchases
+        WHERE user_id = ?
+          AND payment_status = 'completed'
+          AND activated_at IS NOT NULL
+    """
+    rows = execQuery.execute_select(query, [user_id], db)
+    return int(rows[0]["remaining"]) if rows else 0
+
+
+def _consume_one_boost_bonus_message(user_id: int, db: Session) -> bool:
+    """Boost追加メッセージを1通分消費する。消費成功時はTrue"""
+    select_query = """
+        SELECT id
+        FROM boost_purchases
+        WHERE user_id = ?
+          AND payment_status = 'completed'
+          AND activated_at IS NOT NULL
+          AND COALESCE(bonus_messages_total, 0) > COALESCE(bonus_messages_used, 0)
+        ORDER BY purchased_at ASC
+        LIMIT 1
+    """
+    rows = execQuery.execute_select(select_query, [user_id], db)
+    if not rows:
+        return False
+
+    boost_id = int(rows[0]["id"])
+    update_query = """
+        UPDATE boost_purchases
+        SET bonus_messages_used = COALESCE(bonus_messages_used, 0) + 1
+        WHERE id = ?
+          AND user_id = ?
+          AND COALESCE(bonus_messages_total, 0) > COALESCE(bonus_messages_used, 0)
+    """
+    updated = execQuery.execute_update(update_query, [boost_id, user_id], db)
+    return updated > 0
 
 
 def _resolve_chat_quota(user_id: int, db: Session) -> dict:
@@ -128,18 +171,13 @@ def _resolve_chat_quota(user_id: int, db: Session) -> dict:
     """
     boost_result = execQuery.execute_select(boost_query, [user_id], db)
     has_boost = bool(boost_result)
+    boost_bonus_remaining = _get_boost_bonus_remaining(user_id, db)
 
     # 上限決定ロジック
     # Premium 会員または Rank4 以上は無制限
     if has_premium or current_rank >= 4:
         daily_limit = None
         is_unlimited = True
-    # Boost アクティブなら base + 10
-    elif has_boost:
-        base_limits = {1: 3, 2: 5, 3: 10, 4: 10, 5: 10}
-        base_limit = base_limits.get(current_rank, 10)
-        daily_limit = base_limit + 10
-        is_unlimited = False
     # 通常（Rank のみ）
     else:
         daily_limits = {1: 3, 2: 5, 3: 10, 4: 10, 5: 10}
@@ -147,6 +185,9 @@ def _resolve_chat_quota(user_id: int, db: Session) -> dict:
         is_unlimited = current_rank >= 4
 
     remaining_today = None if is_unlimited else max(0, daily_limit - used_today)
+    can_send_with_boost_bonus = (
+        (not is_unlimited) and remaining_today == 0 and boost_bonus_remaining > 0
+    )
 
     return {
         "currentRank": current_rank,
@@ -156,6 +197,8 @@ def _resolve_chat_quota(user_id: int, db: Session) -> dict:
         "isUnlimited": is_unlimited,
         "hasPremium": has_premium,
         "hasBoost": has_boost,
+        "boostBonusRemaining": boost_bonus_remaining,
+        "canSendWithBoostBonus": can_send_with_boost_bonus,
         "rankProgress": rank_progress,
     }
 
@@ -252,19 +295,25 @@ def send_chat_message(
     # ランクに応じた上限チェック
     # Rank1: 3通/日, Rank2: 5通/日, Rank3: 10通/日, Rank4以上: 無制限
     if daily_limit is not None and today_message_count >= daily_limit:
-        detail_message = (
-            f"Rank{current_rank}の1日送信上限({daily_limit}通)に達しました。"
-            "ランクアップで制限が緩和されます"
-        )
-        raise HTTPException(
-            status_code=429,
-            detail={
-                "message": detail_message,
-                "currentRank": current_rank,
-                "dailyLimit": daily_limit,
-                "rankProgress": quota.get("rankProgress"),
-            },
-        )
+        if _consume_one_boost_bonus_message(current_user["id"], db):
+            pass
+        else:
+            detail_message = (
+                f"Rank{current_rank}の1日送信上限({daily_limit}通)に達しました。"
+                "ランクアップまたはBoost追加枠の購入をご検討ください"
+            )
+            raise HTTPException(
+                status_code=429,
+                detail={
+                    "message": detail_message,
+                    "currentRank": current_rank,
+                    "dailyLimit": daily_limit,
+                    "rankProgress": quota.get("rankProgress"),
+                    "boostBonusRemaining": int(quota.get("boostBonusRemaining") or 0),
+                },
+            )
+
+    # 消費型Boost追加枠を使った送信時も通常送信として扱う
 
     # メッセージ送信
     insert_query = """

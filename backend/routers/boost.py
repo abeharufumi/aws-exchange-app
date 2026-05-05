@@ -14,11 +14,14 @@ import execQuery
 
 router = APIRouter(prefix="/api/boost", tags=["boost"])
 
+BOOST_PRICE_JPY = 500
+BOOST_DISPLAY_MINUTES = 30
+BOOST_MESSAGE_BONUS = 10
+
 
 class BoostPurchasePayload(BaseModel):
     """ブースト購入ペイロード"""
 
-    duration_days: int  # 購入期間（日数）。例: 7, 30, 90
     price_jpy: int  # 購入価格（円）
 
 
@@ -27,7 +30,10 @@ class BoostPurchaseResponse(BaseModel):
 
     boost_id: int  # ブースト購入ID
     user_id: int  # ユーザーID
-    expires_at: datetime  # 有効期限
+    expires_at: Optional[datetime] = None  # 表示優先の有効期限（有効化前はNULL）
+    message_bonus_total: int  # 追加メッセージ総数
+    message_bonus_used: int  # 使用済み追加メッセージ数
+    message_bonus_remaining: int  # 残り追加メッセージ数
 
 
 @router.post("/purchase", response_model=BoostPurchaseResponse)
@@ -42,20 +48,22 @@ def purchase_boost(
     - boost_purchases テーブルに記録
     """
 
-    if payload.duration_days not in [7, 30, 90]:
-        raise HTTPException(status_code=400, detail="duration_days must be one of 7, 30, 90")
-    if payload.price_jpy <= 0:
-        raise HTTPException(status_code=400, detail="Invalid duration or price")
+    if payload.price_jpy != BOOST_PRICE_JPY:
+        raise HTTPException(status_code=400, detail=f"price_jpy must be {BOOST_PRICE_JPY}")
 
-    # 購入記録を作成（activated_at は NULL のまま。有効化は別途エンドポイント）
+    # 購入記録を作成（表示優先30分は有効化時に開始）
     insert_query = """
-        INSERT INTO boost_purchases (user_id, purchased_at, expires_at, price_jpy, payment_status)
-        VALUES (?, NOW(), NOW() + (? || ' days')::interval, ?, 'completed')
+        INSERT INTO boost_purchases (
+            user_id, purchased_at, activated_at, expires_at,
+            price_jpy, payment_status,
+            bonus_messages_total, bonus_messages_used
+        )
+        VALUES (?, NOW(), NULL, NULL, ?, 'completed', ?, 0)
         RETURNING id
     """
     boost_id = execQuery.execute_insert(
         insert_query,
-        [current_user["id"], payload.duration_days, payload.price_jpy],
+        [current_user["id"], payload.price_jpy, BOOST_MESSAGE_BONUS],
         db,
     )
 
@@ -64,7 +72,7 @@ def purchase_boost(
 
     # 作成したレコードをIDで取得
     fetch_query = """
-        SELECT id, expires_at FROM boost_purchases
+        SELECT id, expires_at, bonus_messages_total, bonus_messages_used FROM boost_purchases
         WHERE id = ?
     """
     boost_records = execQuery.execute_select(fetch_query, [int(boost_id)], db)
@@ -78,6 +86,13 @@ def purchase_boost(
         "boost_id": int(boost_record["id"]),
         "user_id": current_user["id"],
         "expires_at": boost_record["expires_at"],
+        "message_bonus_total": int(boost_record.get("bonus_messages_total") or BOOST_MESSAGE_BONUS),
+        "message_bonus_used": int(boost_record.get("bonus_messages_used") or 0),
+        "message_bonus_remaining": max(
+            0,
+            int(boost_record.get("bonus_messages_total") or BOOST_MESSAGE_BONUS)
+            - int(boost_record.get("bonus_messages_used") or 0),
+        ),
     }
 
 
@@ -91,6 +106,7 @@ def activate_boost(
     ブースト有効化 (🟠P2-15)
     - 購入したブーストを有効化
     - activated_at を NOW() に設定
+    - 表示優先の有効期限を NOW() + 30分 に設定
     """
 
     query = """
@@ -122,17 +138,27 @@ def activate_boost(
         }
 
     # 有効化処理
-    update_query = """
+    update_query = f"""
         UPDATE boost_purchases
-        SET activated_at = NOW()
+        SET activated_at = NOW(),
+            expires_at = NOW() + INTERVAL '{BOOST_DISPLAY_MINUTES} minutes'
         WHERE id = ? AND user_id = ?
     """
     execQuery.execute_update(update_query, [boost_id, current_user["id"]], db)
 
+    updated_query = """
+        SELECT expires_at
+        FROM boost_purchases
+        WHERE id = ? AND user_id = ?
+        LIMIT 1
+    """
+    updated_rows = execQuery.execute_select(updated_query, [boost_id, current_user["id"]], db)
+    updated_expires_at = updated_rows[0]["expires_at"] if updated_rows else None
+
     return {
         "status": "activated",
         "boost_id": boost_id,
-        "expires_at": boost_record["expires_at"],
+        "expires_at": updated_expires_at,
     }
 
 
@@ -147,7 +173,9 @@ def get_active_boost(
     """
 
     query = """
-        SELECT id, activated_at, expires_at
+         SELECT id, activated_at, expires_at,
+             bonus_messages_total,
+             bonus_messages_used
         FROM boost_purchases
         WHERE user_id = ?
                     AND payment_status = 'completed'
@@ -166,4 +194,9 @@ def get_active_boost(
         "boost_id": int(boost_record["id"]),
         "activated_at": boost_record["activated_at"],
         "expires_at": boost_record["expires_at"],
+        "message_bonus_remaining": max(
+            0,
+            int(boost_record.get("bonus_messages_total") or BOOST_MESSAGE_BONUS)
+            - int(boost_record.get("bonus_messages_used") or 0),
+        ),
     }

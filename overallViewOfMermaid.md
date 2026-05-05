@@ -55,15 +55,15 @@ MatchingBtn1Back --> MatchingReqReceive["相手が鈴アイコンから履歴確
 
 Chat --> CheckMsgQuota{"送信上限チェック (1. メッセージ送信数) 🔴P1-25"}
 CheckMsgQuota -->|"男性 Rank1 通常"| MsgMen1["上限: 3 通/日 🔴P1-26"]
-CheckMsgQuota -->|"男性 Rank1 Boost"| MsgMen1B["上限: 3 通/日 + 10 通 🟠P2-05"]
+CheckMsgQuota -->|"男性 Rank1 Boost"| MsgMen1B["上限: 3 通/日 + 追加10通(使い切り) 🟠P2-05"]
 CheckMsgQuota -->|"男性 Rank2 通常"| MsgMen2["上限: 5 通/日 🟠P2-06"]
-CheckMsgQuota -->|"男性 Rank2 Boost"| MsgMen2B["上限: 5 通/日 + 10 通 🟠P2-07"]
+CheckMsgQuota -->|"男性 Rank2 Boost"| MsgMen2B["上限: 5 通/日 + 追加10通(使い切り) 🟠P2-07"]
 CheckMsgQuota -->|"男性 Rank3 通常"| MsgMen3["上限: 10 通/日 🟠P2-08"]
-CheckMsgQuota -->|"男性 Rank3 Boost"| MsgMen3B["上限: 10 通/日 + 10 通 🟠P2-09"]
+CheckMsgQuota -->|"男性 Rank3 Boost"| MsgMen3B["上限: 10 通/日 + 追加10通(使い切り) 🟠P2-09"]
 CheckMsgQuota -->|"女性 Rank1 通常"| MsgWomen1["上限: 3 通/日 🔴P1-27"]
-CheckMsgQuota -->|"女性 Rank1 Boost"| MsgWomen1B["上限: 3 通/日 + 10 通 🟠P2-10"]
+CheckMsgQuota -->|"女性 Rank1 Boost"| MsgWomen1B["上限: 3 通/日 + 追加10通(使い切り) 🟠P2-10"]
 CheckMsgQuota -->|"女性 Rank2 通常"| MsgWomen2["上限: 10 通/日 🟠P2-11"]
-CheckMsgQuota -->|"女性 Rank2 Boost"| MsgWomen2B["上限: 10 通/日 + 10 通 🟠P2-12"]
+CheckMsgQuota -->|"女性 Rank2 Boost"| MsgWomen2B["上限: 10 通/日 + 追加10通(使い切り) 🟠P2-12"]
 CheckMsgQuota -->|"Premium 全 Rank / Rank4-5 全状態 / 女性 Rank3-5 全状態"| MsgUnlimited["上限: 無制限 🟠P2-13"]
 MsgMen1 --> QuotaCheck{"本日の送信回数チェック 🔴P1-28"}
 MsgMen1B --> QuotaCheck
@@ -300,12 +300,12 @@ BoostEffects --> DisplayPriority["表示順位: 最上位 (Boost マーク付き
 BoostEffects --> CheckGenderBoost{"性別判定 🟠P2-58"}
 CheckGenderBoost -->|"男性"| CheckMaleRankBoost{"Rank 確認 🟠P2-59"}
 CheckGenderBoost -->|"女性"| CheckFemaleRankBoost{"Rank 確認 🟠P2-60"}
-CheckMaleRankBoost -->|"Rank1"| MaleMsgBoost1["3 通/日 + 10 通 🟠P2-61"]
-CheckMaleRankBoost -->|"Rank2"| MaleMsgBoost2["5 通/日 + 10 通 🟠P2-62"]
-CheckMaleRankBoost -->|"Rank3"| MaleMsgBoost3["10 通/日 + 10 通 🟠P2-63"]
+CheckMaleRankBoost -->|"Rank1"| MaleMsgBoost1["3 通/日 + 追加10通(使い切り) 🟠P2-61"]
+CheckMaleRankBoost -->|"Rank2"| MaleMsgBoost2["5 通/日 + 追加10通(使い切り) 🟠P2-62"]
+CheckMaleRankBoost -->|"Rank3"| MaleMsgBoost3["10 通/日 + 追加10通(使い切り) 🟠P2-63"]
 CheckMaleRankBoost -->|"Rank4-5"| MaleMsgBoost45["無制限 🟠P2-64"]
-CheckFemaleRankBoost -->|"Rank1"| FemaleMsgBoost1["3 通/日 + 10 通 🟠P2-65"]
-CheckFemaleRankBoost -->|"Rank2"| FemaleMsgBoost2["10 通/日 + 10 通 🟠P2-66"]
+CheckFemaleRankBoost -->|"Rank1"| FemaleMsgBoost1["3 通/日 + 追加10通(使い切り) 🟠P2-65"]
+CheckFemaleRankBoost -->|"Rank2"| FemaleMsgBoost2["10 通/日 + 追加10通(使い切り) 🟠P2-66"]
 CheckFemaleRankBoost -->|"Rank3 以上"| FemaleMsgBoost3["無制限 🟠P2-67"]
 MaleMsgBoost1 --> CheckBoostRestrictions{"機能制限チェック 🟠P2-68"}
 MaleMsgBoost2 --> CheckBoostRestrictions

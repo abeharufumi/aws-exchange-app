@@ -180,9 +180,11 @@ CREATE TABLE boost_purchases (
     user_id BIGINT REFERENCES users(id) ON DELETE CASCADE,
     purchased_at TIMESTAMP DEFAULT NOW(),
     activated_at TIMESTAMP,
-    expires_at TIMESTAMP,  -- 30分後
+    expires_at TIMESTAMP,  -- 有効化から30分後（表示優先のみ）
     price_jpy INT,  -- 課金額
     payment_status VARCHAR(20),  -- 'pending', 'completed', 'failed'
+    bonus_messages_total INT DEFAULT 10,  -- 追加メッセージ総数
+    bonus_messages_used INT DEFAULT 0,  -- 使用済み追加メッセージ数
     INDEX(user_id, expires_at)
 );
 

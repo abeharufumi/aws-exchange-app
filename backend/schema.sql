@@ -205,7 +205,9 @@ CREATE TABLE boost_purchases (
     activated_at TIMESTAMP,
     expires_at TIMESTAMP,
     price_jpy INTEGER NOT NULL,
-    payment_status VARCHAR(20) DEFAULT 'pending'
+    payment_status VARCHAR(20) DEFAULT 'pending',
+    bonus_messages_total INTEGER NOT NULL DEFAULT 10,
+    bonus_messages_used INTEGER NOT NULL DEFAULT 0
 );
 
 CREATE INDEX idx_boost_purchases_user_id ON boost_purchases(user_id);

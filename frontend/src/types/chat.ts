@@ -23,6 +23,8 @@ export interface ChatQuotaResponse {
   isUnlimited: boolean;
   hasPremium: boolean;
   hasBoost: boolean;
+  boostBonusRemaining?: number;
+  canSendWithBoostBonus?: boolean;
   rankProgress?: import("./profile").RankProgress;
 }
 

@@ -160,6 +160,8 @@ erDiagram
         timestamp expires_at "有効期限"
         integer price_jpy "価格(円)"
         varchar payment_status "支払いステータス(pending/completed/failed)"
+        integer bonus_messages_total "追加メッセージ総数(デフォルト10)"
+        integer bonus_messages_used "使用済み追加メッセージ数"
     }
 
     premium_subscriptions {

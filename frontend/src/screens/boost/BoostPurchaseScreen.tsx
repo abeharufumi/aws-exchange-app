@@ -4,26 +4,11 @@ import { useRouter } from "expo-router";
 import apiClient from "@/src/services/api";
 import { BoostActivationResponse, BoostPurchaseResponse } from "@/src/types/boost";
 
-type BoostPlan = {
-  key: string;
-  label: string;
-  duration_days: number;
-  price_jpy: number;
-  discount_rate: number; // % 割引
-};
-
-const BOOST_PLANS: BoostPlan[] = [
-  { key: "7d", label: "7日間", duration_days: 7, price_jpy: 500, discount_rate: 0 },
-  { key: "30d", label: "30日間", duration_days: 30, price_jpy: 1500, discount_rate: 10 },
-  { key: "90d", label: "90日間", duration_days: 90, price_jpy: 3500, discount_rate: 23 },
-];
+const BOOST_PRICE_JPY = 500;
 
 export function BoostPurchaseScreen() {
   const router = useRouter();
-  const [selectedPlan, setSelectedPlan] = useState<string>("7d");
   const [isProcessing, setIsProcessing] = useState(false);
-
-  const current_plan = BOOST_PLANS.find((p) => p.key === selectedPlan) || BOOST_PLANS[0];
 
   const handlePurchase = async () => {
     if (isProcessing) return;
@@ -33,15 +18,17 @@ export function BoostPurchaseScreen() {
 
       // Backend に購入リクエスト
       const response = await apiClient.post<BoostPurchaseResponse>("/boost/purchase", {
-        duration_days: current_plan.duration_days,
-        price_jpy: current_plan.price_jpy,
+        price_jpy: BOOST_PRICE_JPY,
       });
 
       if (response.data?.boost_id) {
         // 有効化リクエスト
         await apiClient.post<BoostActivationResponse>(`/boost/activate/${response.data.boost_id}`);
 
-        Alert.alert("成功", "ブーストが有効化されました！チャット送信上限が増加しました。");
+        Alert.alert(
+          "成功",
+          "ブーストが有効化されました！30分間の上位表示と追加メッセージ10通（使い切り）が付与されました。",
+        );
         router.back();
       }
     } catch (error) {
@@ -61,62 +48,27 @@ export function BoostPurchaseScreen() {
           ブースト購入
         </Text>
         <Text style={{ textAlign: "center", fontSize: 14, color: "#6b7280" }}>
-          メッセージ送信上限を +10 通 増加できます
+          30分間の上位表示 + 追加メッセージ10通（使い切り）
         </Text>
       </View>
 
-      <View style={{ marginBottom: 32, gap: 12 }}>
-        {BOOST_PLANS.map((plan) => (
-          <TouchableOpacity
-            key={plan.key}
-            style={[
-              {
-                position: "relative",
-                borderRadius: 12,
-                borderWidth: 2,
-                paddingHorizontal: 16,
-                paddingVertical: 16,
-              },
-              {
-                borderColor: selectedPlan === plan.key ? "#f97316" : "#e5e7eb",
-                backgroundColor: selectedPlan === plan.key ? "#fff7ed" : "#f9fafb",
-              },
-            ]}
-            onPress={() => setSelectedPlan(plan.key)}
-          >
-            <Text
-              style={[
-                { marginBottom: 8, fontSize: 16, fontWeight: "600" },
-                { color: selectedPlan === plan.key ? "#ea580c" : "#374151" },
-              ]}
-            >
-              {plan.label}
-            </Text>
-            <Text
-              style={[
-                { fontSize: 24, fontWeight: "700" },
-                { color: selectedPlan === plan.key ? "#f97316" : "#1f2937" },
-              ]}
-            >
-              ¥{plan.price_jpy.toLocaleString()}
-            </Text>
-            {plan.discount_rate > 0 && (
-              <View
-                style={{
-                  position: "absolute",
-                  borderRadius: 6,
-                  backgroundColor: "#ef4444",
-                  paddingHorizontal: 8,
-                  paddingVertical: 4,
-                }}
-              >
-                <Text style={{ fontSize: 12, fontWeight: "600", color: "#ffffff" }}>
-                  {plan.discount_rate}% OFF
-                </Text>
-              </View>
-            )}
-          </TouchableOpacity>
-        ))}
+      <View
+        style={{
+          marginBottom: 32,
+          borderRadius: 12,
+          borderWidth: 2,
+          borderColor: "#f97316",
+          backgroundColor: "#fff7ed",
+          paddingHorizontal: 16,
+          paddingVertical: 16,
+        }}
+      >
+        <Text style={{ marginBottom: 8, fontSize: 16, fontWeight: "600", color: "#ea580c" }}>
+          1回（30分）
+        </Text>
+        <Text style={{ fontSize: 24, fontWeight: "700", color: "#f97316" }}>
+          ¥{BOOST_PRICE_JPY.toLocaleString()}
+        </Text>
       </View>
 
       <View
@@ -129,14 +81,16 @@ export function BoostPurchaseScreen() {
           <Text style={{ marginRight: 8, fontSize: 14, fontWeight: "700", color: "#16a34a" }}>
             ✓
           </Text>
-          <Text style={{ flex: 1, fontSize: 14, color: "#374151" }}>メッセージ送信上限 +10 通</Text>
+          <Text style={{ flex: 1, fontSize: 14, color: "#374151" }}>
+            追加メッセージ +10通（期限なし・使い切り）
+          </Text>
         </View>
         <View style={{ marginBottom: 8, flexDirection: "row", alignItems: "flex-start" }}>
           <Text style={{ marginRight: 8, fontSize: 14, fontWeight: "700", color: "#16a34a" }}>
             ✓
           </Text>
           <Text style={{ flex: 1, fontSize: 14, color: "#374151" }}>
-            期間中はいつでも有効化可能
+            有効化から30分間、検索で上位表示
           </Text>
         </View>
         <View style={{ marginBottom: 8, flexDirection: "row", alignItems: "flex-start" }}>
@@ -164,7 +118,7 @@ export function BoostPurchaseScreen() {
         disabled={isProcessing}
       >
         <Text style={{ fontSize: 16, fontWeight: "700", color: "#ffffff" }}>
-          {isProcessing ? "処理中..." : `¥${current_plan.price_jpy.toLocaleString()} で購入`}
+          {isProcessing ? "処理中..." : `¥${BOOST_PRICE_JPY.toLocaleString()} で購入`}
         </Text>
       </TouchableOpacity>
 

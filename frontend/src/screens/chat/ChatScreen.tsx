@@ -599,6 +599,11 @@ export function ChatScreen({ route }: any) {
               ? `本日の送信: ${messageQuota.usedToday}通 / 無制限 (Rank ${messageQuota.currentRank})`
               : `本日の送信: ${messageQuota.usedToday}/${messageQuota.dailyLimit}通（残り ${messageQuota.remainingToday}通） (Rank ${messageQuota.currentRank})`}
           </Text>
+          {!messageQuota.isUnlimited && (messageQuota.boostBonusRemaining || 0) > 0 && (
+            <Text style={{ marginTop: 6, color: "#ea580c", fontSize: 12, textAlign: "center" }}>
+              Boost追加枠: 残り {messageQuota.boostBonusRemaining}通（期限なし・使い切り）
+            </Text>
+          )}
           {!messageQuota.isUnlimited &&
             messageQuota.rankProgress &&
             !messageQuota.rankProgress.isMaxRank &&
