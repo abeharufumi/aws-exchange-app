@@ -47,9 +47,6 @@ export function BoostPurchaseScreen() {
         <Text style={{ marginBottom: 8, fontSize: 30, fontWeight: "700", color: "#1f2937" }}>
           ブースト購入
         </Text>
-        <Text style={{ textAlign: "center", fontSize: 14, color: "#6b7280" }}>
-          30分間の上位表示 + 追加メッセージ10通（使い切り）
-        </Text>
       </View>
 
       <View
@@ -64,7 +61,7 @@ export function BoostPurchaseScreen() {
         }}
       >
         <Text style={{ marginBottom: 8, fontSize: 16, fontWeight: "600", color: "#ea580c" }}>
-          1回（30分）
+          1回分
         </Text>
         <Text style={{ fontSize: 24, fontWeight: "700", color: "#f97316" }}>
           ¥{BOOST_PRICE_JPY.toLocaleString()}
