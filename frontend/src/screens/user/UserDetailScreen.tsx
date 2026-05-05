@@ -186,7 +186,6 @@ export function UserDetailScreen({ route }: any) {
       >
         <ScreenBackButton
           compact
-          label="<"
           onPress={handleBack}
           style={{ width: 32, height: 32, alignItems: "center", justifyContent: "center" }}
           textStyle={{ fontSize: 24, fontWeight: "700", color: "#111827", lineHeight: 24 }}

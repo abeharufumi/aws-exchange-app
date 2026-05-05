@@ -3,7 +3,6 @@ import { StyleProp, Text, TextStyle, TouchableOpacity, ViewStyle } from "react-n
 
 type ScreenBackButtonProps = {
   onPress: () => void;
-  label?: string;
   variant?: "light" | "dark";
   compact?: boolean;
   disabled?: boolean;
@@ -13,7 +12,6 @@ type ScreenBackButtonProps = {
 
 export function ScreenBackButton({
   onPress,
-  label = "← 戻る",
   variant = "light",
   compact = false,
   disabled = false,
@@ -21,7 +19,6 @@ export function ScreenBackButton({
   textStyle,
 }: ScreenBackButtonProps) {
   const textColor = variant === "dark" ? "#9ca3af" : "#111827";
-  const compactLabel = label === "← 戻る" ? "<" : label;
 
   return (
     <TouchableOpacity
@@ -36,12 +33,12 @@ export function ScreenBackButton({
     >
       <Text
         style={[
-          { fontSize: 16, fontWeight: "600", color: textColor },
+          { fontSize: 24, fontWeight: "700", color: textColor, lineHeight: 24 },
           compact && { fontSize: 24, fontWeight: "700", lineHeight: 24 },
           textStyle,
         ]}
       >
-        {compact ? compactLabel : label}
+        {"<"}
       </Text>
     </TouchableOpacity>
   );

@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 import { CameraView, useCameraPermissions, BarcodeScanningResult } from "expo-camera";
+import { ScreenBackButton } from "../../components/common/ScreenBackButton";
 import apiClient from "../../services/api";
 import {
   MeetTroubleActionResponse,
@@ -503,247 +504,328 @@ export function QRScreen({ route }: any) {
   };
 
   return (
-    <View
-      style={{
-        flex: 1,
-        alignItems: "center",
-        justifyContent: "center",
-        backgroundColor: "#ffffff",
-        paddingHorizontal: 20,
-        paddingVertical: 20,
-      }}
-    >
-      <Text style={{ marginBottom: 20, fontSize: 24, fontWeight: "700", color: "#111827" }}>
-        QR確認
-      </Text>
+    <View style={{ flex: 1, backgroundColor: "#ffffff" }}>
+      <View
+        style={{
+          borderBottomWidth: 1,
+          borderColor: "#f3f4f6",
+          backgroundColor: "#ffffff",
+          paddingHorizontal: 16,
+          paddingTop: 12,
+          paddingBottom: 12,
+        }}
+      >
+        <ScreenBackButton onPress={() => router.back()} style={{ paddingBottom: 6 }} />
+        <Text style={{ fontSize: 20, fontWeight: "700", color: "#111827" }}>QR確認</Text>
+      </View>
 
-      {currentDistanceMeters !== null && (
-        <View
-          style={{
-            marginBottom: 12,
-            width: "100%",
-            borderRadius: 12,
-            borderWidth: 1,
-            borderColor: "#bbf7d0",
-            backgroundColor: "#f0fdf4",
-            paddingHorizontal: 12,
-            paddingVertical: 10,
-          }}
-        >
-          <Text style={{ textAlign: "center", fontSize: 14, fontWeight: "700" }}>
-            待ち合わせ地点まで 約{currentDistanceMeters}m
-          </Text>
-          <Text
-            style={[
-              { marginTop: 4, textAlign: "center", fontSize: 12, fontWeight: "600" },
-              { color: currentDistanceMeters <= allowedRadiusMeters ? "#15803d" : "#b45309" },
-            ]}
-          >
-            {currentDistanceMeters <= allowedRadiusMeters
-              ? `判定: 圏内（${allowedRadiusMeters}m以内）`
-              : `判定: 圏外（${allowedRadiusMeters}m以内で有効）`}
-          </Text>
-          {positionAccuracyMeters !== null && (
-            <Text style={{ marginTop: 4, textAlign: "center", color: "#374151" }}>
-              GPS精度: ±{positionAccuracyMeters}m
-            </Text>
-          )}
-        </View>
-      )}
-
-      {status === "completed" && (
-        <View
-          style={{
-            marginBottom: 12,
-            borderRadius: 8,
-            backgroundColor: "#dcfce7",
-            paddingHorizontal: 12,
-            paddingVertical: 8,
-          }}
-        >
-          <Text style={{ fontWeight: "600", color: "#166534" }}>このデートはQR確認済みです</Text>
-        </View>
-      )}
-
-      {status === "cancelled" && (
-        <View
-          style={{
-            marginBottom: 12,
-            width: "100%",
-            borderRadius: 8,
-            backgroundColor: "#f3f4f6",
-            paddingHorizontal: 12,
-            paddingVertical: 8,
-          }}
-        >
-          <Text style={{ textAlign: "center", fontWeight: "600", color: "#374151" }}>
-            このデートは合意キャンセル済みです
-          </Text>
-        </View>
-      )}
-
-      {status === "reported" && (
-        <View
-          style={{
-            marginBottom: 12,
-            width: "100%",
-            borderRadius: 8,
-            borderWidth: 1,
-            borderColor: "#fecaca",
-            backgroundColor: "#fef2f2",
-            paddingHorizontal: 12,
-            paddingVertical: 8,
-          }}
-        >
-          <Text style={{ textAlign: "center", fontWeight: "600" }}>
-            このデートはドタキャン報告済みです
-          </Text>
-        </View>
-      )}
-
-      {status === "accepted" && !qrEnabled && (
-        <View
-          style={{
-            marginBottom: 12,
-            width: "100%",
-            borderRadius: 12,
-            borderWidth: 1,
-            borderColor: "#bfdbfe",
-            backgroundColor: "#eff6ff",
-            paddingHorizontal: 12,
-            paddingVertical: 10,
-          }}
-        >
-          <Text style={{ textAlign: "center", fontWeight: "600" }}>
-            約束時刻になるとQR確認が有効になります
-          </Text>
-        </View>
-      )}
-
-      {role === "sender" && (
-        <>
-          {qrEnabled ? (
-            <>
-              <Text style={{ marginBottom: 10, textAlign: "center", color: "#4b5563" }}>
-                このトークンを相手に読み取ってもらってください
-              </Text>
-              <Text style={{ marginBottom: 10, fontWeight: "600" }}>
-                有効期限: あと {expiresInSeconds} 秒
-              </Text>
-              <View
-                style={{
-                  marginBottom: 20,
-                  width: "100%",
-                  alignItems: "center",
-                  borderRadius: 12,
-                  backgroundColor: "#f3f4f6",
-                  padding: 20,
-                }}
-              >
-                {qrCode ? (
-                  <Image
-                    source={{ uri: buildQrImageUrl(qrCode) }}
-                    style={{ width: 240, height: 240, marginBottom: 10 }}
-                  />
-                ) : (
-                  <Text style={{ fontSize: 16, fontWeight: "700", color: "#374151" }}>
-                    トークン未発行
-                  </Text>
-                )}
-                <Text
-                  style={{ textAlign: "center", fontSize: 12, fontWeight: "600", color: "#374151" }}
-                >
-                  {qrCode || "トークン未発行"}
-                </Text>
-              </View>
-            </>
-          ) : (
-            <Text style={{ marginBottom: 10, textAlign: "center", color: "#4b5563" }}>
-              有効化後にQRトークンが表示されます
-            </Text>
-          )}
-          <TouchableOpacity
-            style={[
-              {
-                marginBottom: 10,
-                width: "100%",
-                alignItems: "center",
-                borderRadius: 8,
-                backgroundColor: "#ef4444",
-                paddingVertical: 14,
-              },
-              loading ? { opacity: 0.6 } : undefined,
-            ]}
-            onPress={() => fetchQrInfo(true)}
-            disabled={loading}
-          >
-            <Text style={{ fontSize: 16, fontWeight: "700", color: "#ffffff" }}>
-              {loading ? "更新中..." : "状態を更新"}
-            </Text>
-          </TouchableOpacity>
-        </>
-      )}
-
-      {role === "receiver" && (
-        <>
-          <Text style={{ marginBottom: 10, textAlign: "center", color: "#4b5563" }}>
-            カメラ読み取りまたは手入力でQR確認できます
-          </Text>
-          <TouchableOpacity
-            style={[
-              {
-                marginBottom: 10,
-                width: "100%",
-                alignItems: "center",
-                borderRadius: 8,
-                backgroundColor: "#2563eb",
-                paddingVertical: 14,
-              },
-              loading ? { opacity: 0.6 } : undefined,
-            ]}
-            onPress={openScanner}
-            disabled={loading || status === "completed" || !qrEnabled}
-          >
-            <Text style={{ fontSize: 16, fontWeight: "700", color: "#ffffff" }}>
-              カメラで読み取る
-            </Text>
-          </TouchableOpacity>
-          <TextInput
+      <View
+        style={{
+          flex: 1,
+          alignItems: "center",
+          justifyContent: "center",
+          paddingHorizontal: 20,
+          paddingVertical: 20,
+        }}
+      >
+        {currentDistanceMeters !== null && (
+          <View
             style={{
-              marginBottom: 10,
+              marginBottom: 12,
+              width: "100%",
+              borderRadius: 12,
+              borderWidth: 1,
+              borderColor: "#bbf7d0",
+              backgroundColor: "#f0fdf4",
+              paddingHorizontal: 12,
+              paddingVertical: 10,
+            }}
+          >
+            <Text style={{ textAlign: "center", fontSize: 14, fontWeight: "700" }}>
+              待ち合わせ地点まで 約{currentDistanceMeters}m
+            </Text>
+            <Text
+              style={[
+                { marginTop: 4, textAlign: "center", fontSize: 12, fontWeight: "600" },
+                { color: currentDistanceMeters <= allowedRadiusMeters ? "#15803d" : "#b45309" },
+              ]}
+            >
+              {currentDistanceMeters <= allowedRadiusMeters
+                ? `判定: 圏内（${allowedRadiusMeters}m以内）`
+                : `判定: 圏外（${allowedRadiusMeters}m以内で有効）`}
+            </Text>
+            {positionAccuracyMeters !== null && (
+              <Text style={{ marginTop: 4, textAlign: "center", color: "#374151" }}>
+                GPS精度: ±{positionAccuracyMeters}m
+              </Text>
+            )}
+          </View>
+        )}
+
+        {status === "completed" && (
+          <View
+            style={{
+              marginBottom: 12,
+              borderRadius: 8,
+              backgroundColor: "#dcfce7",
+              paddingHorizontal: 12,
+              paddingVertical: 8,
+            }}
+          >
+            <Text style={{ fontWeight: "600", color: "#166534" }}>このデートはQR確認済みです</Text>
+          </View>
+        )}
+
+        {status === "cancelled" && (
+          <View
+            style={{
+              marginBottom: 12,
+              width: "100%",
+              borderRadius: 8,
+              backgroundColor: "#f3f4f6",
+              paddingHorizontal: 12,
+              paddingVertical: 8,
+            }}
+          >
+            <Text style={{ textAlign: "center", fontWeight: "600", color: "#374151" }}>
+              このデートは合意キャンセル済みです
+            </Text>
+          </View>
+        )}
+
+        {status === "reported" && (
+          <View
+            style={{
+              marginBottom: 12,
               width: "100%",
               borderRadius: 8,
               borderWidth: 1,
-              borderColor: "#d1d5db",
+              borderColor: "#fecaca",
+              backgroundColor: "#fef2f2",
+              paddingHorizontal: 12,
+              paddingVertical: 8,
+            }}
+          >
+            <Text style={{ textAlign: "center", fontWeight: "600" }}>
+              このデートはドタキャン報告済みです
+            </Text>
+          </View>
+        )}
+
+        {status === "accepted" && !qrEnabled && (
+          <View
+            style={{
+              marginBottom: 12,
+              width: "100%",
+              borderRadius: 12,
+              borderWidth: 1,
+              borderColor: "#bfdbfe",
+              backgroundColor: "#eff6ff",
               paddingHorizontal: 12,
               paddingVertical: 10,
-              color: "#111827",
             }}
-            value={verifyToken}
-            onChangeText={setVerifyToken}
-            placeholder="QRトークンを入力"
-            autoCapitalize="none"
-            editable={qrEnabled && status !== "completed"}
-          />
-          <TouchableOpacity
-            style={[
-              {
+          >
+            <Text style={{ textAlign: "center", fontWeight: "600" }}>
+              約束時刻になるとQR確認が有効になります
+            </Text>
+          </View>
+        )}
+
+        {role === "sender" && (
+          <>
+            {qrEnabled ? (
+              <>
+                <Text style={{ marginBottom: 10, textAlign: "center", color: "#4b5563" }}>
+                  このトークンを相手に読み取ってもらってください
+                </Text>
+                <Text style={{ marginBottom: 10, fontWeight: "600" }}>
+                  有効期限: あと {expiresInSeconds} 秒
+                </Text>
+                <View
+                  style={{
+                    marginBottom: 20,
+                    width: "100%",
+                    alignItems: "center",
+                    borderRadius: 12,
+                    backgroundColor: "#f3f4f6",
+                    padding: 20,
+                  }}
+                >
+                  {qrCode ? (
+                    <Image
+                      source={{ uri: buildQrImageUrl(qrCode) }}
+                      style={{ width: 240, height: 240, marginBottom: 10 }}
+                    />
+                  ) : (
+                    <Text style={{ fontSize: 16, fontWeight: "700", color: "#374151" }}>
+                      トークン未発行
+                    </Text>
+                  )}
+                  <Text
+                    style={{
+                      textAlign: "center",
+                      fontSize: 12,
+                      fontWeight: "600",
+                      color: "#374151",
+                    }}
+                  >
+                    {qrCode || "トークン未発行"}
+                  </Text>
+                </View>
+              </>
+            ) : (
+              <Text style={{ marginBottom: 10, textAlign: "center", color: "#4b5563" }}>
+                有効化後にQRトークンが表示されます
+              </Text>
+            )}
+            <TouchableOpacity
+              style={[
+                {
+                  marginBottom: 10,
+                  width: "100%",
+                  alignItems: "center",
+                  borderRadius: 8,
+                  backgroundColor: "#ef4444",
+                  paddingVertical: 14,
+                },
+                loading ? { opacity: 0.6 } : undefined,
+              ]}
+              onPress={() => fetchQrInfo(true)}
+              disabled={loading}
+            >
+              <Text style={{ fontSize: 16, fontWeight: "700", color: "#ffffff" }}>
+                {loading ? "更新中..." : "状態を更新"}
+              </Text>
+            </TouchableOpacity>
+          </>
+        )}
+
+        {role === "receiver" && (
+          <>
+            <Text style={{ marginBottom: 10, textAlign: "center", color: "#4b5563" }}>
+              カメラ読み取りまたは手入力でQR確認できます
+            </Text>
+            <TouchableOpacity
+              style={[
+                {
+                  marginBottom: 10,
+                  width: "100%",
+                  alignItems: "center",
+                  borderRadius: 8,
+                  backgroundColor: "#2563eb",
+                  paddingVertical: 14,
+                },
+                loading ? { opacity: 0.6 } : undefined,
+              ]}
+              onPress={openScanner}
+              disabled={loading || status === "completed" || !qrEnabled}
+            >
+              <Text style={{ fontSize: 16, fontWeight: "700", color: "#ffffff" }}>
+                カメラで読み取る
+              </Text>
+            </TouchableOpacity>
+            <TextInput
+              style={{
                 marginBottom: 10,
                 width: "100%",
-                alignItems: "center",
                 borderRadius: 8,
-                backgroundColor: "#16a34a",
-                paddingVertical: 14,
-              },
-              loading ? { opacity: 0.6 } : undefined,
-            ]}
-            onPress={handleVerifyQR}
-            disabled={loading || status === "completed" || !qrEnabled}
-          >
-            <Text style={{ fontSize: 16, fontWeight: "700", color: "#ffffff" }}>
-              {loading ? "確認中..." : "QR確認"}
-            </Text>
-          </TouchableOpacity>
+                borderWidth: 1,
+                borderColor: "#d1d5db",
+                paddingHorizontal: 12,
+                paddingVertical: 10,
+                color: "#111827",
+              }}
+              value={verifyToken}
+              onChangeText={setVerifyToken}
+              placeholder="QRトークンを入力"
+              autoCapitalize="none"
+              editable={qrEnabled && status !== "completed"}
+            />
+            <TouchableOpacity
+              style={[
+                {
+                  marginBottom: 10,
+                  width: "100%",
+                  alignItems: "center",
+                  borderRadius: 8,
+                  backgroundColor: "#16a34a",
+                  paddingVertical: 14,
+                },
+                loading ? { opacity: 0.6 } : undefined,
+              ]}
+              onPress={handleVerifyQR}
+              disabled={loading || status === "completed" || !qrEnabled}
+            >
+              <Text style={{ fontSize: 16, fontWeight: "700", color: "#ffffff" }}>
+                {loading ? "確認中..." : "QR確認"}
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[
+                {
+                  marginBottom: 10,
+                  width: "100%",
+                  alignItems: "center",
+                  borderRadius: 8,
+                  backgroundColor: "#ef4444",
+                  paddingVertical: 14,
+                },
+                loading ? { opacity: 0.6 } : undefined,
+              ]}
+              onPress={() => fetchQrInfo()}
+              disabled={loading}
+            >
+              <Text style={{ fontSize: 16, fontWeight: "700", color: "#ffffff" }}>
+                {loading ? "更新中..." : "状態を更新"}
+              </Text>
+            </TouchableOpacity>
+          </>
+        )}
+
+        {status === "accepted" && (
+          <View style={{ marginTop: 6, width: "100%" }}>
+            <TouchableOpacity
+              style={[
+                {
+                  marginBottom: 10,
+                  width: "100%",
+                  alignItems: "center",
+                  borderRadius: 8,
+                  backgroundColor: "#6b7280",
+                  paddingVertical: 14,
+                },
+                loading ? { opacity: 0.6 } : undefined,
+              ]}
+              onPress={() => handleTroubleAction("cancel_agreed")}
+              disabled={loading}
+            >
+              <Text style={{ fontSize: 16, fontWeight: "700", color: "#ffffff" }}>
+                合意キャンセル
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[
+                {
+                  marginBottom: 10,
+                  width: "100%",
+                  alignItems: "center",
+                  borderRadius: 8,
+                  backgroundColor: "#dc2626",
+                  paddingVertical: 14,
+                },
+                loading ? { opacity: 0.6 } : undefined,
+              ]}
+              onPress={() => handleTroubleAction("report_noshow")}
+              disabled={loading}
+            >
+              <Text style={{ fontSize: 16, fontWeight: "700", color: "#ffffff" }}>
+                ドタキャン報告
+              </Text>
+            </TouchableOpacity>
+          </View>
+        )}
+
+        {role === "unknown" && (
           <TouchableOpacity
             style={[
               {
@@ -760,76 +842,11 @@ export function QRScreen({ route }: any) {
             disabled={loading}
           >
             <Text style={{ fontSize: 16, fontWeight: "700", color: "#ffffff" }}>
-              {loading ? "更新中..." : "状態を更新"}
+              {loading ? "取得中..." : "QR情報を取得"}
             </Text>
           </TouchableOpacity>
-        </>
-      )}
-
-      {status === "accepted" && (
-        <View style={{ marginTop: 6, width: "100%" }}>
-          <TouchableOpacity
-            style={[
-              {
-                marginBottom: 10,
-                width: "100%",
-                alignItems: "center",
-                borderRadius: 8,
-                backgroundColor: "#6b7280",
-                paddingVertical: 14,
-              },
-              loading ? { opacity: 0.6 } : undefined,
-            ]}
-            onPress={() => handleTroubleAction("cancel_agreed")}
-            disabled={loading}
-          >
-            <Text style={{ fontSize: 16, fontWeight: "700", color: "#ffffff" }}>
-              合意キャンセル
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[
-              {
-                marginBottom: 10,
-                width: "100%",
-                alignItems: "center",
-                borderRadius: 8,
-                backgroundColor: "#dc2626",
-                paddingVertical: 14,
-              },
-              loading ? { opacity: 0.6 } : undefined,
-            ]}
-            onPress={() => handleTroubleAction("report_noshow")}
-            disabled={loading}
-          >
-            <Text style={{ fontSize: 16, fontWeight: "700", color: "#ffffff" }}>
-              ドタキャン報告
-            </Text>
-          </TouchableOpacity>
-        </View>
-      )}
-
-      {role === "unknown" && (
-        <TouchableOpacity
-          style={[
-            {
-              marginBottom: 10,
-              width: "100%",
-              alignItems: "center",
-              borderRadius: 8,
-              backgroundColor: "#ef4444",
-              paddingVertical: 14,
-            },
-            loading ? { opacity: 0.6 } : undefined,
-          ]}
-          onPress={() => fetchQrInfo()}
-          disabled={loading}
-        >
-          <Text style={{ fontSize: 16, fontWeight: "700", color: "#ffffff" }}>
-            {loading ? "取得中..." : "QR情報を取得"}
-          </Text>
-        </TouchableOpacity>
-      )}
+        )}
+      </View>
 
       <Modal
         visible={scannerVisible}

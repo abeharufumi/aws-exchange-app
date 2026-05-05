@@ -3,6 +3,7 @@ import { Alert, FlatList, Text, TouchableOpacity, View } from "react-native";
 import { useRouter } from "expo-router";
 import { EmptyState } from "@/src/components/common/EmptyState";
 import { LoadingState } from "@/src/components/common/LoadingState";
+import { ScreenBackButton } from "@/src/components/common/ScreenBackButton";
 import apiClient from "@/src/services/api";
 import { RankProgress } from "@/src/types/profile";
 import { FootprintItem } from "@/src/types/user";
@@ -73,11 +74,37 @@ export function FootprintScreen() {
     }
   };
 
-  if (loading) return <LoadingState color="#e74c3c" />;
+  const header = (
+    <View
+      style={{
+        borderBottomWidth: 1,
+        borderColor: "#f3f4f6",
+        backgroundColor: "#ffffff",
+        paddingHorizontal: 16,
+        paddingTop: 12,
+        paddingBottom: 12,
+      }}
+    >
+      <ScreenBackButton onPress={() => router.back()} style={{ paddingBottom: 6 }} />
+      <Text style={{ fontSize: 20, fontWeight: "700", color: "#111827" }}>足跡履歴</Text>
+    </View>
+  );
+
+  if (loading)
+    return (
+      <View style={{ flex: 1, backgroundColor: "#ffffff" }}>
+        {header}
+        <LoadingState
+          color="#e74c3c"
+          containerStyle={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+        />
+      </View>
+    );
 
   if (!canView) {
     return (
       <View style={{ flex: 1, backgroundColor: "#ffffff" }}>
+        {header}
         <View
           style={{ flex: 1, justifyContent: "center", alignItems: "center", paddingHorizontal: 24 }}
         >
@@ -138,6 +165,7 @@ export function FootprintScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: "#ffffff" }}>
+      {header}
       {footprints.length === 0 ? (
         <EmptyState
           message="足跡がまだありません"
