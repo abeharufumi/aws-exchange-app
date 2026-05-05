@@ -1160,7 +1160,11 @@ export function ChatScreen({ route }: any) {
         <View style={{ flex: 1, justifyContent: "center", padding: 20 }}>
           <View style={{ borderRadius: 12, backgroundColor: "#ffffff", padding: 16 }}>
             <Text style={{ marginBottom: 12, fontSize: 16, fontWeight: "700" }}>時刻を選択</Text>
-            <ScrollView style={{ marginBottom: 12 }}>
+            <ScrollView
+              style={{ marginBottom: 12, maxHeight: 360 }}
+              contentContainerStyle={{ paddingBottom: 4 }}
+              showsVerticalScrollIndicator
+            >
               {timeOptions.map((time) => {
                 const selected = meetTime === time;
                 return (
