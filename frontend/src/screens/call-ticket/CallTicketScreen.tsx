@@ -1,12 +1,14 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Alert, FlatList, Text, TextInput, View } from "react-native";
+import { Alert, FlatList, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { useRouter } from "expo-router";
 import { ActionButton } from "../../components/common/ActionButton";
+import { DatePickerModal } from "../../components/common/DatePickerModal";
 import { EmptyState } from "../../components/common/EmptyState";
 import { LoadingState } from "../../components/common/LoadingState";
 import { SectionCard } from "../../components/common/SectionCard";
 import { SegmentedTab } from "../../components/common/SegmentedTab";
 import { ScreenBackButton } from "../../components/common/ScreenBackButton";
+import { TimePickerModal } from "../../components/common/TimePickerModal";
 import apiClient from "../../services/api";
 import {
   CallTicketCreateErrorDetail,
@@ -42,6 +44,9 @@ export function CallTicketScreen() {
   const [scheduledDate, setScheduledDate] = useState("");
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
+  const [datePickerVisible, setDatePickerVisible] = useState(false);
+  const [timePickerVisible, setTimePickerVisible] = useState(false);
+  const [timePickerTarget, setTimePickerTarget] = useState<"start" | "end">("start");
   const [creating, setCreating] = useState(false);
 
   const fetchData = useCallback(async () => {
@@ -213,6 +218,34 @@ export function CallTicketScreen() {
     color: "#111827",
     backgroundColor: "#f9fafb",
     marginBottom: 12,
+  };
+
+  const pickerFieldStyle = {
+    marginBottom: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#e5e7eb",
+    backgroundColor: "#f9fafb",
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+  };
+
+  const openStartTimePicker = () => {
+    setTimePickerTarget("start");
+    setTimePickerVisible(true);
+  };
+
+  const openEndTimePicker = () => {
+    setTimePickerTarget("end");
+    setTimePickerVisible(true);
+  };
+
+  const handleSelectTicketTime = (time: string) => {
+    if (timePickerTarget === "start") {
+      setStartTime(time);
+      return;
+    }
+    setEndTime(time);
   };
 
   return (
@@ -422,35 +455,29 @@ export function CallTicketScreen() {
                 placeholderTextColor="#9ca3af"
               />
               <Text style={{ marginBottom: 6, fontSize: 12, fontWeight: "600", color: "#6b7280" }}>
-                日付（YYYY-MM-DD）
+                日付
               </Text>
-              <TextInput
-                style={inputStyle}
-                value={scheduledDate}
-                onChangeText={setScheduledDate}
-                placeholder="例: 2026-05-06"
-                placeholderTextColor="#9ca3af"
-              />
+              <TouchableOpacity style={pickerFieldStyle} onPress={() => setDatePickerVisible(true)}>
+                <Text style={{ fontSize: 15, color: scheduledDate ? "#111827" : "#9ca3af" }}>
+                  {scheduledDate || "日付を選択"}
+                </Text>
+              </TouchableOpacity>
               <Text style={{ marginBottom: 6, fontSize: 12, fontWeight: "600", color: "#6b7280" }}>
-                開始時間（HH:MM）
+                開始時間
               </Text>
-              <TextInput
-                style={inputStyle}
-                value={startTime}
-                onChangeText={setStartTime}
-                placeholder="例: 19:00"
-                placeholderTextColor="#9ca3af"
-              />
+              <TouchableOpacity style={pickerFieldStyle} onPress={openStartTimePicker}>
+                <Text style={{ fontSize: 15, color: startTime ? "#111827" : "#9ca3af" }}>
+                  {startTime || "開始時間を選択"}
+                </Text>
+              </TouchableOpacity>
               <Text style={{ marginBottom: 6, fontSize: 12, fontWeight: "600", color: "#6b7280" }}>
-                終了時間（HH:MM）
+                終了時間
               </Text>
-              <TextInput
-                style={inputStyle}
-                value={endTime}
-                onChangeText={setEndTime}
-                placeholder="例: 19:30"
-                placeholderTextColor="#9ca3af"
-              />
+              <TouchableOpacity style={pickerFieldStyle} onPress={openEndTimePicker}>
+                <Text style={{ fontSize: 15, color: endTime ? "#111827" : "#9ca3af" }}>
+                  {endTime || "終了時間を選択"}
+                </Text>
+              </TouchableOpacity>
               <ActionButton
                 label={creating ? "作成中..." : "チケットを作成する"}
                 style={[
@@ -578,6 +605,20 @@ export function CallTicketScreen() {
           }
         />
       )}
+
+      <DatePickerModal
+        visible={datePickerVisible}
+        selectedDate={scheduledDate}
+        onSelectDate={setScheduledDate}
+        onClose={() => setDatePickerVisible(false)}
+      />
+
+      <TimePickerModal
+        visible={timePickerVisible}
+        selectedTime={timePickerTarget === "start" ? startTime : endTime}
+        onSelectTime={handleSelectTicketTime}
+        onClose={() => setTimePickerVisible(false)}
+      />
     </View>
   );
 }

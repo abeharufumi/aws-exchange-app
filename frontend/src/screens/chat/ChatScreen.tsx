@@ -5,7 +5,6 @@ import {
   KeyboardAvoidingView,
   Modal,
   Platform,
-  ScrollView,
   Text,
   TouchableOpacity,
   type ViewToken,
@@ -15,6 +14,8 @@ import { useRouter } from "expo-router";
 import { Button, TextInput as PaperTextInput } from "react-native-paper";
 import { ScreenBackButton } from "../../components/common/ScreenBackButton";
 import { StatusInfoBox } from "../../components/common/StatusInfoBox";
+import { DatePickerModal } from "../../components/common/DatePickerModal";
+import { TimePickerModal } from "../../components/common/TimePickerModal";
 import apiClient, { isUnauthorizedError } from "../../services/api";
 import { useAuth } from "../../contexts/auth";
 import {
@@ -67,39 +68,6 @@ function formatLocalTime(date: Date): string {
   return `${h}:${m}`;
 }
 
-function parseLocalDate(value: string): Date | null {
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) {
-    return null;
-  }
-  const [year, month, day] = value.split("-").map(Number);
-  const date = new Date(year, month - 1, day);
-  if (date.getFullYear() !== year || date.getMonth() !== month - 1 || date.getDate() !== day) {
-    return null;
-  }
-  return date;
-}
-
-function buildCalendarCells(baseMonth: Date): (Date | null)[] {
-  const year = baseMonth.getFullYear();
-  const month = baseMonth.getMonth();
-  const firstDay = new Date(year, month, 1);
-  const lastDay = new Date(year, month + 1, 0);
-  const leadingBlankCount = firstDay.getDay();
-  const daysInMonth = lastDay.getDate();
-
-  const cells: (Date | null)[] = [];
-  for (let i = 0; i < leadingBlankCount; i += 1) {
-    cells.push(null);
-  }
-  for (let day = 1; day <= daysInMonth; day += 1) {
-    cells.push(new Date(year, month, day));
-  }
-  while (cells.length % 7 !== 0) {
-    cells.push(null);
-  }
-  return cells;
-}
-
 async function searchNominatim(query: string): Promise<NominatimResult[]> {
   const params = new URLSearchParams({
     q: query,
@@ -138,10 +106,6 @@ export function ChatScreen({ route }: any) {
   const [meetTime, setMeetTime] = useState("");
   const [calendarVisible, setCalendarVisible] = useState(false);
   const [timePickerVisible, setTimePickerVisible] = useState(false);
-  const [calendarMonth, setCalendarMonth] = useState<Date>(() => {
-    const now = new Date();
-    return new Date(now.getFullYear(), now.getMonth(), 1);
-  });
   const [selectedMeetSpotKey, setSelectedMeetSpotKey] = useState("hakata");
   const [customMeetCoordinates, setCustomMeetCoordinates] = useState<{
     latitude: number;
@@ -190,19 +154,6 @@ export function ChatScreen({ route }: any) {
     }
     router.replace("/(tabs)");
   };
-
-  const timeOptions = useMemo(() => {
-    const options: string[] = [];
-    for (let hour = 0; hour < 24; hour += 1) {
-      for (let minute = 0; minute < 60; minute += 15) {
-        options.push(`${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`);
-      }
-    }
-    return options;
-  }, []);
-
-  const selectedDateObj = useMemo(() => parseLocalDate(meetDate), [meetDate]);
-  const calendarCells = useMemo(() => buildCalendarCells(calendarMonth), [calendarMonth]);
 
   const fetchPartnerProfile = useCallback(async () => {
     try {
@@ -418,7 +369,6 @@ export function ChatScreen({ route }: any) {
     d.setDate(d.getDate() + 7);
     setMeetDate(formatLocalDate(d));
     setMeetTime(formatLocalTime(d));
-    setCalendarMonth(new Date(d.getFullYear(), d.getMonth(), 1));
     setSelectedMeetSpotKey("hakata");
     setCustomMeetCoordinates(null);
     setPlaceSearchQuery("");
@@ -427,24 +377,7 @@ export function ChatScreen({ route }: any) {
   };
 
   const openCalendar = () => {
-    const parsed = parseLocalDate(meetDate);
-    const base = parsed || new Date();
-    setCalendarMonth(new Date(base.getFullYear(), base.getMonth(), 1));
     setCalendarVisible(true);
-  };
-
-  const changeCalendarMonth = (delta: number) => {
-    setCalendarMonth((prev) => new Date(prev.getFullYear(), prev.getMonth() + delta, 1));
-  };
-
-  const handleSelectDate = (date: Date) => {
-    setMeetDate(formatLocalDate(date));
-    setCalendarVisible(false);
-  };
-
-  const handleSelectTime = (time: string) => {
-    setMeetTime(time);
-    setTimePickerVisible(false);
   };
 
   const handlePlaceSearch = async () => {
@@ -1043,171 +976,19 @@ export function ChatScreen({ route }: any) {
         </View>
       </Modal>
 
-      <Modal
+      <DatePickerModal
         visible={calendarVisible}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setCalendarVisible(false)}
-      >
-        <View style={{ flex: 1, justifyContent: "center", padding: 20 }}>
-          <View style={{ borderRadius: 12, backgroundColor: "#ffffff", padding: 16 }}>
-            <View
-              style={{
-                marginBottom: 10,
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "space-between",
-              }}
-            >
-              <TouchableOpacity
-                style={{
-                  height: 32,
-                  width: 32,
-                  alignItems: "center",
-                  justifyContent: "center",
-                  borderRadius: 9999,
-                  backgroundColor: "#e5e7eb",
-                }}
-                onPress={() => changeCalendarMonth(-1)}
-              >
-                <Text style={{ fontWeight: "700", color: "#374151" }}>◀</Text>
-              </TouchableOpacity>
-              <Text style={{ fontSize: 16, fontWeight: "700", color: "#111827" }}>
-                {calendarMonth.getFullYear()}年{calendarMonth.getMonth() + 1}月
-              </Text>
-              <TouchableOpacity
-                style={{
-                  height: 32,
-                  width: 32,
-                  alignItems: "center",
-                  justifyContent: "center",
-                  borderRadius: 9999,
-                  backgroundColor: "#e5e7eb",
-                }}
-                onPress={() => changeCalendarMonth(1)}
-              >
-                <Text style={{ fontWeight: "700", color: "#374151" }}>▶</Text>
-              </TouchableOpacity>
-            </View>
+        selectedDate={meetDate}
+        onSelectDate={setMeetDate}
+        onClose={() => setCalendarVisible(false)}
+      />
 
-            <View style={{ marginBottom: 8, flexDirection: "row" }}>
-              {["日", "月", "火", "水", "木", "金", "土"].map((label) => (
-                <Text
-                  key={label}
-                  style={{ textAlign: "center", fontSize: 12, fontWeight: "600", color: "#6b7280" }}
-                >
-                  {label}
-                </Text>
-              ))}
-            </View>
-
-            <View style={{ marginBottom: 12, flexDirection: "row", flexWrap: "wrap" }}>
-              {calendarCells.map((cell, index) => {
-                if (!cell) {
-                  return <View key={`blank-${index}`} style={{ height: 36, width: "14.2857%" }} />;
-                }
-
-                const selected =
-                  selectedDateObj && formatLocalDate(cell) === formatLocalDate(selectedDateObj);
-                return (
-                  <TouchableOpacity
-                    key={formatLocalDate(cell)}
-                    style={{
-                      height: 36,
-                      width: "14.2857%",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      borderRadius: 9999,
-                      backgroundColor: selected ? "#3b82f6" : "transparent",
-                    }}
-                    onPress={() => handleSelectDate(cell)}
-                  >
-                    <Text
-                      style={{
-                        fontSize: 14,
-                        fontWeight: "600",
-                        color: selected ? "#ffffff" : "#111827",
-                      }}
-                    >
-                      {cell.getDate()}
-                    </Text>
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
-
-            <TouchableOpacity
-              style={{
-                alignItems: "center",
-                borderRadius: 8,
-                backgroundColor: "#9ca3af",
-                paddingVertical: 10,
-              }}
-              onPress={() => setCalendarVisible(false)}
-            >
-              <Text style={{ color: "#ffffff", fontWeight: "700" }}>閉じる</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
-
-      <Modal
+      <TimePickerModal
         visible={timePickerVisible}
-        transparent
-        animationType="slide"
-        onRequestClose={() => setTimePickerVisible(false)}
-      >
-        <View style={{ flex: 1, justifyContent: "center", padding: 20 }}>
-          <View style={{ borderRadius: 12, backgroundColor: "#ffffff", padding: 16 }}>
-            <Text style={{ marginBottom: 12, fontSize: 16, fontWeight: "700" }}>時刻を選択</Text>
-            <ScrollView
-              style={{ marginBottom: 12, maxHeight: 360 }}
-              contentContainerStyle={{ paddingBottom: 4 }}
-              showsVerticalScrollIndicator
-            >
-              {timeOptions.map((time) => {
-                const selected = meetTime === time;
-                return (
-                  <TouchableOpacity
-                    key={time}
-                    style={{
-                      marginBottom: 8,
-                      alignItems: "center",
-                      borderRadius: 8,
-                      borderWidth: 1,
-                      paddingVertical: 10,
-                      borderColor: selected ? "#3b82f6" : "#e5e7eb",
-                      backgroundColor: selected ? "#dbeafe" : "#f9fafb",
-                    }}
-                    onPress={() => handleSelectTime(time)}
-                  >
-                    <Text
-                      style={{
-                        fontSize: 14,
-                        fontWeight: "600",
-                        color: selected ? "#2563eb" : "#374151",
-                      }}
-                    >
-                      {time}
-                    </Text>
-                  </TouchableOpacity>
-                );
-              })}
-            </ScrollView>
-            <TouchableOpacity
-              style={{
-                alignItems: "center",
-                borderRadius: 8,
-                backgroundColor: "#9ca3af",
-                paddingVertical: 10,
-              }}
-              onPress={() => setTimePickerVisible(false)}
-            >
-              <Text style={{ color: "#ffffff", fontWeight: "700" }}>閉じる</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
+        selectedTime={meetTime}
+        onSelectTime={setMeetTime}
+        onClose={() => setTimePickerVisible(false)}
+      />
 
       <Modal
         visible={placeSearchVisible}
