@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { ActivityIndicator, Alert, ScrollView, Text, View } from "react-native";
+import { ActivityIndicator, Alert, Platform, ScrollView, Text, View } from "react-native";
 import { useRouter } from "expo-router";
 import { ActionButton } from "../../components/common/ActionButton";
 import { ActionButtonRow } from "../../components/common/ActionButtonRow";
@@ -116,7 +116,30 @@ export function UserDetailScreen({ route }: any) {
     fetchSellerTickets();
   }, [fetchSellerTickets]);
 
+  const executePurchaseTicket = async (ticketId: number, durationMin: number) => {
+    try {
+      await apiClient.post<CallTicketPurchaseResponse>(`/call-tickets/purchase/${ticketId}`);
+      Alert.alert("購入完了", `通話チケット（${durationMin}分）を購入しました`);
+      fetchSellerTickets();
+    } catch (error: any) {
+      const d = error?.response?.data as CallTicketPurchaseErrorDetail;
+      Alert.alert("購入失敗", d?.message || error?.response?.data?.detail || "購入に失敗しました");
+    }
+  };
+
   const handlePurchaseTicket = async (ticketId: number, durationMin: number, priceJpy: number) => {
+    if (Platform.OS === "web") {
+      const confirmed =
+        typeof window !== "undefined"
+          ? window.confirm(`${durationMin}分 / ¥${priceJpy.toLocaleString()} を購入しますか？`)
+          : true;
+      if (!confirmed) {
+        return;
+      }
+      await executePurchaseTicket(ticketId, durationMin);
+      return;
+    }
+
     Alert.alert(
       "通話チケット購入",
       `${durationMin}分 / ¥${priceJpy.toLocaleString()} を購入しますか？`,
@@ -125,19 +148,7 @@ export function UserDetailScreen({ route }: any) {
         {
           text: "購入する",
           onPress: async () => {
-            try {
-              await apiClient.post<CallTicketPurchaseResponse>(
-                `/call-tickets/purchase/${ticketId}`,
-              );
-              Alert.alert("購入完了", `通話チケット（${durationMin}分）を購入しました`);
-              fetchSellerTickets();
-            } catch (error: any) {
-              const d = error?.response?.data as CallTicketPurchaseErrorDetail;
-              Alert.alert(
-                "購入失敗",
-                d?.message || error?.response?.data?.detail || "購入に失敗しました",
-              );
-            }
+            await executePurchaseTicket(ticketId, durationMin);
           },
         },
       ],
