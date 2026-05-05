@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Alert, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { useRouter } from "expo-router";
-import { ScreenBackHeader } from "@/src/components/common/ScreenBackButton";
+import { ScreenBackHeader } from "@/src/components/common/ScreenBackHeader";
 import apiClient from "@/src/services/api";
 import { BoostActivationResponse, BoostPurchaseResponse } from "@/src/types/boost";
 

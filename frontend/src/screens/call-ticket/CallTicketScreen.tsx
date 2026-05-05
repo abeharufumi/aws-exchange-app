@@ -7,7 +7,7 @@ import { EmptyState } from "../../components/common/EmptyState";
 import { LoadingState } from "../../components/common/LoadingState";
 import { SectionCard } from "../../components/common/SectionCard";
 import { SegmentedTab } from "../../components/common/SegmentedTab";
-import { ScreenBackHeader } from "../../components/common/ScreenBackButton";
+import { ScreenBackHeader } from "../../components/common/ScreenBackHeader";
 import { TimePickerModal } from "../../components/common/TimePickerModal";
 import apiClient from "../../services/api";
 import {

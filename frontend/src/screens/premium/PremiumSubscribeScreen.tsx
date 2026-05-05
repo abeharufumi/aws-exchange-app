@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Alert, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { useRouter } from "expo-router";
-import { ScreenBackHeader } from "@/src/components/common/ScreenBackButton";
+import { ScreenBackHeader } from "@/src/components/common/ScreenBackHeader";
 import apiClient from "@/src/services/api";
 import { PremiumSubscriptionResponse } from "@/src/types/premium";
 
@@ -85,122 +85,126 @@ export function PremiumSubscribeScreen() {
           </Text>
         </View>
 
-      <View
-        style={{
-          marginBottom: 32,
-          borderRadius: 12,
-          backgroundColor: "#fffbeb",
-          paddingHorizontal: 16,
-          paddingVertical: 16,
-        }}
-      >
-        <Text style={{ marginBottom: 12, fontSize: 16, fontWeight: "600", color: "#1f2937" }}>
-          プレミアム特典
-        </Text>
-        <View style={{ marginBottom: 8, flexDirection: "row", alignItems: "flex-start" }}>
-          <Text style={{ marginRight: 8, fontSize: 14, fontWeight: "700", color: "#16a34a" }}>
-            ✓
+        <View
+          style={{
+            marginBottom: 32,
+            borderRadius: 12,
+            backgroundColor: "#fffbeb",
+            paddingHorizontal: 16,
+            paddingVertical: 16,
+          }}
+        >
+          <Text style={{ marginBottom: 12, fontSize: 16, fontWeight: "600", color: "#1f2937" }}>
+            プレミアム特典
           </Text>
-          <Text style={{ flex: 1, fontSize: 14, color: "#374151" }}>メッセージ送信上限 +20 通</Text>
+          <View style={{ marginBottom: 8, flexDirection: "row", alignItems: "flex-start" }}>
+            <Text style={{ marginRight: 8, fontSize: 14, fontWeight: "700", color: "#16a34a" }}>
+              ✓
+            </Text>
+            <Text style={{ flex: 1, fontSize: 14, color: "#374151" }}>
+              メッセージ送信上限 +20 通
+            </Text>
+          </View>
+          <View style={{ marginBottom: 8, flexDirection: "row", alignItems: "flex-start" }}>
+            <Text style={{ marginRight: 8, fontSize: 14, fontWeight: "700", color: "#16a34a" }}>
+              ✓
+            </Text>
+            <Text style={{ flex: 1, fontSize: 14, color: "#374151" }}>
+              すべての受信設定（age/rank/image）解除
+            </Text>
+          </View>
+          <View style={{ marginBottom: 8, flexDirection: "row", alignItems: "flex-start" }}>
+            <Text style={{ marginRight: 8, fontSize: 14, fontWeight: "700", color: "#16a34a" }}>
+              ✓
+            </Text>
+            <Text style={{ flex: 1, fontSize: 14, color: "#374151" }}>優先表示・特別バッジ</Text>
+          </View>
         </View>
-        <View style={{ marginBottom: 8, flexDirection: "row", alignItems: "flex-start" }}>
-          <Text style={{ marginRight: 8, fontSize: 14, fontWeight: "700", color: "#16a34a" }}>
-            ✓
-          </Text>
-          <Text style={{ flex: 1, fontSize: 14, color: "#374151" }}>
-            すべての受信設定（age/rank/image）解除
-          </Text>
-        </View>
-        <View style={{ marginBottom: 8, flexDirection: "row", alignItems: "flex-start" }}>
-          <Text style={{ marginRight: 8, fontSize: 14, fontWeight: "700", color: "#16a34a" }}>
-            ✓
-          </Text>
-          <Text style={{ flex: 1, fontSize: 14, color: "#374151" }}>優先表示・特別バッジ</Text>
-        </View>
-      </View>
 
-      <View style={{ marginBottom: 32, gap: 12 }}>
-        {PREMIUM_PLANS.map((plan) => (
-          <TouchableOpacity
-            key={plan.key}
-            style={[
-              {
-                position: "relative",
-                borderRadius: 12,
-                borderWidth: 2,
-                paddingHorizontal: 16,
-                paddingVertical: 16,
-              },
-              {
-                borderColor: selectedPlan === plan.key ? "#f97316" : "#e5e7eb",
-                backgroundColor: selectedPlan === plan.key ? "#fff7ed" : "#f9fafb",
-              },
-            ]}
-            onPress={() => setSelectedPlan(plan.key)}
-          >
-            <Text
+        <View style={{ marginBottom: 32, gap: 12 }}>
+          {PREMIUM_PLANS.map((plan) => (
+            <TouchableOpacity
+              key={plan.key}
               style={[
-                { marginBottom: 8, fontSize: 16, fontWeight: "600" },
-                { color: selectedPlan === plan.key ? "#ea580c" : "#374151" },
+                {
+                  position: "relative",
+                  borderRadius: 12,
+                  borderWidth: 2,
+                  paddingHorizontal: 16,
+                  paddingVertical: 16,
+                },
+                {
+                  borderColor: selectedPlan === plan.key ? "#f97316" : "#e5e7eb",
+                  backgroundColor: selectedPlan === plan.key ? "#fff7ed" : "#f9fafb",
+                },
               ]}
+              onPress={() => setSelectedPlan(plan.key)}
             >
-              {plan.label}
-            </Text>
-            <Text
-              style={[
-                { fontSize: 24, fontWeight: "700" },
-                { color: selectedPlan === plan.key ? "#f97316" : "#1f2937" },
-              ]}
-            >
-              ¥{plan.price_jpy.toLocaleString()}
-            </Text>
-            <Text
-              style={[
-                { marginTop: 4, fontSize: 14 },
-                { color: selectedPlan === plan.key ? "#ea580c" : "#6b7280" },
-              ]}
-            >
-              月あたり ¥{plan.monthly_effective_price.toLocaleString()}
-            </Text>
-            {plan.discount_rate > 0 && (
-              <View
-                style={{
-                  position: "absolute",
-                  borderRadius: 6,
-                  backgroundColor: "#ef4444",
-                  paddingHorizontal: 8,
-                  paddingVertical: 4,
-                }}
+              <Text
+                style={[
+                  { marginBottom: 8, fontSize: 16, fontWeight: "600" },
+                  { color: selectedPlan === plan.key ? "#ea580c" : "#374151" },
+                ]}
               >
-                <Text style={{ fontSize: 12, fontWeight: "600", color: "#ffffff" }}>
-                  {plan.discount_rate}% OFF
-                </Text>
-              </View>
-            )}
-          </TouchableOpacity>
-        ))}
-      </View>
+                {plan.label}
+              </Text>
+              <Text
+                style={[
+                  { fontSize: 24, fontWeight: "700" },
+                  { color: selectedPlan === plan.key ? "#f97316" : "#1f2937" },
+                ]}
+              >
+                ¥{plan.price_jpy.toLocaleString()}
+              </Text>
+              <Text
+                style={[
+                  { marginTop: 4, fontSize: 14 },
+                  { color: selectedPlan === plan.key ? "#ea580c" : "#6b7280" },
+                ]}
+              >
+                月あたり ¥{plan.monthly_effective_price.toLocaleString()}
+              </Text>
+              {plan.discount_rate > 0 && (
+                <View
+                  style={{
+                    position: "absolute",
+                    borderRadius: 6,
+                    backgroundColor: "#ef4444",
+                    paddingHorizontal: 8,
+                    paddingVertical: 4,
+                  }}
+                >
+                  <Text style={{ fontSize: 12, fontWeight: "600", color: "#ffffff" }}>
+                    {plan.discount_rate}% OFF
+                  </Text>
+                </View>
+              )}
+            </TouchableOpacity>
+          ))}
+        </View>
 
-      <View
-        style={{
-          marginBottom: 32,
-          borderRadius: 12,
-          backgroundColor: "#f3f4f6",
-          paddingHorizontal: 16,
-          paddingVertical: 16,
-        }}
-      >
-        <Text style={{ marginBottom: 8, fontSize: 14, fontWeight: "600", color: "#1f2937" }}>
-          利用規約
-        </Text>
-        <Text style={{ marginBottom: 4, fontSize: 12, color: "#6b7280" }}>
-          • 月額自動更新されます
-        </Text>
-        <Text style={{ marginBottom: 4, fontSize: 12, color: "#6b7280" }}>
-          • いつでも解約可能です
-        </Text>
-        <Text style={{ marginBottom: 4, fontSize: 12, color: "#6b7280" }}>• 返金はできません</Text>
-      </View>
+        <View
+          style={{
+            marginBottom: 32,
+            borderRadius: 12,
+            backgroundColor: "#f3f4f6",
+            paddingHorizontal: 16,
+            paddingVertical: 16,
+          }}
+        >
+          <Text style={{ marginBottom: 8, fontSize: 14, fontWeight: "600", color: "#1f2937" }}>
+            利用規約
+          </Text>
+          <Text style={{ marginBottom: 4, fontSize: 12, color: "#6b7280" }}>
+            • 月額自動更新されます
+          </Text>
+          <Text style={{ marginBottom: 4, fontSize: 12, color: "#6b7280" }}>
+            • いつでも解約可能です
+          </Text>
+          <Text style={{ marginBottom: 4, fontSize: 12, color: "#6b7280" }}>
+            • 返金はできません
+          </Text>
+        </View>
 
         <TouchableOpacity
           style={[
@@ -220,7 +224,6 @@ export function PremiumSubscribeScreen() {
             {isProcessing ? "処理中..." : `¥${current_plan.price_jpy.toLocaleString()} で加入`}
           </Text>
         </TouchableOpacity>
-
       </ScrollView>
     </View>
   );

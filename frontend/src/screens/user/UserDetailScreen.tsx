@@ -7,7 +7,7 @@ import { AvatarWithFrame } from "../../components/common/AvatarWithFrame";
 import { UserPresenceStatus } from "../../components/common";
 import { EmptyState } from "../../components/common/EmptyState";
 import { LoadingState } from "../../components/common/LoadingState";
-import { ScreenBackHeader } from "../../components/common/ScreenBackButton";
+import { ScreenBackHeader } from "../../components/common/ScreenBackHeader";
 import apiClient from "../../services/api";
 import { PublicUserProfile } from "../../types/user";
 import { LikeActionResponse, PassActionResponse } from "../../types/match";

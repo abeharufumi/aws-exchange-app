@@ -3,7 +3,7 @@ import { Alert, FlatList, Modal, Pressable, Text, TouchableOpacity, View } from 
 import { useRouter } from "expo-router";
 import { EmptyState } from "../../components/common/EmptyState";
 import { LoadingState } from "../../components/common/LoadingState";
-import { ScreenBackHeader } from "../../components/common/ScreenBackButton";
+import { ScreenBackHeader } from "../../components/common/ScreenBackHeader";
 import { SegmentedTab } from "../../components/common/SegmentedTab";
 import apiClient from "../../services/api";
 import {

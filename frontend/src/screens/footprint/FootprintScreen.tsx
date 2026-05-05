@@ -3,7 +3,7 @@ import { Alert, FlatList, Text, TouchableOpacity, View } from "react-native";
 import { useRouter } from "expo-router";
 import { EmptyState } from "@/src/components/common/EmptyState";
 import { LoadingState } from "@/src/components/common/LoadingState";
-import { ScreenBackHeader } from "@/src/components/common/ScreenBackButton";
+import { ScreenBackHeader } from "@/src/components/common/ScreenBackHeader";
 import apiClient from "@/src/services/api";
 import { RankProgress } from "@/src/types/profile";
 import { FootprintItem } from "@/src/types/user";
@@ -74,9 +74,7 @@ export function FootprintScreen() {
     }
   };
 
-  const header = (
-    <ScreenBackHeader title="足跡履歴" onPress={() => router.back()} />
-  );
+  const header = <ScreenBackHeader title="足跡履歴" onPress={() => router.back()} />;
 
   if (loading)
     return (

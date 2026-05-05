@@ -4,7 +4,7 @@ import { useFocusEffect, useRouter } from "expo-router";
 import { ActionButton } from "../../components/common/ActionButton";
 import { EmptyState } from "../../components/common/EmptyState";
 import { LoadingState } from "../../components/common/LoadingState";
-import { ScreenBackHeader } from "../../components/common/ScreenBackButton";
+import { ScreenBackHeader } from "../../components/common/ScreenBackHeader";
 import { SegmentedTab } from "../../components/common/SegmentedTab";
 import { SectionCard } from "../../components/common/SectionCard";
 import apiClient from "../../services/api";
