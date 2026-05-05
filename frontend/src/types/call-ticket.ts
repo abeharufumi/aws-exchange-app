@@ -21,6 +21,18 @@ export interface PurchasedTicketItem {
   is_used: boolean;
 }
 
+export interface CreatedTicketItem {
+  ticket_id: number;
+  ticket_number: number;
+  ticket_duration_minutes: number;
+  price_jpy: number;
+  is_available: boolean;
+  created_at: string;
+  sold_at?: string;
+  buyer_id?: number;
+  buyer_name?: string;
+}
+
 export interface CallTicketCreateErrorDetail {
   message?: string;
   requiredGender?: string;

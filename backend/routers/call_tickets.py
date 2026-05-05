@@ -48,6 +48,20 @@ class PurchasedTicketItem(BaseModel):
     is_used: bool  # 使用済みか
 
 
+class CreatedTicketItem(BaseModel):
+    """作成済み通話チケットアイテム"""
+
+    ticket_id: int  # チケットID
+    ticket_number: int  # 表示用チケット番号
+    ticket_duration_minutes: int  # 通話時間（分）
+    price_jpy: int  # 価格（円）
+    is_available: bool  # 販売中フラグ（True=販売中, False=販売済み）
+    created_at: str  # 作成日時
+    sold_at: Optional[str] = None  # 売却日時（未売却は None）
+    buyer_id: Optional[int] = None  # 購入者ユーザーID
+    buyer_name: Optional[str] = None  # 購入者表示名
+
+
 def _assert_rank5_male(user_id: int, db: Session) -> None:
     """Rank5 の男性でない場合は 403 を返す"""
     user_rows = execQuery.execute_select(
@@ -274,6 +288,35 @@ def my_purchases(
         db,
     )
     return [PurchasedTicketItem(**r) for r in rows]
+
+
+@router.get("/my-created", response_model=List[CreatedTicketItem])
+def my_created_tickets(
+    current_user: dict = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """自分が作成した通話チケット一覧（販売中・販売済み）"""
+    rows = execQuery.execute_select(
+        """
+        SELECT ct.id AS ticket_id,
+               ct.id AS ticket_number,
+               ct.ticket_duration_minutes,
+               ct.price_jpy,
+               ct.is_available,
+               ct.created_at::text AS created_at,
+               ctp.purchased_at::text AS sold_at,
+               ctp.buyer_id,
+               buyer.display_name AS buyer_name
+        FROM call_tickets ct
+        LEFT JOIN call_ticket_purchases ctp ON ctp.ticket_id = ct.id
+        LEFT JOIN user_profiles buyer ON buyer.user_id = ctp.buyer_id
+        WHERE ct.seller_id = ?
+        ORDER BY ct.created_at DESC
+        """,
+        [current_user["id"]],
+        db,
+    )
+    return [CreatedTicketItem(**r) for r in rows]
 
 
 @router.post("/use/{purchase_id}")

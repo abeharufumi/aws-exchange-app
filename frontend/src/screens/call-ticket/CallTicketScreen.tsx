@@ -11,6 +11,7 @@ import apiClient from "../../services/api";
 import {
   CallTicketCreateErrorDetail,
   CallTicketItem,
+  CreatedTicketItem,
   CallTicketPurchaseResponse,
   CallTicketUseResponse,
   PurchasedTicketItem,
@@ -22,13 +23,15 @@ const CALL_TICKET_TABS = [
   { key: "available", label: "購入可能" },
   { key: "purchased", label: "所有済み" },
   { key: "sell", label: "販売する" },
+  { key: "created", label: "販売作成済み" },
 ] as const;
 
 export function CallTicketScreen() {
   const router = useRouter();
-  const [tab, setTab] = useState<"available" | "purchased" | "sell">("available");
+  const [tab, setTab] = useState<"available" | "purchased" | "sell" | "created">("available");
   const [availableTickets, setAvailableTickets] = useState<CallTicketItem[]>([]);
   const [purchasedTickets, setPurchasedTickets] = useState<PurchasedTicketItem[]>([]);
+  const [createdTickets, setCreatedTickets] = useState<CreatedTicketItem[]>([]);
   const [myProfile, setMyProfile] = useState<Pick<
     UserProfile,
     "gender" | "rank" | "rankProgress"
@@ -41,13 +44,16 @@ export function CallTicketScreen() {
   const fetchData = useCallback(async () => {
     try {
       setLoading(true);
-      const [availableResponse, purchasedResponse, profileResponse] = await Promise.all([
-        apiClient.get<CallTicketItem[]>("/call-tickets/available"),
-        apiClient.get<PurchasedTicketItem[]>("/call-tickets/my-purchases"),
-        apiClient.get<UserProfile>("/users/me").catch(() => ({ data: null })),
-      ]);
+      const [availableResponse, purchasedResponse, createdResponse, profileResponse] =
+        await Promise.all([
+          apiClient.get<CallTicketItem[]>("/call-tickets/available"),
+          apiClient.get<PurchasedTicketItem[]>("/call-tickets/my-purchases"),
+          apiClient.get<CreatedTicketItem[]>("/call-tickets/my-created"),
+          apiClient.get<UserProfile>("/users/me").catch(() => ({ data: null })),
+        ]);
       setAvailableTickets(availableResponse.data || []);
       setPurchasedTickets(purchasedResponse.data || []);
+      setCreatedTickets(createdResponse.data || []);
       setMyProfile(
         profileResponse?.data
           ? {
@@ -61,6 +67,7 @@ export function CallTicketScreen() {
       console.error("Failed to fetch call tickets:", error);
       setAvailableTickets([]);
       setPurchasedTickets([]);
+      setCreatedTickets([]);
       setMyProfile(null);
     } finally {
       setLoading(false);
@@ -146,7 +153,7 @@ export function CallTicketScreen() {
       setDuration("30");
       setPrice("500");
       await fetchData();
-      setTab("available");
+      setTab("created");
     } catch (error: any) {
       const rawDetail = error?.response?.data?.detail;
       const detailObj: CallTicketCreateErrorDetail | null =
@@ -343,7 +350,7 @@ export function CallTicketScreen() {
             />
           }
         />
-      ) : (
+      ) : tab === "sell" ? (
         <SectionCard
           style={{
             margin: 16,
@@ -440,6 +447,67 @@ export function CallTicketScreen() {
             </>
           )}
         </SectionCard>
+      ) : (
+        <FlatList
+          data={createdTickets}
+          keyExtractor={(item) => `${item.ticket_id}`}
+          onRefresh={fetchData}
+          refreshing={loading}
+          renderItem={({ item }) => (
+            <SectionCard
+              style={{
+                marginHorizontal: 16,
+                marginVertical: 6,
+                borderRadius: 12,
+                padding: 14,
+                backgroundColor: "#f9fafb",
+                borderWidth: 1,
+                borderColor: "#e5e7eb",
+              }}
+            >
+              <View
+                style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 6 }}
+              >
+                <Text style={{ fontSize: 14, fontWeight: "700", color: "#111827" }}>
+                  チケットNo. #{item.ticket_number}
+                </Text>
+                <Text
+                  style={{
+                    fontSize: 12,
+                    fontWeight: "700",
+                    color: item.is_available ? "#2563eb" : "#9ca3af",
+                  }}
+                >
+                  {item.is_available ? "販売中" : "販売済み"}
+                </Text>
+              </View>
+              <Text style={{ marginBottom: 2, fontSize: 14, color: "#374151" }}>
+                {item.ticket_duration_minutes}分 / ¥{item.price_jpy.toLocaleString()}
+              </Text>
+              <Text style={{ marginBottom: 2, fontSize: 12, color: "#6b7280" }}>
+                作成日: {new Date(item.created_at).toLocaleDateString("ja-JP")}
+              </Text>
+              {item.sold_at ? (
+                <Text style={{ marginBottom: 2, fontSize: 12, color: "#6b7280" }}>
+                  売却日: {new Date(item.sold_at).toLocaleDateString("ja-JP")}
+                  {item.buyer_name ? ` / 購入者: ${item.buyer_name}` : ""}
+                </Text>
+              ) : null}
+            </SectionCard>
+          )}
+          ListEmptyComponent={
+            <EmptyState
+              message="作成済みチケットはありません"
+              containerStyle={{
+                flex: 1,
+                justifyContent: "center",
+                alignItems: "center",
+                paddingTop: 80,
+              }}
+              textStyle={{ fontSize: 14, color: "#9ca3af", textAlign: "center" }}
+            />
+          }
+        />
       )}
     </View>
   );
