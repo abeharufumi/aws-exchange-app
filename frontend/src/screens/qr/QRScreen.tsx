@@ -471,24 +471,35 @@ export function QRScreen({ route }: any) {
   };
 
   const openScanner = async () => {
+    console.log("[openScanner] 開始");
+    console.log("[openScanner] qrEnabled:", qrEnabled, "status:", status);
+    
     if (!qrEnabled || status === "completed") {
+      console.log("[openScanner] QR未有効化");
       Alert.alert("利用不可", "QR確認が有効になってからスキャンしてください");
       return;
     }
 
+    console.log("[openScanner] Camera permission check:", cameraPermission);
     try {
       if (!cameraPermission?.granted) {
+        console.log("[openScanner] 権限要求開始");
         const result = await requestCameraPermission();
+        console.log("[openScanner] 権限要求結果:", result);
         if (!result.granted) {
+          console.log("[openScanner] 権限拒否");
           Alert.alert("権限エラー", "カメラ権限を許可してください");
           return;
         }
       }
-    } catch {
+      console.log("[openScanner] Camera permission granted");
+    } catch (error) {
+      console.error("[openScanner] catch エラー:", error);
       Alert.alert("未対応", "この環境ではカメラを起動できません。手入力をご利用ください");
       return;
     }
 
+    console.log("[openScanner] CameraView表示");
     setScanLocked(false);
     setScannerVisible(true);
   };
@@ -882,6 +893,8 @@ export function QRScreen({ route }: any) {
               facing="back"
               barcodeScannerSettings={{ barcodeTypes: ["qr"] }}
               onBarcodeScanned={handleBarcodeScanned}
+              onCameraReady={() => console.log("[CameraView] ready")}
+              onMountError={(error) => console.error("[CameraView] mount error:", error)}
             />
           </View>
         </View>
