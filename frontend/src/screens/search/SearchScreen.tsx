@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { FlatList, Text, TouchableOpacity, View } from "react-native";
 import { ActivityIndicator, Button, Surface, TextInput } from "react-native-paper";
 import { useRouter } from "expo-router";
-import { UserPresenceStatus } from "../../components/common";
+import { UserPresenceStatus } from "../../components/common/UserPresenceStatus";
 import apiClient from "../../services/api";
 import { UserCard } from "../../types/user";
 

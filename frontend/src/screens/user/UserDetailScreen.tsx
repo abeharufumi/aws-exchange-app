@@ -4,7 +4,7 @@ import { useRouter } from "expo-router";
 import { ActionButton } from "../../components/common/ActionButton";
 import { ActionButtonRow } from "../../components/common/ActionButtonRow";
 import { AvatarWithFrame } from "../../components/common/AvatarWithFrame";
-import { UserPresenceStatus } from "../../components/common";
+import { UserPresenceStatus } from "../../components/common/UserPresenceStatus";
 import { EmptyState } from "../../components/common/EmptyState";
 import { LoadingState } from "../../components/common/LoadingState";
 import { ScreenBackHeader } from "../../components/common/ScreenBackHeader";
