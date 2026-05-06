@@ -7,7 +7,6 @@ import {
   TextInput,
   Image,
   Modal,
-  Platform,
   Pressable,
 } from "react-native";
 import { useRouter } from "expo-router";
@@ -471,34 +470,26 @@ export function QRScreen({ route }: any) {
   };
 
   const openScanner = async () => {
-    Alert.alert("DEBUG 1", "[openScanner] 開始\nqrEnabled: " + qrEnabled + "\nstatus: " + status);
-
     if (!qrEnabled || status === "completed") {
       Alert.alert("利用不可", "QR確認が有効になってからスキャンしてください");
       return;
     }
 
-    Alert.alert("DEBUG 2", "Camera permission check: " + JSON.stringify(cameraPermission));
     try {
       if (!cameraPermission?.granted) {
-        Alert.alert("DEBUG 3", "権限要求開始");
         const result = await requestCameraPermission();
-        Alert.alert("DEBUG 4", "権限要求結果: " + JSON.stringify(result));
         if (!result.granted) {
           Alert.alert("権限エラー", "カメラ権限を許可してください");
           return;
         }
       }
-      Alert.alert("DEBUG 5", "Camera permission granted");
-    } catch (error) {
-      Alert.alert("DEBUG ERROR", "catch エラー: " + String(error));
+    } catch {
+      Alert.alert("未対応", "この環境ではカメラを起動できません。手入力をご利用ください");
       return;
     }
 
-    Alert.alert("DEBUG 6", "CameraView表示開始");
     setScanLocked(false);
     setScannerVisible(true);
-    Alert.alert("DEBUG 7", "CameraView表示完了");
   };
 
   const handleBarcodeScanned = async ({ data }: BarcodeScanningResult) => {
@@ -890,8 +881,9 @@ export function QRScreen({ route }: any) {
               facing="back"
               barcodeScannerSettings={{ barcodeTypes: ["qr"] }}
               onBarcodeScanned={handleBarcodeScanned}
-              onCameraReady={() => Alert.alert("DEBUG 8", "CameraView ready")}
-              onMountError={(error) => Alert.alert("DEBUG ERROR", "CameraView mount error: " + String(error))}
+              onMountError={() =>
+                Alert.alert("カメラ起動エラー", "カメラを起動できません。手入力をご利用ください")
+              }
             />
           </View>
         </View>
