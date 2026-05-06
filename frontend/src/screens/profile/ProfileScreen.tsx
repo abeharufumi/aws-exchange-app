@@ -176,7 +176,7 @@ export function ProfileScreen() {
         return;
       }
       await logout();
-      router.replace("/auth");
+      router.replace("/auth/login");
       return;
     }
 
@@ -186,7 +186,7 @@ export function ProfileScreen() {
         text: "ログアウト",
         onPress: async () => {
           await logout();
-          router.replace("/auth");
+          router.replace("/auth/login");
         },
       },
     ]);

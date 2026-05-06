@@ -55,7 +55,7 @@ function RootLayoutContent() {
             </>
           ) : (
             // 未認証時は認証画面
-            <Stack.Screen name="auth/index" options={{ headerShown: false }} />
+            <Stack.Screen name="auth/login" options={{ headerShown: false }} />
           )}
         </Stack>
         <StatusBar style="auto" />
