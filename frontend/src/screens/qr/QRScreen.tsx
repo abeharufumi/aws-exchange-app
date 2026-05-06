@@ -471,37 +471,34 @@ export function QRScreen({ route }: any) {
   };
 
   const openScanner = async () => {
-    console.log("[openScanner] 開始");
-    console.log("[openScanner] qrEnabled:", qrEnabled, "status:", status);
-    
+    Alert.alert("DEBUG 1", "[openScanner] 開始\nqrEnabled: " + qrEnabled + "\nstatus: " + status);
+
     if (!qrEnabled || status === "completed") {
-      console.log("[openScanner] QR未有効化");
       Alert.alert("利用不可", "QR確認が有効になってからスキャンしてください");
       return;
     }
 
-    console.log("[openScanner] Camera permission check:", cameraPermission);
+    Alert.alert("DEBUG 2", "Camera permission check: " + JSON.stringify(cameraPermission));
     try {
       if (!cameraPermission?.granted) {
-        console.log("[openScanner] 権限要求開始");
+        Alert.alert("DEBUG 3", "権限要求開始");
         const result = await requestCameraPermission();
-        console.log("[openScanner] 権限要求結果:", result);
+        Alert.alert("DEBUG 4", "権限要求結果: " + JSON.stringify(result));
         if (!result.granted) {
-          console.log("[openScanner] 権限拒否");
           Alert.alert("権限エラー", "カメラ権限を許可してください");
           return;
         }
       }
-      console.log("[openScanner] Camera permission granted");
+      Alert.alert("DEBUG 5", "Camera permission granted");
     } catch (error) {
-      console.error("[openScanner] catch エラー:", error);
-      Alert.alert("未対応", "この環境ではカメラを起動できません。手入力をご利用ください");
+      Alert.alert("DEBUG ERROR", "catch エラー: " + String(error));
       return;
     }
 
-    console.log("[openScanner] CameraView表示");
+    Alert.alert("DEBUG 6", "CameraView表示開始");
     setScanLocked(false);
     setScannerVisible(true);
+    Alert.alert("DEBUG 7", "CameraView表示完了");
   };
 
   const handleBarcodeScanned = async ({ data }: BarcodeScanningResult) => {
@@ -893,8 +890,8 @@ export function QRScreen({ route }: any) {
               facing="back"
               barcodeScannerSettings={{ barcodeTypes: ["qr"] }}
               onBarcodeScanned={handleBarcodeScanned}
-              onCameraReady={() => console.log("[CameraView] ready")}
-              onMountError={(error) => console.error("[CameraView] mount error:", error)}
+              onCameraReady={() => Alert.alert("DEBUG 8", "CameraView ready")}
+              onMountError={(error) => Alert.alert("DEBUG ERROR", "CameraView mount error: " + String(error))}
             />
           </View>
         </View>
