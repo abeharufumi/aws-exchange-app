@@ -9,6 +9,7 @@ from pydantic import BaseModel
 from datetime import datetime, date, time
 from typing import Optional
 import math
+from zoneinfo import ZoneInfo
 from database import get_db
 from utils.dependencies import get_current_user
 from utils.rank import (
@@ -171,6 +172,7 @@ class QRInfoResponse(BaseModel):
 MEET_CENTER_LAT = 33.589886
 MEET_CENTER_LON = 130.420685
 MEET_ALLOWED_RADIUS_METERS = 500.0
+APP_TIMEZONE = ZoneInfo("Asia/Tokyo")
 
 
 def _resolve_meet_center(
@@ -207,7 +209,8 @@ def _is_qr_available_now(scheduled_date_value, scheduled_time_value) -> bool:
     meet_at = _to_meet_datetime(scheduled_date_value, scheduled_time_value)
     if not meet_at:
         return False
-    return datetime.now() >= meet_at
+    # scheduled_date/scheduled_time are entered as Japan local wall-clock time.
+    return datetime.now(APP_TIMEZONE).replace(tzinfo=None) >= meet_at
 
 
 def _distance_meters(lat1: float, lon1: float, lat2: float, lon2: float) -> float:

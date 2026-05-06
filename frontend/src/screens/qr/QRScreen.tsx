@@ -471,21 +471,22 @@ export function QRScreen({ route }: any) {
   };
 
   const openScanner = async () => {
-    if (Platform.OS === "web") {
-      Alert.alert("未対応", "Webではカメラスキャン非対応です。手入力をご利用ください");
-      return;
-    }
     if (!qrEnabled || status === "completed") {
       Alert.alert("利用不可", "QR確認が有効になってからスキャンしてください");
       return;
     }
 
-    if (!cameraPermission?.granted) {
-      const result = await requestCameraPermission();
-      if (!result.granted) {
-        Alert.alert("権限エラー", "カメラ権限を許可してください");
-        return;
+    try {
+      if (!cameraPermission?.granted) {
+        const result = await requestCameraPermission();
+        if (!result.granted) {
+          Alert.alert("権限エラー", "カメラ権限を許可してください");
+          return;
+        }
       }
+    } catch {
+      Alert.alert("未対応", "この環境ではカメラを起動できません。手入力をご利用ください");
+      return;
     }
 
     setScanLocked(false);
