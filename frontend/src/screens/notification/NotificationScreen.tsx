@@ -89,7 +89,7 @@ export function NotificationScreen() {
     if (stopPolling) {
       return;
     }
-    const interval = setInterval(fetchNotifications, 5000);
+    const interval = setInterval(fetchNotifications, 60000); // 1分に1回へ変更（APIスパム防止）
     fetchNotifications();
     return () => clearInterval(interval);
   }, [stopPolling]);

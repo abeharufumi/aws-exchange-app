@@ -41,7 +41,7 @@ export default function TabLayout() {
     };
 
     fetchUnreadCount();
-    const interval = setInterval(fetchUnreadCount, 10000);
+    const interval = setInterval(fetchUnreadCount, 60000); // 1分に1回へ変更（APIスパム防止）
 
     return () => {
       active = false;
