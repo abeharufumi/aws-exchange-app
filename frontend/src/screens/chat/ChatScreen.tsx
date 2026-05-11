@@ -294,7 +294,7 @@ export function ChatScreen({ route }: any) {
       if (stopPolling) {
         return;
       }
-      
+
       let interval: ReturnType<typeof setInterval> | null = null;
       let currentAppState = AppState.currentState;
 
@@ -306,7 +306,7 @@ export function ChatScreen({ route }: any) {
         interval = setInterval(() => {
           fetchMessages();
           fetchMeetStatus();
-        }, 3000); // 3秒間隔（アクティブ時＆フォーカス時のみ）
+        }, 60000); // 60秒間隔（アクティブ時＆フォーカス時のみ）へ変更（短期間隔によるAPIスパム防止）
       };
 
       const stopPollingTimer = () => {
@@ -333,7 +333,7 @@ export function ChatScreen({ route }: any) {
         stopPollingTimer();
         subscription.remove();
       };
-    }, [fetchMessages, fetchMeetStatus, fetchPartnerProfile, fetchMessageQuota, stopPolling])
+    }, [fetchMessages, fetchMeetStatus, fetchPartnerProfile, fetchMessageQuota, stopPolling]),
   );
 
   useEffect(() => {
