@@ -10,8 +10,9 @@ import {
   TouchableOpacity,
   type ViewToken,
   View,
+  AppState,
 } from "react-native";
-import { useRouter } from "expo-router";
+import { useRouter, useFocusEffect } from "expo-router";
 import { Button, TextInput as PaperTextInput } from "react-native-paper";
 import { ScreenBackButton } from "../../components/common/ScreenBackButton";
 import { StatusInfoBox } from "../../components/common/StatusInfoBox";
@@ -288,20 +289,52 @@ export function ChatScreen({ route }: any) {
     }
   }, [chatUserId, fetchReviewStatus]);
 
-  useEffect(() => {
-    if (stopPolling) {
-      return;
-    }
-    const interval = setInterval(() => {
-      fetchMessages();
-      fetchMeetStatus();
-    }, 3000);
-    fetchMessages();
-    fetchPartnerProfile();
-    fetchMeetStatus();
-    fetchMessageQuota();
-    return () => clearInterval(interval);
-  }, [fetchMessages, fetchMeetStatus, fetchPartnerProfile, fetchMessageQuota, stopPolling]);
+  useFocusEffect(
+    useCallback(() => {
+      if (stopPolling) {
+        return;
+      }
+      
+      let interval: ReturnType<typeof setInterval> | null = null;
+      let currentAppState = AppState.currentState;
+
+      const startPolling = () => {
+        fetchMessages();
+        fetchPartnerProfile();
+        fetchMeetStatus();
+        fetchMessageQuota();
+        interval = setInterval(() => {
+          fetchMessages();
+          fetchMeetStatus();
+        }, 3000); // 3秒間隔（アクティブ時＆フォーカス時のみ）
+      };
+
+      const stopPollingTimer = () => {
+        if (interval) {
+          clearInterval(interval);
+          interval = null;
+        }
+      };
+
+      if (currentAppState === "active") {
+        startPolling();
+      }
+
+      const subscription = AppState.addEventListener("change", (nextAppState) => {
+        if (currentAppState.match(/inactive|background/) && nextAppState === "active") {
+          startPolling();
+        } else if (nextAppState.match(/inactive|background/)) {
+          stopPollingTimer();
+        }
+        currentAppState = nextAppState;
+      });
+
+      return () => {
+        stopPollingTimer();
+        subscription.remove();
+      };
+    }, [fetchMessages, fetchMeetStatus, fetchPartnerProfile, fetchMessageQuota, stopPolling])
+  );
 
   useEffect(() => {
     const timer = setInterval(() => setNowTick(Date.now()), 30000);
