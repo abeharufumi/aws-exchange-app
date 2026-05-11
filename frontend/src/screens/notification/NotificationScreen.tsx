@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { Alert, FlatList, Text, TouchableOpacity, View } from "react-native";
-import { useRouter } from "expo-router";
+import { useRouter, useFocusEffect } from "expo-router";
 import { ActionButton } from "../../components/common/ActionButton";
 import { ActionButtonRow } from "../../components/common/ActionButtonRow";
 import { EmptyState } from "../../components/common/EmptyState";
@@ -85,14 +85,26 @@ export function NotificationScreen() {
   const [loading, setLoading] = useState(true);
   const [stopPolling, setStopPolling] = useState(false);
 
-  useEffect(() => {
-    if (stopPolling) {
-      return;
-    }
-    const interval = setInterval(fetchNotifications, 60000); // 1分に1回へ変更（APIスパム防止）
-    fetchNotifications();
-    return () => clearInterval(interval);
-  }, [stopPolling]);
+  useFocusEffect(
+    useCallback(() => {
+      if (stopPolling) {
+        return;
+      }
+
+      let interval: ReturnType<typeof setInterval>;
+
+      const startPolling = () => {
+        fetchNotifications();
+        interval = setInterval(fetchNotifications, 60000); // 1分に1回へ変更
+      };
+
+      startPolling();
+
+      return () => {
+        if (interval) clearInterval(interval);
+      };
+    }, [stopPolling]),
+  );
 
   const fetchNotifications = async () => {
     try {

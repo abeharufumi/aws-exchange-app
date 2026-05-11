@@ -1,5 +1,6 @@
 import { Tabs } from "expo-router";
 import React, { useEffect, useState } from "react";
+import { AppState } from "react-native";
 
 import { HapticTab } from "@/components/haptic-tab";
 import { IconSymbol } from "@/components/ui/icon-symbol";
@@ -18,6 +19,8 @@ export default function TabLayout() {
     }
 
     let active = true;
+    let interval: ReturnType<typeof setInterval> | null = null;
+    let currentAppState = AppState.currentState;
 
     const fetchUnreadCount = async () => {
       try {
@@ -40,12 +43,37 @@ export default function TabLayout() {
       }
     };
 
-    fetchUnreadCount();
-    const interval = setInterval(fetchUnreadCount, 60000); // 1分に1回へ変更（APIスパム防止）
+    const startPolling = () => {
+      if (!interval) {
+        fetchUnreadCount();
+        interval = setInterval(fetchUnreadCount, 60000); // 1分に1回へ変更
+      }
+    };
+
+    const stopPollingTimer = () => {
+      if (interval) {
+        clearInterval(interval);
+        interval = null;
+      }
+    };
+
+    if (currentAppState === "active") {
+      startPolling();
+    }
+
+    const subscription = AppState.addEventListener("change", (nextAppState) => {
+      if (currentAppState.match(/inactive|background/) && nextAppState === "active") {
+        startPolling();
+      } else if (nextAppState.match(/inactive|background/)) {
+        stopPollingTimer();
+      }
+      currentAppState = nextAppState;
+    });
 
     return () => {
       active = false;
-      clearInterval(interval);
+      stopPollingTimer();
+      subscription.remove();
     };
   }, [stopPolling]);
 
