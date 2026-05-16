@@ -14,23 +14,16 @@ def get_boto3_client():
 def extract_tags_for_embedding(bio: str) -> str:
     client = get_boto3_client()
     try:
+        system_prompt = """抽出タスク：自己紹介文から職業、業界、ステータス、趣味に関する単語のみをカンマ区切りで抽出せよ。
+厳守ルール：
+- 文章にない職業や業界を絶対に捏造しないこと。
+- Web制作やプログラミング等があれば「IT」「エンジニア」という上位概念の単語を追加すること。
+- 出力は単語のみ。"""
         body = json.dumps({
             "schemaVersion": "messages-v1",
-            "system": [
-                {
-                    "text": "あなたは自己紹介文から属性タグを抽出するシステムです。入力された文章のみに基づき、5〜10個の抽象化・標準化されたキーワード（例「IT」「エンジニア」「学生」「趣味」など）をカンマ区切りで出力してください。文章にない情報を勝手に追加しないでください。"
-                }
-            ],
-            "messages": [
-                {
-                    "role": "user",
-                    "content": [{"text": bio}]
-                }
-            ],
-            "inferenceConfig": {
-                "maxTokens": 50,
-                "temperature": 0.0
-            }
+            "system": [{"text": system_prompt}],
+            "messages": [{"role": "user", "content": [{"text": bio}]}],
+            "inferenceConfig": {"maxTokens": 50, "temperature": 0.0}
         })
         response = client.invoke_model(
             modelId=NOVA_MODEL_ID,
@@ -49,8 +42,9 @@ def generate_embedding(text: str) -> Optional[List[float]]:
     if not text or len(text.strip()) == 0:
         return None
 
+    # ONLY embed the tags, so Titan doesn't get distracted by grammar and mood!
     extracted_tags = extract_tags_for_embedding(text)
-    optimized_text = f"{extracted_tags}, {text}" if extracted_tags else text
+    optimized_text = extracted_tags if extracted_tags else text
     logger.info(f"Optimized text for embedding: {optimized_text}")
 
     client = get_boto3_client()
