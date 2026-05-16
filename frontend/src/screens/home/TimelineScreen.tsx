@@ -53,7 +53,7 @@ export function TimelineScreen() {
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      const response = await apiClient.get<UserCard[]>("/users/discover");
+      const response = await apiClient.get<UserCard[]>("/users/recommendations");
       setUsers(response.data);
       setCurrentIndex(0);
     } catch (error) {
@@ -249,6 +249,11 @@ export function TimelineScreen() {
             </View>
           )}
           <Animated.View style={[cardBaseStyle, animatedCardStyle]} {...panResponder.panHandlers}>
+            {currentUser.isRecommended && (
+              <View style={{ backgroundColor: "#1e40af", alignSelf: "flex-start", paddingHorizontal: 12, paddingVertical: 4, borderRadius: 16, marginBottom: 8 }}>
+                <Text style={{ color: "#fff", fontSize: 12, fontWeight: "bold" }}>おすすめ✨</Text>
+              </View>
+            )}
             <Text style={{ fontSize: 22, fontWeight: "bold", marginBottom: 12, color: "#111827" }}>
               {currentUser.displayName}
               {currentUser.age ? `, ${currentUser.age}` : ""}

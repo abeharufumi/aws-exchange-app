@@ -13,6 +13,7 @@ export interface UserCard {
   reviewAvg?: number;
   requestStatus?: "pending" | "matched" | "passed" | "expired" | string;
   requestCreatedAt?: string;
+  isRecommended?: boolean;
 }
 
 export interface PublicUserProfile {

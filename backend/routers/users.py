@@ -188,6 +188,7 @@ class UserCardResponse(BaseModel):
     isBoostActive: Optional[bool] = None  # Boost有効中か（true/false）
     onlineStatus: Optional[str] = None  # オンライン状態: 'online'/'offline'/'logged_out'
     lastActiveAt: Optional[datetime] = None  # 最終アクティブ日時
+    isRecommended: Optional[bool] = None  # AIレコメンド対象か
     lastLogoutAt: Optional[datetime] = None  # 最終ログアウト日時
 
 
@@ -308,14 +309,17 @@ def recommend_users(
             COALESCE(users.last_active_at, users.last_login, users.created_at) AS "lastActiveAt",
             users.last_logout_at AS "lastLogoutAt",
             req.status AS "requestStatus",
-            req.created_at AS "requestCreatedAt",
+            req.created_at AS "requestCreatedAt"
             -- similarity スコアも返すことができるが、UserCardResponse にはないので省略可能
-            -- { '1 - (user_profiles.bio_embedding <=> ?::vector) AS similarity' if my_embedding_str else '0 AS similarity' }
+
     """
     
     if my_embedding_str:
-        query += f", 1 - (user_profiles.bio_embedding <=> ?::vector) AS similarity"
+        query += f", 1 - (user_profiles.bio_embedding <=> CAST(? AS vector)) AS similarity, TRUE AS \"isRecommended\""
         map_params.append(my_embedding_str)
+    else:
+        query += ", FALSE AS \"isRecommended\""
+
     
     query += f"""
         FROM users
@@ -352,7 +356,7 @@ def recommend_users(
         query += f"""
             AND user_profiles.bio_embedding IS NOT NULL
             ORDER BY
-                (user_profiles.bio_embedding <=> ?::vector) ASC
+                (user_profiles.bio_embedding <=> CAST(? AS vector)) ASC
             LIMIT 100
         """
         map_params.append(my_embedding_str)
