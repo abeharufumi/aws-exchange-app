@@ -3,6 +3,7 @@ import { FlatList, Text, TouchableOpacity, View } from "react-native";
 import { ActivityIndicator, Button, Surface, TextInput } from "react-native-paper";
 import { useRouter } from "expo-router";
 import { UserPresenceStatus } from "../../components/common/UserPresenceStatus";
+import { RecommendedBadge } from "../../components/common/RecommendedBadge";
 import apiClient from "../../services/api";
 import { UserCard } from "../../types/user";
 
@@ -120,6 +121,7 @@ export function SearchScreen() {
                 paddingVertical: 16,
               }}
             >
+              {item.isRecommended && <RecommendedBadge style={{ marginBottom: 4 }} />}
               <Text style={{ marginBottom: 4, fontSize: 16, fontWeight: "bold", color: "#111827" }}>
                 {item.displayName}, {item.age}
               </Text>

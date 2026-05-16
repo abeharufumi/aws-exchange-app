@@ -241,7 +241,7 @@ def discover_users(
                 WHERE users.status = ?
                     AND users.id <> ?
         """
-    map_params = [current_user["id"], "active", current_user["id"]]
+    map_params.extend([current_user["id"], "active", current_user["id"]])
 
     target_gender = _resolve_target_gender(current_user["gender"])
     query += " AND users.gender = ?"
@@ -315,7 +315,8 @@ def recommend_users(
     """
     
     if my_embedding_str:
-        query += f", 1 - (user_profiles.bio_embedding <=> CAST(? AS vector)) AS similarity, TRUE AS \"isRecommended\""
+        query += f", 1 - (user_profiles.bio_embedding <=> CAST(? AS vector)) AS similarity, (1 - (user_profiles.bio_embedding <=> CAST(? AS vector)) > 0.3) AS \"isRecommended\""
+        map_params.append(my_embedding_str)
         map_params.append(my_embedding_str)
     else:
         query += ", FALSE AS \"isRecommended\""
@@ -396,6 +397,7 @@ def search_users(
     地域ベースの検索 + 年齢・ランク絞り込み
     """
 
+    map_params = []
     # ユーザー検索クエリ
     query = f"""
         SELECT users.id,
@@ -410,8 +412,26 @@ def search_users(
                {_presence_status_case('users')} AS "onlineStatus",
                COALESCE(users.last_active_at, users.last_login, users.created_at) AS "lastActiveAt",
                users.last_logout_at AS "lastLogoutAt",
-                   req.status AS "requestStatus",
-                   req.created_at AS "requestCreatedAt"
+               req.status AS "requestStatus",
+               req.created_at AS "requestCreatedAt"
+    """
+    
+    # 検索結果にも おすすめ✨ フラグを計算して返す
+    me_query = "SELECT bio_embedding::text FROM user_profiles WHERE user_id = ?"
+    me_rows = execQuery.execute_select(me_query, [current_user["id"]], db)
+    my_embedding_str = me_rows[0]["bio_embedding"] if me_rows and me_rows[0]["bio_embedding"] else None
+    
+    if my_embedding_str:
+        # ベクトルが存在する場合は類似度を計算し、例として類似度が高い(距離が近い、0.2以下など、あるいは単にベクトルがあればTRUEか)
+        # おすすめAPIと同じ基準(単におすすめバッジを出すなら)にするか、類似度上位ならTRUEにするか。
+        # 単に TRUE にするか？ timeline と同様に my_embedding_str があれば TRUE としておく
+        query += f", 1 - (user_profiles.bio_embedding <=> CAST(? AS vector)) AS similarity, (1 - (user_profiles.bio_embedding <=> CAST(? AS vector)) > 0.3) AS \"isRecommended\" "
+        map_params.append(my_embedding_str)
+        map_params.append(my_embedding_str)
+    else:
+        query += ", FALSE AS \"isRecommended\" "
+        
+    query += f"""
         FROM users
         JOIN user_profiles ON users.id = user_profiles.user_id
         JOIN user_ranks ON users.id = user_ranks.user_id
@@ -427,7 +447,7 @@ def search_users(
         WHERE users.status = ?
           AND users.id != ?
     """
-    map_params = [current_user["id"], "active", current_user["id"]]
+    map_params.extend([current_user["id"], "active", current_user["id"]])
 
     target_gender = _resolve_target_gender(current_user["gender"])
     query += " AND users.gender = ?"
@@ -590,7 +610,7 @@ def update_me(
 
     # Bioが更新された場合は、バックグラウンドでAmazon Bedrockによるベクトル化を実行する
     if payload.bio is not None:
-        background_tasks.add_task(update_bio_embedding_task, current_user["id"], payload.bio, db)
+        background_tasks.add_task(update_bio_embedding_task, current_user["id"], payload.bio)
 
     return {"status": "updated"}
 

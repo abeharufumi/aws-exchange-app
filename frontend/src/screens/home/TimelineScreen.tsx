@@ -9,6 +9,7 @@ import {
   View,
 } from "react-native";
 import { useRouter } from "expo-router";
+import { RecommendedBadge } from "../../components/common/RecommendedBadge";
 import { EmptyState } from "../../components/common/EmptyState";
 import { LoadingState } from "../../components/common/LoadingState";
 import apiClient from "../../services/api";
@@ -250,9 +251,7 @@ export function TimelineScreen() {
           )}
           <Animated.View style={[cardBaseStyle, animatedCardStyle]} {...panResponder.panHandlers}>
             {currentUser.isRecommended && (
-              <View style={{ backgroundColor: "#1e40af", alignSelf: "flex-start", paddingHorizontal: 12, paddingVertical: 4, borderRadius: 16, marginBottom: 8 }}>
-                <Text style={{ color: "#fff", fontSize: 12, fontWeight: "bold" }}>おすすめ✨</Text>
-              </View>
+              <RecommendedBadge />
             )}
             <Text style={{ fontSize: 22, fontWeight: "bold", marginBottom: 12, color: "#111827" }}>
               {currentUser.displayName}
