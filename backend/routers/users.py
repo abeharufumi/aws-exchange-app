@@ -315,7 +315,7 @@ def recommend_users(
     """
     
     if my_embedding_str:
-        query += f", 1 - (user_profiles.bio_embedding <=> CAST(? AS vector)) AS similarity, (1 - (user_profiles.bio_embedding <=> CAST(? AS vector)) > 0.12) AS \"isRecommended\""
+        query += f", 1 - (user_profiles.bio_embedding <=> CAST(? AS vector)) AS similarity, (1 - (user_profiles.bio_embedding <=> CAST(? AS vector)) > 0.20) AS \"isRecommended\""
         map_params.append(my_embedding_str)
         map_params.append(my_embedding_str)
     else:
@@ -425,7 +425,7 @@ def search_users(
         # ベクトルが存在する場合は類似度を計算し、例として類似度が高い(距離が近い、0.2以下など、あるいは単にベクトルがあればTRUEか)
         # おすすめAPIと同じ基準(単におすすめバッジを出すなら)にするか、類似度上位ならTRUEにするか。
         # 単に TRUE にするか？ timeline と同様に my_embedding_str があれば TRUE としておく
-        query += f", 1 - (user_profiles.bio_embedding <=> CAST(? AS vector)) AS similarity, (1 - (user_profiles.bio_embedding <=> CAST(? AS vector)) > 0.12) AS \"isRecommended\" "
+        query += f", 1 - (user_profiles.bio_embedding <=> CAST(? AS vector)) AS similarity, (1 - (user_profiles.bio_embedding <=> CAST(? AS vector)) > 0.20) AS \"isRecommended\" "
         map_params.append(my_embedding_str)
         map_params.append(my_embedding_str)
     else:
