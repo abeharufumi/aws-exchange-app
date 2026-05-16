@@ -211,6 +211,7 @@ def discover_users(
     ユーザー発見（タイムラインスワイプ用） (🔴P1-07)
     全ユーザーを取得（地域・フィルター条件なし）
     """
+    map_params = []
     query = f"""
                 SELECT users.id,
                              user_profiles.display_name AS "displayName",
@@ -274,7 +275,6 @@ def discover_users(
     return execQuery.execute_select(query, map_params, db)
 
 
-
 @router.get("/recommendations", response_model=List[UserCardResponse])
 def recommend_users(
     current_user: dict = Depends(get_current_user),
@@ -285,15 +285,17 @@ def recommend_users(
     自身と自己紹介の文脈が近いユーザーを優先表示する (Amazon Titan + pgvector)
     """
     map_params = []
-    
+
     # 1. 自身のベクトルを取得
     me_query = "SELECT bio_embedding::text FROM user_profiles WHERE user_id = ?"
     me_rows = execQuery.execute_select(me_query, [current_user["id"]], db)
-    
-    my_embedding_str = me_rows[0]["bio_embedding"] if me_rows and me_rows[0]["bio_embedding"] else None
+
+    my_embedding_str = (
+        me_rows[0]["bio_embedding"] if me_rows and me_rows[0]["bio_embedding"] else None
+    )
 
     target_gender = _resolve_target_gender(current_user["gender"])
-    
+
     # ベースとなるSELECT句とJOIN句
     query = f"""
         SELECT users.id,
@@ -313,15 +315,14 @@ def recommend_users(
             -- similarity スコアも返すことができるが、UserCardResponse にはないので省略可能
 
     """
-    
+
     if my_embedding_str:
-        query += f", 1 - (user_profiles.bio_embedding <=> CAST(? AS vector)) AS similarity, (1 - (user_profiles.bio_embedding <=> CAST(? AS vector)) > 0.20) AS \"isRecommended\""
+        query += f', 1 - (user_profiles.bio_embedding <=> CAST(? AS vector)) AS similarity, (1 - (user_profiles.bio_embedding <=> CAST(? AS vector)) > 0.20) AS "isRecommended"'
         map_params.append(my_embedding_str)
         map_params.append(my_embedding_str)
     else:
-        query += ", FALSE AS \"isRecommended\""
+        query += ', FALSE AS "isRecommended"'
 
-    
     query += f"""
         FROM users
         JOIN user_profiles ON users.id = user_profiles.user_id
@@ -415,22 +416,24 @@ def search_users(
                req.status AS "requestStatus",
                req.created_at AS "requestCreatedAt"
     """
-    
+
     # 検索結果にも おすすめ✨ フラグを計算して返す
     me_query = "SELECT bio_embedding::text FROM user_profiles WHERE user_id = ?"
     me_rows = execQuery.execute_select(me_query, [current_user["id"]], db)
-    my_embedding_str = me_rows[0]["bio_embedding"] if me_rows and me_rows[0]["bio_embedding"] else None
-    
+    my_embedding_str = (
+        me_rows[0]["bio_embedding"] if me_rows and me_rows[0]["bio_embedding"] else None
+    )
+
     if my_embedding_str:
         # ベクトルが存在する場合は類似度を計算し、例として類似度が高い(距離が近い、0.2以下など、あるいは単にベクトルがあればTRUEか)
         # おすすめAPIと同じ基準(単におすすめバッジを出すなら)にするか、類似度上位ならTRUEにするか。
         # 単に TRUE にするか？ timeline と同様に my_embedding_str があれば TRUE としておく
-        query += f", 1 - (user_profiles.bio_embedding <=> CAST(? AS vector)) AS similarity, (1 - (user_profiles.bio_embedding <=> CAST(? AS vector)) > 0.20) AS \"isRecommended\" "
+        query += f', 1 - (user_profiles.bio_embedding <=> CAST(? AS vector)) AS similarity, (1 - (user_profiles.bio_embedding <=> CAST(? AS vector)) > 0.20) AS "isRecommended" '
         map_params.append(my_embedding_str)
         map_params.append(my_embedding_str)
     else:
-        query += ", FALSE AS \"isRecommended\" "
-        
+        query += ', FALSE AS "isRecommended" '
+
     query += f"""
         FROM users
         JOIN user_profiles ON users.id = user_profiles.user_id

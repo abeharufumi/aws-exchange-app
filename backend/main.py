@@ -37,13 +37,11 @@ def _expire_pending_matching_requests():
     db: Session = SessionLocal()
     try:
         # 期限切れ対象を取得
-        select_query = text(
-            """
+        select_query = text("""
             SELECT id, from_user_id, to_user_id FROM matching_requests
             WHERE status = 'pending'
               AND created_at < NOW() - INTERVAL '7 days'
-            """
-        )
+            """)
         expired_rows = db.execute(select_query).fetchall()
 
         if expired_rows:
@@ -56,12 +54,10 @@ def _expire_pending_matching_requests():
             # 送信者へ通知
             for row in expired_rows:
                 db.execute(
-                    text(
-                        """
+                    text("""
                         INSERT INTO notifications (user_id, target_user_id, content, type, is_read, created_at)
                         VALUES (:uid, :target_user_id, :content, 'match_expired', FALSE, NOW())
-                    """
-                    ),
+                    """),
                     {
                         "uid": row[1],
                         "target_user_id": row[2],
@@ -117,6 +113,18 @@ async def lifespan(application: FastAPI):
                     "REFERENCES users(id) ON DELETE SET NULL"
                 )
             )
+
+            # ensure vector extension and column exist
+            conn.execute(text("CREATE EXTENSION IF NOT EXISTS vector"))
+            try:
+                conn.execute(
+                    text(
+                        "ALTER TABLE user_profiles ADD COLUMN IF NOT EXISTS bio_embedding vector(1024)"
+                    )
+                )
+            except Exception as e:
+                print(f"[Migration] Vector column add error: {e}")
+
             conn.commit()
     except Exception as e:
         print(f"[Migration] Warning: {e}")

@@ -2,6 +2,8 @@
 -- テーブル定義スクリプト
 -- 実行方法: psql -U postgres -d aws_exchange_app -f schema.sql
 
+CREATE EXTENSION IF NOT EXISTS vector;
+
 -- 既存のテーブルを削除（開発環境のみ）
 DROP TABLE IF EXISTS user_statistics CASCADE;
 DROP TABLE IF EXISTS monthly_revenue CASCADE;
@@ -63,6 +65,7 @@ CREATE TABLE user_profiles (
     age INTEGER,
     location VARCHAR(100),
     bio TEXT,
+    bio_embedding vector(1024),
     avatar_url VARCHAR(255),
     icon_frame_id INTEGER,
     last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP
