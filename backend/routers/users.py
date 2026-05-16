@@ -273,6 +273,107 @@ def discover_users(
     return execQuery.execute_select(query, map_params, db)
 
 
+
+@router.get("/recommendations", response_model=List[UserCardResponse])
+def recommend_users(
+    current_user: dict = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """
+    AIレコメンド（プロフィール類似度に基づくユーザー発見）
+    自身と自己紹介の文脈が近いユーザーを優先表示する (Amazon Titan + pgvector)
+    """
+    map_params = []
+    
+    # 1. 自身のベクトルを取得
+    me_query = "SELECT bio_embedding::text FROM user_profiles WHERE user_id = ?"
+    me_rows = execQuery.execute_select(me_query, [current_user["id"]], db)
+    
+    my_embedding_str = me_rows[0]["bio_embedding"] if me_rows and me_rows[0]["bio_embedding"] else None
+
+    target_gender = _resolve_target_gender(current_user["gender"])
+    
+    # ベースとなるSELECT句とJOIN句
+    query = f"""
+        SELECT users.id,
+            user_profiles.display_name AS "displayName",
+            user_profiles.age,
+            user_profiles.location,
+            user_profiles.bio,
+            user_ranks.current_rank AS rank,
+            user_ranks.review_avg AS "reviewAvg",
+            {_premium_active_clause('users')} AS "isPremiumActive",
+            {_boost_active_clause('users')} AS "isBoostActive",
+            {_presence_status_case('users')} AS "onlineStatus",
+            COALESCE(users.last_active_at, users.last_login, users.created_at) AS "lastActiveAt",
+            users.last_logout_at AS "lastLogoutAt",
+            req.status AS "requestStatus",
+            req.created_at AS "requestCreatedAt",
+            -- similarity スコアも返すことができるが、UserCardResponse にはないので省略可能
+            -- { '1 - (user_profiles.bio_embedding <=> ?::vector) AS similarity' if my_embedding_str else '0 AS similarity' }
+    """
+    
+    if my_embedding_str:
+        query += f", 1 - (user_profiles.bio_embedding <=> ?::vector) AS similarity"
+        map_params.append(my_embedding_str)
+    
+    query += f"""
+        FROM users
+        JOIN user_profiles ON users.id = user_profiles.user_id
+        JOIN user_ranks ON users.id = user_ranks.user_id
+        LEFT JOIN LATERAL (
+            SELECT mr.status,
+                   mr.created_at
+            FROM matching_requests mr
+            WHERE mr.from_user_id = ?
+              AND mr.to_user_id = users.id
+            ORDER BY mr.created_at DESC
+            LIMIT 1
+        ) req ON TRUE
+        WHERE users.status = 'active'
+          AND users.id <> ?
+          AND users.gender = ?
+    """
+    map_params.extend([current_user["id"], current_user["id"], target_gender])
+
+    # passed / matched 済みユーザーを除外
+    query += """
+        AND NOT EXISTS (
+            SELECT 1 FROM matching_requests excl
+            WHERE excl.from_user_id = ?
+              AND excl.to_user_id = users.id
+              AND excl.status IN ('passed', 'matched', 'pending')
+        )
+    """
+    map_params.append(current_user["id"])
+
+    # ベクトルが存在する場合は類似度順にソート、存在しない場合は通常のアクティブ順
+    if my_embedding_str:
+        query += f"""
+            AND user_profiles.bio_embedding IS NOT NULL
+            ORDER BY
+                (user_profiles.bio_embedding <=> ?::vector) ASC
+            LIMIT 100
+        """
+        map_params.append(my_embedding_str)
+    else:
+        # フォールバック: 通常のdiscoverと同じ並び順
+        query += f"""
+            ORDER BY
+                CASE
+                    WHEN {_boost_active_clause('users')} THEN 0
+                    WHEN user_ranks.current_rank = 5 THEN 1
+                    WHEN user_ranks.current_rank = 4 THEN 2
+                    WHEN user_ranks.current_rank = 3 THEN 3
+                    ELSE 4
+                END ASC,
+                {_activity_order_clause('users')}
+            LIMIT 100
+        """
+
+    return execQuery.execute_select(query, map_params, db)
+
+
 @router.get("/search", response_model=List[UserCardResponse])
 def search_users(
     current_user: dict = Depends(get_current_user),
