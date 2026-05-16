@@ -3,7 +3,7 @@
 検索、発見、プロフィール取得
 """
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, BackgroundTasks
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
 from typing import Any, List, Optional
@@ -11,6 +11,7 @@ from datetime import datetime
 from database import get_db
 from utils.dependencies import get_current_user
 from utils.rank import build_rank_progress
+from utils.embedding_task import update_bio_embedding_task
 import execQuery
 
 router = APIRouter(prefix="/api/users", tags=["users"])
@@ -443,6 +444,7 @@ def get_me(current_user: dict = Depends(get_current_user), db: Session = Depends
 @router.patch("/me")
 def update_me(
     payload: ProfileUpdateRequest,
+    background_tasks: BackgroundTasks,
     current_user: dict = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
@@ -480,6 +482,10 @@ def update_me(
     updated_count = execQuery.execute_update(query, map_params, db)
     if updated_count == 0:
         raise HTTPException(status_code=404, detail="Profile not found")
+
+    # Bioが更新された場合は、バックグラウンドでAmazon Bedrockによるベクトル化を実行する
+    if payload.bio is not None:
+        background_tasks.add_task(update_bio_embedding_task, current_user["id"], payload.bio, db)
 
     return {"status": "updated"}
 
