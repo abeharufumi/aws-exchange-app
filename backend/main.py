@@ -29,6 +29,8 @@ from routers import (
     fanclub,
     call_tickets,
     gifts,
+,
+    chatbot
 )
 
 
@@ -162,6 +164,7 @@ app.add_middleware(
 app.include_router(auth.router)
 app.include_router(auth.router, prefix="/api")
 app.include_router(users.router)
+app.include_router(chatbot.router)
 app.include_router(matches.router)
 app.include_router(notifications.router)
 app.include_router(chat.router)
