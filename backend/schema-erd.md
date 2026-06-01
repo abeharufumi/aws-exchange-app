@@ -341,6 +341,37 @@ erDiagram
         numeric avg_arpu "平均ARPU"
         timestamp created_at "作成日時"
     }
+
+  %% ==========================================
+  %% P3: AIコンシェルジュ (AI Chatbot)
+  %% ==========================================
+  ai_chat_sessions {
+    uuid id PK
+    bigint user_id FK
+    varchar title
+    timestamp created_at
+    timestamp updated_at
+  }
+
+  ai_chat_messages {
+    bigserial id PK
+    uuid session_id FK
+    varchar role
+    text content
+    timestamp created_at
+  }
+
+  ai_knowledge_base {
+    bigserial id PK
+    varchar category
+    varchar title
+    text content
+    vector content_embedding
+    boolean is_active
+    timestamp created_at
+    timestamp updated_at
+  }
+
 ```
 
 ## テーブル構成サマリー
@@ -380,3 +411,10 @@ erDiagram
 - `monthly_revenue` - 月次売上集計
 
 **総テーブル数: 26テーブル**
+
+
+  %% ==========================================
+  %% リレーションシップ - P3: AIコンシェルジュ
+  %% ==========================================
+  users ||--o{ ai_chat_sessions : "1:N (has_many)"
+  ai_chat_sessions ||--o{ ai_chat_messages : "1:N (contains)"
