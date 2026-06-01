@@ -264,3 +264,27 @@ BEGIN
     RAISE NOTICE '🔔 通知: 18件';
     RAISE NOTICE '🔗 マッチング: 22件';
 END $$;
+
+-- =========================================
+-- AIコンシェルジュ機能 (AI Chatbot) のサンプルデータ
+-- =========================================
+
+-- 1. AIナレッジベース (RAG用FAQ)
+-- note: content_embedding は Bedrock 側で生成するためダミーや NULL からスタートするか、
+--       今回はとりあえず NULL にしておき後でパッチを当てる等の運用を想定します。
+INSERT INTO ai_knowledge_base (category, title, content) VALUES
+('app_usage', 'ポイントの購入方法', 'ポイントは、マイページの「ポイント購入」からクレジットカードやアプリ内決済で購入できます。'),
+('app_usage', '退会方法', '設定画面の下部にある「退会する」ボタンから退会手続きが行えます。退会すると全てのデータが削除されます。'),
+('profile_advice', 'マッチングしやすいプロフィールのコツ', '顔がはっきりとわかる明るい写真を選び、自己紹介文には趣味や休日の過ごし方を具体的に書くとマッチング率が上がります。'),
+('system', '禁止事項について', '誹謗中傷、公序良俗に反する行為、外部サービスへの誘導などは禁止されています。違反した場合はアカウント停止の対象となります。');
+
+-- 2. サンプルAI会話セッション
+INSERT INTO ai_chat_sessions (id, user_id, title) VALUES
+('aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee', 1, 'アプリの使い方について'),
+('11111111-2222-3333-4444-555555555555', 2, 'プロフィールの相談');
+
+-- 3. サンプルAIメッセージ履歴
+INSERT INTO ai_chat_messages (session_id, role, content)
+VALUES
+('aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee', 'user', 'ポイントの購入方法を教えてください'),
+('aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee', 'assistant', 'ポイントは、マイページの「ポイント購入」からクレジットカードやアプリ内決済で購入できます。');
