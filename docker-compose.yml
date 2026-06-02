@@ -11,7 +11,7 @@ services:
       POSTGRES_PASSWORD: password
       POSTGRES_DB: exchange_db
     ports:
-      - "5433:5432"
+      - "5432:5432"
 
   # DBの中身を見る管理画面 (pgAdmin) - ブラウザで見れます
   pgadmin:

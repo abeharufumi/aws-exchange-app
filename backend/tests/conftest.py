@@ -5,14 +5,14 @@ from sqlalchemy.orm import sessionmaker
 from fastapi.testclient import TestClient
 
 # モジュールインポート前に環境変数をテスト用に上書き
-os.environ["DATABASE_URL"] = "postgresql://user:password@127.0.0.1:5433/exchange_test_db"
+os.environ["DATABASE_URL"] = "postgresql://user:password@127.0.0.1:5432/exchange_test_db"
 os.environ["SECRET_KEY"] = "test_super_secret"
 
 # これらは環境変数を上書きした後にインポートする
 from main import app
 from database import get_db
 
-TEST_DATABASE_URL_NO_DB = "postgresql://user:password@127.0.0.1:5433/exchange_db"
+TEST_DATABASE_URL_NO_DB = "postgresql://user:password@127.0.0.1:5432/exchange_db"
 TEST_DATABASE_URL = os.environ["DATABASE_URL"]
 
 
