@@ -421,12 +421,53 @@ CREATE TABLE user_statistics (
 
 CREATE INDEX idx_user_statistics_date ON user_statistics(date);
 
+
+-- =========================================
+-- AIコンシェルジュ機能 (AI Chatbot)
+-- =========================================
+
+-- AI会話セッション
+CREATE TABLE ai_chat_sessions (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    title VARCHAR(100),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX idx_ai_chat_sessions_user_id ON ai_chat_sessions(user_id);
+CREATE INDEX idx_ai_chat_sessions_updated_at ON ai_chat_sessions(updated_at DESC);
+
+-- AIメッセージ履歴
+CREATE TABLE ai_chat_messages (
+    id BIGSERIAL PRIMARY KEY,
+    session_id UUID NOT NULL REFERENCES ai_chat_sessions(id) ON DELETE CASCADE,
+    role VARCHAR(20) NOT NULL CHECK (role IN ('user', 'assistant', 'system')),
+    content TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX idx_ai_chat_messages_session_id ON ai_chat_messages(session_id);
+
+-- AIナレッジベース (RAG用)
+CREATE TABLE ai_knowledge_base (
+    id BIGSERIAL PRIMARY KEY,
+    category VARCHAR(50) NOT NULL,
+    title VARCHAR(100) NOT NULL,
+    content TEXT NOT NULL,
+    content_embedding vector(1024),
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX idx_ai_knowledge_base_category ON ai_knowledge_base(category);
+
+
+
 -- 完了メッセージ
 DO $$
 BEGIN
     RAISE NOTICE '✅ スキーマ作成完了！';
-    RAISE NOTICE '📊 テーブル数: 31個';
+    RAISE NOTICE '📊 テーブル数: 34個';
     RAISE NOTICE '🔴 P1テーブル: 11個';
     RAISE NOTICE '🟠 P2テーブル: 8個';
-    RAISE NOTICE '🟡 P3テーブル: 12個';
+    RAISE NOTICE '🟡 P3テーブル: 15個 (AIボット含む)';
 END $$;
