@@ -42,16 +42,16 @@ if [ -z "$TOKEN" ]; then
     echo "🚀 Schemathesisテスト実行中（認証なし）..."
     schemathesis run http://localhost:8000/openapi.json \
         --checks all \
-        --hypothesis-max-examples=10 \
-        --hypothesis-seed=1
+        --max-examples=10 \
+        --seed=1
 else
     echo "✅ トークン取得成功"
     echo ""
     echo "🚀 Schemathesisテスト実行中（認証あり）..."
     schemathesis run http://localhost:8000/openapi.json \
         --checks all \
-        --hypothesis-max-examples=10 \
-        --hypothesis-seed=1 \
+        --max-examples=10 \
+        --seed=1 \
         --header "Authorization: Bearer $TOKEN"
 fi
 
