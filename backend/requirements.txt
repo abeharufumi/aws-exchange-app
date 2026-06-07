@@ -12,3 +12,4 @@ python-dotenv==1.0.0
 requests==2.31.0
 boto3
 pgvector
+schemathesis>=3.19.0
