@@ -11,6 +11,11 @@ backend/.venv/
 **/__pycache__/
 *.py[cod]
 
+# pytest
+.pytest_cache/
+htmlcov/
+.coverage
+
 # Expo
 frontend/.expo/
 frontend/dist/
