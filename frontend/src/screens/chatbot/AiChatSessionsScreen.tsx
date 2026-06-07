@@ -8,7 +8,11 @@ import { Colors } from "../../../constants/theme";
 import { useColorScheme } from "../../../hooks/use-color-scheme";
 import { IconSymbol } from "../../../components/ui/icon-symbol";
 
-export function AiChatSessionsScreen() {
+interface AiChatSessionsScreenProps {
+  showHeader?: boolean;
+}
+
+export function AiChatSessionsScreen({ showHeader = true }: AiChatSessionsScreenProps = {}) {
   const router = useRouter();
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? "light"];
@@ -82,7 +86,7 @@ export function AiChatSessionsScreen() {
 
   return (
     <ThemedView style={{ flex: 1 }}>
-      <Stack.Screen options={{ title: "AI コンシェルジュ履歴", headerBackTitle: "戻る" }} />
+      {showHeader && <Stack.Screen options={{ title: "AI コンシェルジュ履歴", headerBackTitle: "戻る" }} />}
       
       <View style={{ padding: 16, borderBottomWidth: 1, borderBottomColor: borderColor }}>
         <TouchableOpacity 
