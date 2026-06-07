@@ -118,6 +118,7 @@ export default function TabLayout() {
         name="ai-concierge"
         options={{
           title: "AI",
+          headerShown: false,
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="sparkles" color={color} />,
         }}
       />
